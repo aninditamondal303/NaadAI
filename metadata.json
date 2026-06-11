@@ -1,0 +1,6 @@
+{
+  "name": "NaadAI",
+  "description": "AI-Powered Musical Digital Twin for Hindustani Classical Vocalists, providing real-time Swara tuner, Tanpura drone synthesizer, Taal rhythm matcher, and Pandit Naad-Guru coaching interface.",
+  "requestFramePermissions": ["microphone"],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
