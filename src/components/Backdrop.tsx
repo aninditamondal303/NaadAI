@@ -8,7 +8,7 @@ import { Sparkles, Moon, Sun, Sunrise, Sunset, ShieldAlert, Music } from 'lucide
 
 interface BackdropProps {
   timeOfDay: string;
-  themeId: "peacock" | "sunset" | "monsoon";
+  themeId: "peacock" | "sunset" | "monsoon" | "midnight";
 }
 
 interface ThemeState {
