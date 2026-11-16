@@ -11,22 +11,10 @@ import {
 } from 'lucide-react';
 import { ALL_84_RAAGS, ComprehensiveRaag } from '../data/allRaags';
 import { addRecord, newId } from '../lib/practiceHistory';
+import { firstStringForRaag, STRING_ORDER, TanpuraEngine, type FirstString } from '../audio/tanpura';
+import { westernNote } from '../analysis/music';
 
 // Pitch frequencies corresponding to classical standard scales (C3 base standard)
-const NOTE_PITCHES = [
-  { note: "C", hz: 130.81 },
-  { note: "C#", hz: 138.59 },
-  { note: "D", hz: 146.83 },
-  { note: "D#", hz: 155.56 },
-  { note: "E", hz: 164.81 },
-  { note: "F", hz: 174.61 },
-  { note: "F#", hz: 185.00 },
-  { note: "G", hz: 196.00 },
-  { note: "G#", hz: 207.65 },
-  { note: "A", hz: 220.00 },
-  { note: "A#", hz: 233.08 },
-  { note: "B", hz: 246.94 }
-];
 
 interface PracticeSession {
   raagId: string;
@@ -243,7 +231,6 @@ export const HomeTab: React.FC<HomeTabProps> = ({
   const [activePractice, setActivePractice] = useState<PracticeSession | null>(null);
   const [savedMessage, setSavedMessage] = useState<string | null>(null);
   const [selectedPracticeRaag, setSelectedPracticeRaag] = useState<string>("yaman");
-  const [selectedPracticeScale, setSelectedPracticeScale] = useState<string>("C#");
   const [selectedPracticeDuration, setSelectedPracticeScaleDuration] = useState<number>(30);
   
   // Pluck indicator active wave state (0-3 strings)
@@ -251,9 +238,6 @@ export const HomeTab: React.FC<HomeTabProps> = ({
 
   // Audio Context Ref block for Practice Mode Tanpura
   const audioCtxRef = useRef<AudioContext | null>(null);
-  const masterGainRef = useRef<GainNode | null>(null);
-  const sequencerTimeoutRef = useRef<number | null>(null);
-  const stringIndexRef = useRef<number>(0);
   const practiceCountdownIntervalRef = useRef<number | null>(null);
 
   // Keep a live clock
@@ -271,9 +255,11 @@ export const HomeTab: React.FC<HomeTabProps> = ({
         setActivePractice(prev => {
           if (!prev) return null;
           if (prev.secondsRemaining <= 1) {
-            // Stop sound
+            // Session complete: stop the drone and save the full duration
             stopPracticeTanpura();
-            alert("Congratulations! You have completed your Riyāz standard segment safely. Pranam.");
+            addRecord({ kind: "riyaz-timer", id: newId(), dateIso: new Date().toISOString(), raagName: prev.raagName, minutes: prev.durationMins });
+            setSavedMessage(`Riyaz complete: saved ${prev.durationMins} min on ${prev.raagName}.`);
+            window.setTimeout(() => setSavedMessage(null), 5000);
             return null;
           }
           return {
@@ -301,145 +287,50 @@ export const HomeTab: React.FC<HomeTabProps> = ({
     };
   }, []);
 
-  // synthesized Tanpura physical pluck helper node
-  const playAcousticPluckSynth = (ctx: AudioContext, frequency: number, idx: number, volume: number) => {
-    // Standard detuning multiplier to simulate Jawari buzzing bridge
-    const tunedFreq = frequency;
-    const duration = 4.2;
+  // Shared tanpura engine (same sound and tuning as the Tanpura tab)
+  const tanpuraRef = useRef<TanpuraEngine | null>(null);
+  const cycleFromTempo = (bpm: number) => (4 * 60 / bpm) * 1.15;
 
-    const oscSaw = ctx.createOscillator();
-    const oscTri = ctx.createOscillator();
-    const subOsc = ctx.createOscillator();
-    const bandpassNode = ctx.createBiquadFilter();
-    const pluckGain = ctx.createGain();
-
-    oscSaw.type = "sawtooth";
-    oscTri.type = "triangle";
-    subOsc.type = "sine";
-
-    // Chorus detuning coefficients for acoustic resonance
-    oscSaw.frequency.setValueAtTime(tunedFreq, ctx.currentTime);
-    oscTri.frequency.setValueAtTime(tunedFreq * 1.002, ctx.currentTime);
-    subOsc.frequency.setValueAtTime(tunedFreq * 0.5, ctx.currentTime); // low sub third
-
-    bandpassNode.type = "lowpass";
-    bandpassNode.Q.setValueAtTime(3.5, ctx.currentTime);
-    bandpassNode.frequency.setValueAtTime(200, ctx.currentTime);
-    bandpassNode.frequency.exponentialRampToValueAtTime(2400, ctx.currentTime + 0.05);
-    bandpassNode.frequency.exponentialRampToValueAtTime(350, ctx.currentTime + duration);
-
-    pluckGain.gain.setValueAtTime(0, ctx.currentTime);
-    // Pluck amplitude envelope curve
-    pluckGain.gain.linearRampToValueAtTime(idx === 3 ? (volume / 100) * 0.4 : (volume / 100) * 0.28, ctx.currentTime + 0.025);
-    pluckGain.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + duration);
-
-    oscSaw.connect(bandpassNode);
-    oscTri.connect(bandpassNode);
-    bandpassNode.connect(pluckGain);
-    subOsc.connect(pluckGain);
-    pluckGain.connect(masterGainRef.current || ctx.destination);
-
-    oscSaw.start();
-    oscTri.start();
-    subOsc.start();
-
-    oscSaw.stop(ctx.currentTime + duration);
-    oscTri.stop(ctx.currentTime + duration);
-    subOsc.stop(ctx.currentTime + duration);
-  };
-
-  const sequencerDroneLoop = () => {
-    if (!audioCtxRef.current || !activePractice) return;
-    const ctx = audioCtxRef.current;
-    
-    // Safety check for suspension state (Safari/Chrome autoplay restrictions)
-    if (ctx.state === "suspended") {
-      ctx.resume();
-    }
-
-    const currentIdx = stringIndexRef.current;
-    setActiveString(currentIdx);
-
-    const baseTonic = activePractice.baseHz;
-    let PluckFrequency = baseTonic;
-
-    // Plucking strings sequentially: 1st (Pa/Ma/Ni), 2nd (Sa), 3rd (Sa), 4th (Low Sa)
-    if (currentIdx === 0) {
-      if (activePractice.isSelectedTuning === "Pa") {
-        PluckFrequency = baseTonic * 0.75; // Low Dominant Pa fifth
-      } else if (activePractice.isSelectedTuning === "Ma") {
-        PluckFrequency = baseTonic * 0.666; // Subdominant Shuddha Ma
-      } else {
-        PluckFrequency = baseTonic * 0.9375; // Shuddha Nishad standard
-      }
-    } else if (currentIdx === 1) {
-      PluckFrequency = baseTonic; // Middle octave drone
-    } else if (currentIdx === 2) {
-      PluckFrequency = baseTonic * 1.0012; // Chorused Sa drone
-    } else if (currentIdx === 3) {
-      PluckFrequency = baseTonic * 0.5; // Deep Kharaj Sa (low octave)
-    }
-
-    playAcousticPluckSynth(ctx, PluckFrequency, currentIdx, activePractice.volume);
-
-    // Advance index
-    stringIndexRef.current = (currentIdx + 1) % 4;
-
-    // Schedule next string pluck in sequence (determined by tempo in BPM)
-    const pluckIntervalMs = (60 / activePractice.tempoBpm) * 1150;
-    sequencerTimeoutRef.current = window.setTimeout(sequencerDroneLoop, pluckIntervalMs);
-  };
-
-  const startPracticeTanpura = (session: PracticeSession) => {
-    try {
-      stopPracticeTanpura();
-      
-      const AudioCtxClass = window.AudioContext || (window as any).webkitAudioContext;
-      const ctx = new AudioCtxClass();
-      audioCtxRef.current = ctx;
-
-      const masterGain = ctx.createGain();
-      masterGain.gain.setValueAtTime(session.volume / 100, ctx.currentTime);
-      masterGain.connect(ctx.destination);
-      masterGainRef.current = masterGain;
-
-      stringIndexRef.current = 0;
-      
-      // Seed interval and start loop
-      sequencerTimeoutRef.current = window.setTimeout(sequencerDroneLoop, 50);
-    } catch(err) {
-      console.error("Autoplay browser constraints prevented Audio Drone setup:", err);
-    }
+  const startPracticeTanpura = async (session: PracticeSession) => {
+    stopPracticeTanpura();
+    const AudioCtxClass = window.AudioContext || (window as any).webkitAudioContext;
+    const ctx: AudioContext = new AudioCtxClass();
+    audioCtxRef.current = ctx;
+    const eng = new TanpuraEngine(ctx, ctx.destination, {
+      saHz: session.baseHz,
+      firstString: session.isSelectedTuning,
+      cycleSec: cycleFromTempo(session.tempoBpm),
+      volume: session.volume / 100,
+    });
+    eng.onPluck = s => setActiveString(STRING_ORDER.indexOf(s));
+    tanpuraRef.current = eng;
+    await eng.loadSamples();
+    if (tanpuraRef.current === eng) eng.start();
   };
 
   const stopPracticeTanpura = () => {
-    if (sequencerTimeoutRef.current) {
-      clearTimeout(sequencerTimeoutRef.current);
-      sequencerTimeoutRef.current = null;
-    }
+    tanpuraRef.current?.disconnect();
+    tanpuraRef.current = null;
     if (audioCtxRef.current) {
-      audioCtxRef.current.close().catch(e => console.log("Context close error: ", e));
+      audioCtxRef.current.close().catch(() => {});
       audioCtxRef.current = null;
     }
     setActiveString(null);
   };
 
   const handleStartPracticeSession = () => {
-    // Resolve matching base scale freq
-    const matchedNote = NOTE_PITCHES.find(n => n.note === selectedPracticeScale) || NOTE_PITCHES[1];
-    
-    // Choose appropriate tuning style for Raga
-    let optimalTuning: "Pa" | "Ma" | "Ni" = "Pa";
-    if (selectedPracticeRaag === "yaman") optimalTuning = "Ni"; // Yaman customarily tuned to Nishad
-    else if (selectedPracticeRaag === "bageshree") optimalTuning = "Ma"; // Bageshree tunes to Madhyam
+    // The drone uses the singer's own Sa; the first string follows the raag's swaras.
+    const raagData = ALL_84_RAAGS.find(r => r.id === selectedPracticeRaag);
+    const optimalTuning: FirstString = raagData ? firstStringForRaag(raagData.allowedSwaras) : "Pa";
+    const saHz = baseTonicHz ?? 130.81;
 
     const session: PracticeSession = {
       raagId: selectedPracticeRaag,
       raagName: selectedPracticeRaag === "yaman" ? "Raag Yaman" : 
                 selectedPracticeRaag === "bhairav" ? "Raag Bhairav" : 
                 selectedPracticeRaag === "bageshree" ? "Raag Bageshree" : "Raag Bhupali",
-      scaleLabel: selectedPracticeScale,
-      baseHz: matchedNote.hz,
+      scaleLabel: westernNote(saHz).name,
+      baseHz: saHz,
       durationMins: selectedPracticeDuration,
       secondsRemaining: selectedPracticeDuration * 60,
       isSelectedTuning: optimalTuning,
@@ -477,26 +368,20 @@ export const HomeTab: React.FC<HomeTabProps> = ({
 
   const togglePracticeTuning = (tuning: "Pa" | "Ma" | "Ni") => {
     if (!activePractice) return;
-    const updated = { ...activePractice, isSelectedTuning: tuning };
-    setActivePractice(updated);
-    
-    // Restart Sequencer with new parameter on the fly
-    if (audioCtxRef.current) {
-      stringIndexRef.current = 0;
-    }
+    setActivePractice({ ...activePractice, isSelectedTuning: tuning });
+    tanpuraRef.current?.setOptions({ firstString: tuning });
   };
 
   const handleTempoChange = (newTempo: number) => {
     if (!activePractice) return;
     setActivePractice({ ...activePractice, tempoBpm: newTempo });
+    tanpuraRef.current?.setOptions({ cycleSec: cycleFromTempo(newTempo) });
   };
 
   const handleVolumeChange = (newVolume: number) => {
     if (!activePractice) return;
     setActivePractice({ ...activePractice, volume: newVolume });
-    if (masterGainRef.current && audioCtxRef.current) {
-      masterGainRef.current.gain.setValueAtTime(newVolume / 100, audioCtxRef.current.currentTime);
-    }
+    tanpuraRef.current?.setOptions({ volume: newVolume / 100 });
   };
 
   // Determine current Prahar Raga based on hour of the day
@@ -691,7 +576,7 @@ export const HomeTab: React.FC<HomeTabProps> = ({
                                 : "bg-[#0F1115] border-slate-850 hover:border-slate-800 text-slate-400"
                             }`}
                           >
-                            {opt} (Fifth)
+                            {opt}
                           </button>
                         );
                       })}
@@ -988,22 +873,11 @@ export const HomeTab: React.FC<HomeTabProps> = ({
                 </div>
               </div>
 
-              {/* Selector B: Choose Scale */}
+              {/* Sa: always the singer's own */}
               <div className="space-y-1.5">
-                <label className="text-[10px] font-mono text-slate-500 uppercase block font-bold">Select Sa Scale Frequency</label>
-                <div className="relative">
-                  <select 
-                    value={selectedPracticeScale}
-                    onChange={(e) => setSelectedPracticeScale(e.target.value)}
-                    className="w-full bg-[#0F1115] border border-slate-800 text-slate-300 font-bold p-3 rounded-xl appearance-none cursor-pointer hover:border-purple-500/50 focus:border-[#7C3AED] focus:outline-none"
-                  >
-                    {NOTE_PITCHES.map((n) => (
-                      <option key={n.note} value={n.note}>
-                        Sa Pitch: {n.note} ({n.hz.toFixed(1)} Hz)
-                      </option>
-                    ))}
-                  </select>
-                  <ChevronRight className="h-4 w-4 text-slate-500 absolute top-4 right-3 transform rotate-45 pointer-events-none" />
+                <label className="text-[10px] font-mono text-slate-500 uppercase block font-bold">Sa</label>
+                <div className="w-full bg-[#0F1115] border border-slate-800 text-slate-300 font-bold p-3 rounded-xl">
+                  {(baseTonicHz ?? 130.81).toFixed(1)} Hz ({westernNote(baseTonicHz ?? 130.81).name}) · change it in the Tanpura tab or with "Find my Sa"
                 </div>
               </div>
 
