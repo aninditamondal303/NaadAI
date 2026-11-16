@@ -321,7 +321,7 @@ export const GuruFeedback: React.FC<GuruFeedbackProps> = ({
     setUploadStatus("Extracting microtonal speech envelopes...");
 
     try {
-      setUploadStatus("Piping telemetry through Music Intelligence Layer (MIL)...");
+      setUploadStatus("Analysing recording...");
       const response = await fetch("/api/analyze-audio", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -354,7 +354,7 @@ export const GuruFeedback: React.FC<GuruFeedbackProps> = ({
       }
     } catch (e) {
       console.error("Failed executing take analysis:", e);
-      setErrorText("Telemetry failure during take analysis processing on server.");
+      setErrorText("Analysis failed on the server. Please try again.");
     } finally {
       setIsLoading(false);
       setUploadStatus("");
@@ -505,7 +505,7 @@ export const GuruFeedback: React.FC<GuruFeedbackProps> = ({
           <div className="flex space-x-1 p-1 bg-slate-900/50 border border-slate-800/40 rounded-xl grow sm:grow-0 w-full sm:w-auto">
             {[
               { id: "gurus", label: "Gurus Sabha" },
-              { id: "dsp", label: "DSP Telemetry" },
+              { id: "dsp", label: "Measurements" },
               { id: "takes", label: "Take Analyzer" }
             ].map((tab) => {
               const isTabActive = activeTab === tab.id;

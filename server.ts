@@ -109,7 +109,7 @@ app.post("/api/profile", (req, res) => {
 
 /**
  * Robust fallback generator that simulates the 6-Guru Council discussions
- * when the remote Gemini API is offline or the API key is not configured.
+ * when the AI feedback service is offline or the API key is not configured.
  */
 function generate6GuruFallbackFeedback(
   sessionMetrics: any,
@@ -179,11 +179,9 @@ ${alankars}
 
 ---
 
-### 📻 Recommended Listening & Compositions
+### 📻 Compositions
 *   **Traditional Bandishes**: 
-    ${(TRADITIONAL_COMPOSITIONS[ragaName.toLowerCase()] || TRADITIONAL_COMPOSITIONS.yaman).bandishes.map(b => `- *${b}*`).join("\n    ")}
-*   **Historic Master Audio References**: 
-    ${(TRADITIONAL_COMPOSITIONS[ragaName.toLowerCase()] || TRADITIONAL_COMPOSITIONS.yaman).listening.map(l => `- *${l}*`).join("\n    ")}`;
+    ${(TRADITIONAL_COMPOSITIONS[ragaName.toLowerCase()] || TRADITIONAL_COMPOSITIONS.yaman).bandishes.map(b => `- *${b}*`).join("\n    ")}`;
 }
 
 // AI Diagnostic analysis using Pandit Naad-Guru prompt
@@ -241,10 +239,10 @@ app.post("/api/analyze", async (req, res) => {
   };
 
   try {
-    // Check validation of the Gemini API key
+    // Check that an AI feedback API key is configured
     const apiKey = process.env.GEMINI_API_KEY;
     if (!apiKey || apiKey === "MY_GEMINI_API_KEY" || apiKey.trim() === "") {
-      console.log("Gemini API key is unconfigured. Running classroom fallback evaluation...");
+      console.log("No AI feedback API key set. Using built-in feedback.");
       updateVocalTwinProfileStats(sessionMetrics, userProfile);
       const fallbackReport = generate6GuruFallbackFeedback(
         sessionMetrics, 
@@ -261,17 +259,10 @@ app.post("/api/analyze", async (req, res) => {
       });
     }
 
-    console.log("Initializing Gemini Client to invoke NaadAI Classical Music Intelligence panel...");
+    console.log("Requesting written feedback...");
     
     // Create modern standard GoogleGenAI client as per skill guidelines
-    const ai = new GoogleGenAI({
-      apiKey: apiKey,
-      httpOptions: {
-        headers: {
-          "User-Agent": "aistudio-build"
-        }
-      }
-    });
+    const ai = new GoogleGenAI({ apiKey });
 
     const systemInstruction = `You are NaadAI's Classical Music Intelligence Engine.
 You are not a generic music critic.
@@ -308,7 +299,7 @@ STRUCTURE YOUR RESPONSE EXACTLY AS FOLLOWS:
 2. **### 🪕 Guru Sabha Roundtable (Legendary Panel Critique)**: Provide structured individual commentaries from each of the six Gurus. Ensure they reference numbers and notes from the incoming DSP reports!
 3. **### 🎼 Character Diagnostics**: Sum up the key classical strengths and areas for classical refinement.
 4. **### 📿 Prescribed Riyaz (Alankars)**: Issue 2-3 highly customized traditional practice patterns using Hindustani note symbols (e.g. S-r-g-m-P or S S R R G G) to correct the identified flaws.
-5. **### 📻 Recommended Listening & Compositions**: List traditional compositions and master audio recordings matching the active raga.
+5. **### 📻 Compositions**: List traditional compositions and master audio recordings matching the active raga.
 
 Keep your feedback highly specific, constructive, and free of generic AI hype. Speak directly to the student (Shishya).`;
 
@@ -351,7 +342,7 @@ Analyze this data and generate my comprehensive vocal diagnostic roundtable crit
     });
 
   } catch (err: any) {
-    console.error("Error executing Gemini analysis, spinning fallback:", err.message || err);
+    console.error("AI feedback request failed, using built-in feedback:", err.message || err);
     try {
       updateVocalTwinProfileStats(sessionMetrics, userProfile);
       const fallbackReport = generate6GuruFallbackFeedback(
@@ -408,7 +399,7 @@ app.post("/api/analyze-audio", async (req, res) => {
   try {
     const apiKey = process.env.GEMINI_API_KEY;
     if (!apiKey || apiKey === "MY_GEMINI_API_KEY" || apiKey.trim() === "") {
-      console.log("Gemini API key is unconfigured. Running classroom audio fallback...");
+      console.log("No AI feedback API key set. Using built-in feedback.");
       const fallbackReport = generate6GuruFallbackFeedback(
         audioMetrics, 
         userProfile, 
@@ -424,11 +415,8 @@ app.post("/api/analyze-audio", async (req, res) => {
       });
     }
 
-    console.log(`Initializing Gemini client for Audio Take analysis (${audioSec}s)...`);
-    const ai = new GoogleGenAI({
-      apiKey: apiKey,
-      httpOptions: { headers: { "User-Agent": "aistudio-build" } }
-    });
+    console.log("Requesting written feedback for recording...");
+    const ai = new GoogleGenAI({ apiKey });
 
     const systemInstruction = `You are NaadAI's Classical Music Intelligence Engine.
 You are evaluating a recorded vocal performance (take) submitted by a Shishya.

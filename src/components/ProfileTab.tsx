@@ -32,7 +32,7 @@ export const ProfileTab: React.FC = () => {
             Musical DNA Portrait
           </h2>
           <p className="text-xs text-slate-400 mt-1 max-w-xl">
-            A comprehensive, microtonally auditory record modeling your classical vocalist twin metrics, saptak coverage boundaries, and stylistic ornament capacities.
+            Your Sa, range and practice scores saved from your riyaz sessions.
           </p>
         </div>
         <div className="text-right">
@@ -57,7 +57,7 @@ export const ProfileTab: React.FC = () => {
                 <PolarAngleAxis dataKey="attribute" tick={{ fill: '#94a3b8', fontSize: 10, fontWeight: 'bold' }} />
                 <PolarRadiusAxis angle={30} domain={[0, 100]} tick={{ fill: '#475569', fontSize: 7 }} />
                 <Radar 
-                  name="Vocal Twin" 
+                  name="Your profile" 
                   dataKey="value" 
                   stroke="#7C3AED" 
                   fill="#7C3AED" 
