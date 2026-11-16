@@ -6,10 +6,12 @@
  * a bayan (left drum) stroke, e.g. Dha = Na (dayan) + Ge (bayan).
  *
  * Sound source:
- * - Recorded strokes, if /samples/tabla/manifest.json exists (see
- *   docs/recording-guide.md).
- * - Otherwise simple synthesised strokes (tuned so the dayan sits on Sa).
- *   The app says which one is playing.
+ * - Recorded bols listed in /samples/tabla/manifest.json. The app ships
+ *   real tabla recordings (from the MIT-licensed Naad project, see
+ *   public/samples/tabla/LICENSE), retuned so the dayan sits on the
+ *   singer's Sa.
+ * - If they can't be loaded, simple synthesised strokes. The app says which
+ *   one is playing.
  */
 import type { Taal } from "../data/taals";
 
@@ -90,12 +92,42 @@ export function synthStroke(stroke: Stroke, sampleRate: number, saHz: number): F
 
 // ------------------------------------------------------------ engine
 
+/** Recorded bols the app knows how to use. */
+export type SampleBol = "Dha" | "Dhin" | "Na" | "Ta" | "Tin" | "Tun" | "Ti" | "Ge" | "Ga" | "Ke";
+
+const BOL_SAMPLE: Record<string, SampleBol | null> = {
+  dha: "Dha", dhin: "Dhin", dhi: "Dhin", din: "Dhin",
+  na: "Na", ta: "Ta", tin: "Tin", tu: "Tun",
+  ti: "Ti", te: "Ti", di: "Ti", ra: "Ti",
+  ge: "Ge", ghe: "Ge", ga: "Ga",
+  ke: "Ke", ka: "Ke", ki: "Ke", kat: "Ke",
+  "-": null,
+};
+
+/** Which recorded bol plays a theka bol (null = rest). Throws for an unknown bol. */
+export function sampleFor(bol: string): SampleBol | null {
+  const key = bol.toLowerCase();
+  if (!(key in BOL_SAMPLE)) throw new Error(`Unknown bol "${bol}"`);
+  return BOL_SAMPLE[key];
+}
+
 interface TablaManifest {
   credit?: string;
   licence?: string;
-  /** Recorded pitch of the dayan (Hz), used to retune strokes to the singer's Sa. */
+  /** Recorded pitch of the dayan (Hz), used to retune the tabla to the singer's Sa. */
   dayanHz?: number;
-  strokes: Partial<Record<Stroke, string>>;
+  bols: Partial<Record<SampleBol, string>>;
+}
+
+/**
+ * Playback rate that moves the recorded dayan pitch to the singer's Sa, in
+ * whichever octave needs the smallest shift (never more than 6 semitones).
+ */
+export function retuneRate(recordedHz: number, saHz: number): number {
+  let r = saHz / recordedHz;
+  while (r > Math.SQRT2) r /= 2;
+  while (r < Math.SQRT1_2) r *= 2;
+  return r;
 }
 
 export interface TaalOptions {
@@ -125,7 +157,7 @@ export class TaalPlayer {
   private cycleStart = 0;
   private nextIndex = 0;
   private events: ReturnType<typeof bolTimes> = [];
-  private recorded = new Map<Stroke, AudioBuffer>();
+  private recorded = new Map<SampleBol, AudioBuffer>();
   private synthCache = new Map<string, AudioBuffer>();
   private dayanHz: number | null = null;
   source: "samples" | "synth" = "synth";
@@ -145,13 +177,14 @@ export class TaalPlayer {
       const res = await fetch(`${baseUrl}/manifest.json`);
       if (!res.ok) return;
       const manifest = (await res.json()) as TablaManifest;
-      for (const s of STROKES) {
-        const file = manifest.strokes[s];
-        if (!file) throw new Error(`no sample for ${s}`);
+      const needed: SampleBol[] = ["Dha", "Dhin", "Na", "Ta", "Tin", "Tun", "Ti", "Ge", "Ga", "Ke"];
+      await Promise.all(needed.map(async b => {
+        const file = manifest.bols?.[b];
+        if (!file) throw new Error(`no sample for ${b}`);
         const r = await fetch(`${baseUrl}/${file}`);
         if (!r.ok) throw new Error(`missing ${file}`);
-        this.recorded.set(s, await this.ctx.decodeAudioData(await r.arrayBuffer()));
-      }
+        this.recorded.set(b, await this.ctx.decodeAudioData(await r.arrayBuffer()));
+      }));
       this.dayanHz = manifest.dayanHz ?? null;
       this.source = "samples";
       this.sourceCredit = [manifest.credit, manifest.licence].filter(Boolean).join(" · ") || null;
@@ -203,7 +236,12 @@ export class TaalPlayer {
       const ev = this.events[this.nextIndex];
       const when = this.cycleStart + ev.at;
       if (when >= this.ctx.currentTime + 0.2) break;
-      for (const s of strokesFor(ev.bol)) this.play(s, when);
+      if (this.source === "samples") {
+        const b = sampleFor(ev.bol);
+        if (b) this.playRecorded(b, when, ev.startsMatra && ev.matra === 1);
+      } else {
+        for (const s of strokesFor(ev.bol)) this.play(s, when);
+      }
       if (ev.startsMatra && this.onMatra) {
         const cb = this.onMatra;
         const m = ev.matra;
@@ -217,29 +255,31 @@ export class TaalPlayer {
     }
   }
 
+  private playRecorded(bol: SampleBol, when: number, sam: boolean) {
+    const buffer = this.recorded.get(bol)!;
+    const src = this.ctx.createBufferSource();
+    src.buffer = buffer;
+    // the whole tabla is retuned together, as if the player had tuned it to your Sa
+    if (this.dayanHz) src.playbackRate.value = retuneRate(this.dayanHz, this.opts.saHz);
+    const g = this.ctx.createGain();
+    g.gain.value = sam ? 1 : 0.85; // a little weight on sam, like a real player
+    src.connect(g);
+    g.connect(this.out);
+    src.start(when);
+  }
+
+  /** Fallback: synthesised stroke. */
   private play(stroke: Stroke, when: number) {
-    let buffer = this.recorded.get(stroke);
-    let rate = 1;
-    if (buffer) {
-      if (this.dayanHz && stroke !== "ge" && stroke !== "ke") {
-        let target = this.opts.saHz;
-        while (target < this.dayanHz / Math.SQRT2) target *= 2;
-        while (target > this.dayanHz * Math.SQRT2) target /= 2;
-        rate = target / this.dayanHz;
-      }
-    } else {
-      const key = `${stroke}:${this.opts.saHz.toFixed(2)}`;
-      buffer = this.synthCache.get(key);
-      if (!buffer) {
-        const data = synthStroke(stroke, this.ctx.sampleRate, this.opts.saHz);
-        buffer = this.ctx.createBuffer(1, data.length, this.ctx.sampleRate);
-        buffer.getChannelData(0).set(data);
-        this.synthCache.set(key, buffer);
-      }
+    const key = `${stroke}:${this.opts.saHz.toFixed(2)}`;
+    let buffer = this.synthCache.get(key);
+    if (!buffer) {
+      const data = synthStroke(stroke, this.ctx.sampleRate, this.opts.saHz);
+      buffer = this.ctx.createBuffer(1, data.length, this.ctx.sampleRate);
+      buffer.getChannelData(0).set(data);
+      this.synthCache.set(key, buffer);
     }
     const src = this.ctx.createBufferSource();
     src.buffer = buffer;
-    src.playbackRate.value = rate;
     src.connect(this.out);
     src.start(when);
   }

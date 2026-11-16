@@ -1,0 +1,17 @@
+{
+  "credit": "Naad by Oormi Creations, github.com/oormicreations/naad",
+  "licence": "MIT licence",
+  "dayanHz": 262.2,
+  "bols": {
+    "Dha": "dha.wav",
+    "Dhin": "dhin.wav",
+    "Na": "na.wav",
+    "Ta": "ta.wav",
+    "Tin": "tin.wav",
+    "Tun": "tun.wav",
+    "Ti": "ti.wav",
+    "Ge": "ge.wav",
+    "Ga": "ga.wav",
+    "Ke": "ke.wav"
+  }
+}
