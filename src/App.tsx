@@ -5,16 +5,12 @@
 
 import React, { useState, useEffect } from 'react';
 import { Music, Award, Sparkles, RefreshCw, Compass, AlertTriangle, FileText, Settings, User, Search, Filter, Check, ChevronDown, X, Sun, Moon, Sunrise, Lock, ShieldCheck, Mail, LogIn, Database, Home, BookOpen, BarChart2, Activity } from 'lucide-react';
-import { DigitalTwinState, SWARAS_MAP } from './types';
+import { DigitalTwinState } from './types';
+import { loadHistory, onHistoryChange } from './lib/practiceHistory';
+import { practiceStreakDays } from './lib/stats';
 import { getExpanded84Raags } from './data/allRaags';
-import { TanpuraDrone } from './components/TanpuraDrone';
-import { SwaraTuner } from './components/SwaraTuner';
 import { TaalMetronome } from './components/TaalMetronome';
-import { VocalTwinRadar } from './components/VocalTwinRadar';
-import { GuruFeedback } from './components/GuruFeedback';
 import { Backdrop } from './components/Backdrop';
-import { AudioVoiceRecorder } from './components/AudioVoiceRecorder';
-import { MusicIntelligenceLab } from './components/MusicIntelligenceLab';
 
 // Modular Tab components
 import { HomeTab } from './components/HomeTab';
@@ -48,40 +44,15 @@ export default function App() {
   const [selectedThaatFilter, setSelectedThaatFilter] = useState("All");
   const [isPickerOpen, setIsPickerOpen] = useState(false);
 
-  // Riyaaz performance trial metrics
-  const [currentMetrics, setCurrentMetrics] = useState<{
-    overallSurAccuracy: number;
-    averageDeviationCents: number;
-    meendCount: number;
-    gamakCount: number;
-    noteCoverage: Record<number, { count: number; stableCount: number; avgDeviation: number }>;
-  } | null>(null);
-
   // Persistent user digital twin profile state
   const [profileState, setProfileState] = useState<DigitalTwinState>({
-    digitalTwinId: "dt_v1_vocalist_main",
-    vocalProfile: {
-      baseTonicHz: 130.81,
-      effectiveRange: { lowerBoundaryHz: 130.81, upperBoundaryHz: 523.25, notation: "C3-C5" },
-      timbreStabilityIndex: 0.85,
-      breathHoldingCapacitySeconds: 15.0
-    },
-    stylisticFingerprint: {
-      preferredRaags: ["Yaman", "Bhimpalasi"],
-      meendExecutionFluidity: 0.78,
-      gamakVibratoHzMean: 6.0
-    },
-    historicalErrorPatterns: {
-      habitualFlatNotes: [4, 11],
-      taalDriftTendency: "early_entry_on_khali",
-      avgLatencyMs: -22.5
-    },
-    runningScores: {
-      cumulativeSurAccuracy: 84.5,
-      cumulativeTaalStability: 71.0,
-      riyazStreakDays: 5
-    }
+    digitalTwinId: "local_profile",
+    vocalProfile: { baseTonicHz: 130.81 }
   });
+
+  // Riyaz streak: consecutive days with saved practice in this browser
+  const [streakDays, setStreakDays] = useState<number>(() => practiceStreakDays(loadHistory()));
+  useEffect(() => onHistoryChange(() => setStreakDays(practiceStreakDays(loadHistory()))), []);
 
   const activeRaag = RAAGS[selectedRaagIdx];
 
@@ -127,16 +98,6 @@ export default function App() {
       }
     };
     handleProfileUpdated(updated);
-  };
-
-  const handleSessionMetricsAccomulated = (metrics: {
-    overallSurAccuracy: number;
-    averageDeviationCents: number;
-    meendCount: number;
-    gamakCount: number;
-    noteCoverage: Record<number, { count: number; stableCount: number; avgDeviation: number }>;
-  }) => {
-    setCurrentMetrics(metrics);
   };
 
   /**
@@ -713,7 +674,7 @@ export default function App() {
           <div className="flex items-center gap-4 text-xs font-mono">
             <div className="hidden md:flex flex-col text-right">
               <span className="text-[9px] text-slate-500 uppercase tracking-widest">Streak</span>
-              <span className="text-[#FBBF24] font-black">{profileState.runningScores.riyazStreakDays} Days 🔥</span>
+              <span className="text-[#FBBF24] font-black">{streakDays} {streakDays === 1 ? "Day" : "Days"}</span>
             </div>
             <button
               onClick={() => { setIsAuthenticated(false); setActivePage("welcome"); }}

@@ -40,32 +40,11 @@ export interface TooltipProps {
   label?: string;
 }
 
+/** The singer's saved settings. Only the Sa is stored for now. */
 export interface DigitalTwinState {
   digitalTwinId: string;
   vocalProfile: {
     baseTonicHz: number;
-    effectiveRange: {
-      lowerBoundaryHz: number;
-      upperBoundaryHz: number;
-      notation: string;
-    };
-    timbreStabilityIndex: number; // 0 to 1
-    breathHoldingCapacitySeconds: number;
-  };
-  stylisticFingerprint: {
-    preferredRaags: string[];
-    meendExecutionFluidity: number; // 0 to 1
-    gamakVibratoHzMean: number;     // e.g. 6.2 Hz
-  };
-  historicalErrorPatterns: {
-    habitualFlatNotes: number[];    // Swara indices
-    taalDriftTendency: string;      // e.g., "early_entry_on_khali"
-    avgLatencyMs: number;
-  };
-  runningScores: {
-    cumulativeSurAccuracy: number;  // percentage
-    cumulativeTaalStability: number; // percentage
-    riyazStreakDays: number;
   };
 }
 
