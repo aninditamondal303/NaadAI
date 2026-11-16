@@ -33,7 +33,7 @@ export default function App() {
   // Custom theme and onboarding welcome states
   const [currentTheme, setCurrentTheme] = useState<"peacock" | "sunset" | "monsoon" | "midnight">("midnight");
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
-  const [activePage, setActivePage] = useState<string>("welcome"); // "welcome" | "login" | "signup" | "riyaz" | "almanac" | "academy" | "twin-telemetry"
+  const [activePage, setActivePage] = useState<string>("welcome"); // "welcome" | "profiles"
   const [vocalistName, setVocalistName] = useState<string>("");
   const [dashboardView, setDashboardView] = useState<"practice" | "informatics">("practice");
   
