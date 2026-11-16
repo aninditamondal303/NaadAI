@@ -9,7 +9,6 @@ import { DigitalTwinState } from './types';
 import { loadHistory, onHistoryChange } from './lib/practiceHistory';
 import { practiceStreakDays } from './lib/stats';
 import { getExpanded84Raags } from './data/allRaags';
-import { TaalMetronome } from './components/TaalMetronome';
 import { Backdrop } from './components/Backdrop';
 
 // Modular Tab components
@@ -643,7 +642,7 @@ export default function App() {
           <nav className="flex flex-wrap justify-center gap-1 font-mono text-[11px] font-bold">
             {[
               { id: "home", label: "Home", icon: Home },
-              { id: "tanpura", label: "Tanpura", icon: Music },
+              { id: "tanpura", label: "Tanpura & Taal", icon: Music },
               { id: "analyzer", label: "Raga Analyzer", icon: Activity },
               { id: "journal", label: "Riyaz Journal", icon: BookOpen },
               { id: "progress", label: "Progress", icon: BarChart2 },
