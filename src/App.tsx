@@ -14,7 +14,7 @@ import { Backdrop } from './components/Backdrop';
 // Modular Tab components
 import { HomeTab } from './components/HomeTab';
 import { TanpuraTab } from './components/TanpuraTab';
-import { AnalyzerTab } from './components/AnalyzerTab';
+import { AnalyzerTab, type AnalyzerMode } from './components/AnalyzerTab';
 import { JournalTab } from './components/JournalTab';
 import { ProgressTab } from './components/ProgressTab';
 import { LibraryTab } from './components/LibraryTab';
@@ -38,7 +38,8 @@ export default function App() {
   
   // Seven active menu tabs for classical musicians
   const [activeTab, setActiveTab] = useState<AppTab>("home");
-  const [analyzerMode, setAnalyzerMode] = useState<"scale" | "singing">("singing");
+  const [analyzerMode, setAnalyzerMode] = useState<AnalyzerMode>("singing");
+  const [practiceMode, setPracticeMode] = useState<"palta" | "pakad" | "ear">("palta");
 
   // Custom raga selection and filter states
   const [searchQuery, setSearchQuery] = useState("");
@@ -695,6 +696,7 @@ export default function App() {
           <HomeTab 
             setActiveTab={setActiveTab} 
             setAnalyzerMode={setAnalyzerMode}
+            setPracticeMode={setPracticeMode}
             vocalistName={vocalistName} 
             baseTonicHz={baseTonicHz} 
           />
@@ -716,7 +718,7 @@ export default function App() {
         )}
         {activeTab === "journal" && <JournalTab />}
         {activeTab === "progress" && <ProgressTab />}
-        {activeTab === "practice" && <PracticeTab baseTonicHz={baseTonicHz} />}
+        {activeTab === "practice" && <PracticeTab baseTonicHz={baseTonicHz} initialMode={practiceMode} />}
         {activeTab === "library" && <LibraryTab />}
         {activeTab === "profile" && <ProfileTab baseTonicHz={baseTonicHz} vocalistName={vocalistName} />}
       </main>

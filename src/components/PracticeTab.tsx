@@ -18,8 +18,10 @@ import { parseSargam, type SargamToken } from '../practice/notation';
 import { generatePaltas, LAYAS, UNLOCK_SCORE } from '../practice/paltas';
 import { expectedHz, scoreNote, totalScore, type NoteScore } from '../practice/scoring';
 import { useMic } from './analysis/micHooks';
+import { EarTraining } from './practice/EarTraining';
+import { weakSwaraPalta, weakSwaras } from '../practice/weakSwaras';
 
-interface Props { baseTonicHz: number }
+interface Props { baseTonicHz: number; initialMode?: "palta" | "pakad" | "ear" }
 
 type Exercise = { id: string; name: string; description: string; tokens: SargamToken[] };
 type PracticeRec = Extract<PracticeRecord, { kind: "palta" | "pakad" }>;
@@ -51,10 +53,11 @@ function click(ctx: AudioContext, when: number, accent: boolean) {
   o.start(when); o.stop(when + 0.08);
 }
 
-export const PracticeTab: React.FC<Props> = ({ baseTonicHz }) => {
+export const PracticeTab: React.FC<Props> = ({ baseTonicHz, initialMode = "palta" }) => {
   const mic = useMic();
   const [raagId, setRaagId] = useState("yaman");
-  const [kind, setKind] = useState<"palta" | "pakad">("palta");
+  const [kind, setKind] = useState<"palta" | "pakad" | "ear">(initialMode);
+  useEffect(() => setKind(initialMode), [initialMode]);
   const [exerciseId, setExerciseId] = useState("aroh-avaroh");
   const [bpm, setBpm] = useState(60);
   const [speed, setSpeed] = useState(1);
@@ -73,11 +76,18 @@ export const PracticeTab: React.FC<Props> = ({ baseTonicHz }) => {
     if (kind === "pakad") {
       return details ? [{ id: "pakad", name: "Pakad", description: details.pakad, tokens: parseSargam(details.pakad) }] : [];
     }
-    return generatePaltas(raag).map(p => ({ id: p.id, name: p.name, description: p.description, tokens: p.notes }));
-  }, [raag, kind, details]);
+    const base = generatePaltas(raag).map(p => ({ id: p.id, name: p.name, description: p.description, tokens: p.notes as SargamToken[] }));
+    // Paltas focused on the singer's own weak swaras (from their measurements)
+    const weak = weakSwaras(history).flatMap(w => {
+      const notes = weakSwaraPalta(raag, w.semitone);
+      return notes ? [{ id: `weak-${w.semitone}`, name: `Weak swara: ${w.name}`, description: `Your ${w.name} ${w.reason}. ${notes.map(n => n.label).join(" ")}`, tokens: notes as SargamToken[] }] : [];
+    });
+    return [...weak, ...base];
+  }, [raag, kind, details, history]);
   const exercise = exercises.find(e => e.id === exerciseId) ?? exercises[0];
 
   useEffect(() => { setExerciseId(kind === "pakad" ? "pakad" : "aroh-avaroh"); }, [kind, raagId]);
+  const recordKind: "palta" | "pakad" = kind === "pakad" ? "pakad" : "palta";
   useEffect(() => { setScores([]); setFinalScore(null); setCurrent(-1); }, [exerciseId, raagId, kind, speed]);
 
   const best = bestSpeeds(history, raagId);
@@ -161,7 +171,7 @@ export const PracticeTab: React.FC<Props> = ({ baseTonicHz }) => {
           const score = totalScore(scored);
           setFinalScore(score);
           addRecord({
-            kind: kind, id: newId(), dateIso: new Date().toISOString(), raagId, raagName: raag.name.replace(/^Raag\s+/i, ""),
+            kind: recordKind, id: newId(), dateIso: new Date().toISOString(), raagId, raagName: raag.name.replace(/^Raag\s+/i, ""),
             exerciseId: exercise.id, exerciseName: exercise.name, speed, bpm, score, notes: scored.length,
             durationSec: endTime - t0,
           });
@@ -205,10 +215,10 @@ export const PracticeTab: React.FC<Props> = ({ baseTonicHz }) => {
           <div className="space-y-1">
             <span className={label}>Exercise type</span>
             <div className="flex gap-2">
-              {(["palta", "pakad"] as const).map(k => (
+              {(["palta", "pakad", "ear"] as const).map(k => (
                 <button key={k} type="button" disabled={running || (k === "pakad" && !details)} onClick={() => setKind(k)}
                   className={`px-3 py-2 rounded-lg border text-xs font-mono font-bold cursor-pointer disabled:opacity-40 ${kind === k ? "bg-[#7C3AED] border-[#7C3AED] text-white" : "border-slate-800 text-slate-300"}`}>
-                  {k === "palta" ? "Paltas" : "Pakad"}
+                  {k === "palta" ? "Paltas" : k === "pakad" ? "Pakad" : "Ear training"}
                 </button>
               ))}
             </div>
@@ -240,7 +250,9 @@ export const PracticeTab: React.FC<Props> = ({ baseTonicHz }) => {
         </div>
       )}
 
-      {exercise && (
+      {kind === "ear" && <EarTraining raag={raag} saHz={baseTonicHz} />}
+
+      {kind !== "ear" && exercise && (
         <div className={card}>
           <div className="flex flex-wrap items-center justify-between gap-3">
             <div className="flex gap-2">

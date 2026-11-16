@@ -69,6 +69,16 @@ export type PracticeRecord =
       durationSec: number;
     }
   | {
+      kind: "ear-quiz";
+      id: string;
+      dateIso: string;
+      level: "swara" | "raag";
+      correct: number;
+      total: number;
+      /** Swara symbols the singer got wrong (for "swara" level). */
+      missed: string[];
+    }
+  | {
       kind: "riyaz-timer";
       id: string;
       dateIso: string;
