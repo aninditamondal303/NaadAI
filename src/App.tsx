@@ -5,7 +5,8 @@
 
 import React, { useState, useEffect } from 'react';
 import { Music, Award, Sparkles, RefreshCw, Compass, AlertTriangle, FileText, Settings, User, Search, Filter, Check, ChevronDown, X, Sun, Moon, Sunrise, Lock, ShieldCheck, Mail, LogIn, Database, Home, BookOpen, BarChart2, Activity } from 'lucide-react';
-import { DigitalTwinState } from './types';
+import { ProfilePicker } from './components/ProfilePicker';
+import { currentProfile, setCurrentProfile, updateProfile, type SingerProfile } from './lib/profiles';
 import { loadHistory, onHistoryChange } from './lib/practiceHistory';
 import { practiceStreakDays } from './lib/stats';
 import { RAAG_LIST } from './data/allRaags';
@@ -46,11 +47,23 @@ export default function App() {
   const [selectedThaatFilter, setSelectedThaatFilter] = useState("All");
   const [isPickerOpen, setIsPickerOpen] = useState(false);
 
-  // Persistent user digital twin profile state
-  const [profileState, setProfileState] = useState<DigitalTwinState>({
-    digitalTwinId: "local_profile",
-    vocalProfile: { baseTonicHz: 130.81 }
-  });
+  // The active singer (profiles live in this browser; see src/lib/profiles.ts)
+  const [profileId, setProfileId] = useState<string | null>(null);
+
+  const enterProfile = (p: SingerProfile) => {
+    setProfileId(p.id);
+    setVocalistName(p.name);
+    setBaseTonicHz(p.saHz);
+    setStreakDays(practiceStreakDays(loadHistory()));
+    setIsAuthenticated(true);
+    setActiveTab("home");
+  };
+
+  // Continue with the last singer on this device, if any
+  useEffect(() => {
+    const p = currentProfile();
+    if (p) enterProfile(p);
+  }, []);
 
   // Riyaz streak: consecutive days with saved practice in this browser
   const [streakDays, setStreakDays] = useState<number>(() => practiceStreakDays(loadHistory()));
@@ -58,48 +71,9 @@ export default function App() {
 
   const activeRaag = RAAGS[selectedRaagIdx];
 
-  // Load physical user profile details on startup from server-side JSON persistence
-  useEffect(() => {
-    fetchProfileFromDatabase();
-  }, []);
-
-  const fetchProfileFromDatabase = async () => {
-    try {
-      const response = await fetch("/api/profile");
-      if (response.ok) {
-        const dbProfile = await response.json();
-        setProfileState(dbProfile);
-        
-        // Sync sliding frequency pitch if previously configured in profile
-        if (dbProfile.vocalProfile?.baseTonicHz) {
-          setBaseTonicHz(dbProfile.vocalProfile.baseTonicHz);
-        }
-      }
-    } catch (err) {
-      console.warn("Failed fetching persistent digital twin profile from backend, operating with local defaults:", err);
-    }
-  };
-
-  const handleProfileUpdated = (newProfile: DigitalTwinState) => {
-    setProfileState(newProfile);
-    // Persist new profile vector state cleanly onto Express backend JSON database
-    fetch("/api/profile", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(newProfile)
-    }).catch(err => console.error("Database profile synchronization failure:", err));
-  };
-
   const handleTonicChange = (newHz: number) => {
     setBaseTonicHz(newHz);
-    const updated = {
-      ...profileState,
-      vocalProfile: {
-        ...profileState.vocalProfile,
-        baseTonicHz: newHz
-      }
-    };
-    handleProfileUpdated(updated);
+    if (profileId) updateProfile(profileId, { saHz: newHz });
   };
 
   /**
@@ -107,99 +81,6 @@ export default function App() {
    */
   const handleTaalStatsChange = (stats: { layaAccuracy: number; driftMs: number } | any) => {
     // If the metronome has a high-quality run, feed stats into active attempt
-  };
-
-  // Additional sign-in state variables
-  const [email, setEmail] = useState<string>("");
-  const [password, setPassword] = useState<string>("");
-  const [confirmPassword, setConfirmPassword] = useState<string>("");
-  const [isPasswordVisible, setIsPasswordVisible] = useState<boolean>(false);
-  const [authStage, setAuthStage] = useState<"form" | "loading" | "complete">("form");
-  const [authStepMessage, setAuthStepMessage] = useState<string>("");
-  const [authError, setAuthError] = useState<string>("");
-
-  // Robust authentication validation checks
-  const validateAuthInputs = (isRegistering: boolean): boolean => {
-    setAuthError("");
-    
-    // Check Email
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!email.trim() || !emailRegex.test(email)) {
-      setAuthError("Please enter a valid email address.");
-      return false;
-    }
-
-    // Check Password
-    if (password.length < 6) {
-      setAuthError("Security Failure: Access passcode must be at least 6 characters in length to safeguard profile parameters.");
-      return false;
-    }
-
-    const hasSpecialOrDigit = /[0-9!@#$%^&*()_+={}\[\]|\\:;"'<>,.?/~`]/.test(password);
-    if (!hasSpecialOrDigit) {
-      setAuthError("Password must contain at least one number or special character.");
-      return false;
-    }
-
-    // Checking Registration credentials
-    if (isRegistering) {
-      if (!vocalistName.trim()) {
-        setAuthError("Please enter your name.");
-        return false;
-      }
-      if (password !== confirmPassword) {
-        setAuthError("Credential Mismatch: The Password and Confirm Password entries do not match.");
-        return false;
-      }
-    }
-
-    return true;
-  };
-
-  const handleAuthSubmit = (isRegistering: boolean) => {
-    if (!validateAuthInputs(isRegistering)) return;
-
-    setAuthStage("loading");
-    setAuthError("");
-
-    const steps = [
-      "Opening your riyaz desk..."
-    ];
-
-    let currentStep = 0;
-    setAuthStepMessage(steps[0]);
-
-    const interval = setInterval(() => {
-      currentStep++;
-      if (currentStep < steps.length) {
-        setAuthStepMessage(steps[currentStep]);
-      } else {
-        clearInterval(interval);
-        setAuthStage("complete");
-
-        setTimeout(() => {
-          const formattedName = vocalistName.trim() || email.split("@")[0] || "Shishya";
-          const sanitaryName = formattedName.replace(/[^\w\s]/gi, "");
-          
-          const updatedProfile = {
-            ...profileState,
-            vocalProfile: {
-              ...profileState.vocalProfile,
-              baseTonicHz: baseTonicHz
-            },
-            digitalTwinId: `dt_${sanitaryName.toLowerCase().replace(/\s+/g, '_')}`
-          };
-
-          handleProfileUpdated(updatedProfile);
-          setVocalistName(sanitaryName);
-          setIsAuthenticated(true);
-          setActivePage("riyaz"); // redirect directly to Riyaz training desk
-          // Reset states back
-          setAuthStage("form");
-          setAuthError("");
-        }, 900);
-      }
-    }, 700);
   };
 
   if (!isAuthenticated) {
@@ -244,7 +125,7 @@ export default function App() {
               {activePage !== "welcome" ? (
                 <button
                   type="button"
-                  onClick={() => { setActivePage("welcome"); setAuthError(""); }}
+                  onClick={() => setActivePage("welcome")}
                   className="px-3.5 py-1.5 rounded-xl border border-teal-900 bg-teal-950/20 text-teal-300 font-mono text-xs font-bold hover:bg-teal-950/60 transition-all cursor-pointer"
                 >
                   ← Home
@@ -253,17 +134,17 @@ export default function App() {
                 <div className="flex items-center gap-2">
                   <button
                     type="button"
-                    onClick={() => { setActivePage("login"); setAuthError(""); }}
+                    onClick={() => setActivePage("profiles")}
                     className="px-3 py-1.5 text-xs font-bold text-slate-300 hover:text-white transition-all cursor-pointer"
                   >
-                    Log In
+                    Choose singer
                   </button>
                   <button
                     type="button"
-                    onClick={() => { setActivePage("signup"); setAuthError(""); }}
+                    onClick={() => setActivePage("profiles")}
                     className="px-3.5 py-1.5 rounded-xl bg-teal-500 text-slate-950 hover:bg-teal-400 text-xs font-mono font-bold transition-all shadow-lg hover:-translate-y-0.5 duration-300 cursor-pointer"
                   >
-                    Sign Up
+                    Start
                   </button>
                 </div>
               )}
@@ -295,17 +176,10 @@ export default function App() {
                 <div className="flex flex-wrap justify-center gap-4 pt-4">
                   <button
                     type="button"
-                    onClick={() => { setActivePage("signup"); setAuthError(""); }}
+                    onClick={() => setActivePage("profiles")}
                     className="px-6 py-3 rounded-xl bg-gradient-to-r from-teal-500 to-emerald-600 text-slate-950 text-sm font-mono font-bold uppercase tracking-wider hover:opacity-90 shadow-xl transition-all hover:-translate-y-0.5 duration-300 cursor-pointer"
                   >
-                    Create free account
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => { setActivePage("login"); setAuthError(""); }}
-                    className="px-6 py-3 rounded-xl border border-teal-900 bg-teal-950/30 text-teal-300 text-sm font-mono font-bold uppercase tracking-wider hover:bg-teal-950/70 transition-all cursor-pointer"
-                  >
-                    Log in
+                    Start practising
                   </button>
                 </div>
               </div>
@@ -390,8 +264,8 @@ export default function App() {
                     a: "It measures the pitch of your voice many times a second and compares it with your Sa. The difference is shown in cents (100 cents = one semitone), so you can see whether a swara is sharp or flat."
                   },
                   {
-                    q: "Is my account stored securely?",
-                    a: "Not yet. Sign-in is currently only a local placeholder: the password is not checked by a server. Proper per-user accounts are planned. Please don't reuse a real password here."
+                    q: "Where is my data stored?",
+                    a: "Only in this browser. Each singer on the device has their own profile, Sa and practice history; there are no passwords and nothing is uploaded. Recordings are analysed in the browser. You can export a profile to move it to another device."
                   }
                 ].map((faq, index) => (
                   <div key={index} className="border-b border-teal-950/40 pb-3">
@@ -404,208 +278,7 @@ export default function App() {
             </div>
           ) : (
             
-            /* 6. Authentic Authentication Pages: Login and Signup portals */
-            <div className="max-w-md mx-auto pt-6">
-              <div className={`p-6 rounded-2xl border backdrop-blur-md shadow-2xl relative z-30 transition-all ${
-                currentTheme === "peacock" 
-                  ? "bg-slate-950/90 border-cyan-950" 
-                  : currentTheme === "sunset" 
-                  ? "bg-[#1C0D0A]/90 border-amber-950"
-                  : "bg-[#061711]/90 border-emerald-950"
-              }`}>
-                
-                {/* Visual Header of portal */}
-                <div className="text-center space-y-2 mb-6">
-                  <h3 className="text-2xl font-bold font-serif text-white">
-                    {activePage === "login" ? "Welcome back" : "Create your account"}
-                  </h3>
-                  <p className="text-xs text-slate-400 font-mono">
-                    {activePage === "login" 
-                      ? "Attune credentials to enter the virtual riyāz deck" 
-                      : "Create your practice profile"}
-                  </p>
-                </div>
-
-                {/* Highly clear red diagnostics for failure */}
-                {authError && (
-                  <div className="bg-red-950/60 border border-red-500/50 p-3 rounded-lg text-xs text-red-200 font-medium space-y-1 mb-4">
-                    <div className="flex items-center gap-1.5 font-bold uppercase text-red-400 text-[10px]">
-                      <AlertTriangle className="h-3.5 w-3.5" />
-                      Please check
-                    </div>
-                    <p className="leading-normal">{authError}</p>
-                  </div>
-                )}
-
-                {/* Loader screen when sequence is active */}
-                {authStage === "loading" && (
-                  <div className="py-8 flex flex-col items-center justify-center space-y-4">
-                    <div className="relative flex items-center justify-center font-sans">
-                      <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-teal-400" />
-                      <Music className="h-4 w-4 text-teal-400 absolute animate-pulse text-center" />
-                    </div>
-                    <div className="space-y-1.5 text-center">
-                      <p className="text-xs font-mono font-bold text-teal-400 animate-pulse">{authStepMessage}</p>
-                      <p className="text-[10px] text-slate-400 font-sans font-medium">Setting up your profile...</p>
-                    </div>
-                  </div>
-                )}
-
-                {/* Form state fields */}
-                {authStage === "form" && (
-                  <form onSubmit={(e) => { e.preventDefault(); handleAuthSubmit(activePage === "signup"); }} className="space-y-4">
-                    
-                    {/* SignUp practitioner name */}
-                    {activePage === "signup" && (
-                      <div className="space-y-1">
-                        <label className="font-mono uppercase tracking-wider text-[9px] font-bold text-slate-400 block">
-                          Your name
-                        </label>
-                        <div className="relative">
-                          <input 
-                            type="text"
-                            required
-                            placeholder="e.g. Shishya Anindita"
-                            value={vocalistName}
-                            onChange={(e) => setVocalistName(e.target.value)}
-                            className="bg-slate-900 border border-teal-950/60 text-slate-200 block w-full pl-9 pr-3 py-2 rounded-lg text-sm focus:outline-none focus:border-teal-500 focus:bg-slate-950 transition-all font-bold placeholder-slate-500"
-                          />
-                          <User className="h-4 w-4 text-slate-500 absolute left-3 top-2.5" />
-                        </div>
-                      </div>
-                    )}
-
-                    {/* Email Input */}
-                    <div className="space-y-1">
-                      <label className="font-mono uppercase tracking-wider text-[9px] font-bold text-slate-400 block">
-                        Email
-                      </label>
-                      <div className="relative">
-                        <input 
-                          type="text"
-                          required
-                          placeholder="shishya@academy.com"
-                          value={email}
-                          onChange={(e) => setEmail(e.target.value)}
-                          className="bg-slate-900 border border-teal-950/60 text-slate-200 block w-full pl-9 pr-3 py-2 rounded-lg text-sm focus:outline-none focus:border-teal-500 focus:bg-slate-950 transition-all font-bold placeholder-slate-500"
-                        />
-                        <Mail className="h-4 w-4 text-slate-500 absolute left-3 top-2.5" />
-                      </div>
-                    </div>
-
-                    {/* Passcode lock */}
-                    <div className="space-y-1">
-                      <label className="font-mono uppercase tracking-wider text-[9px] font-bold text-slate-400 block">
-                        Password
-                      </label>
-                      <div className="relative">
-                        <input 
-                          type={isPasswordVisible ? "text" : "password"}
-                          required
-                          placeholder="••••••••"
-                          value={password}
-                          onChange={(e) => setPassword(e.target.value)}
-                          className="bg-slate-900 border border-teal-950/60 text-slate-200 block w-full pl-9 pr-14 py-2 rounded-lg text-sm focus:outline-none focus:border-teal-500 focus:bg-slate-950 transition-all font-bold placeholder-slate-500 text-slate-100"
-                        />
-                        <Lock className="h-4 w-4 text-slate-500 absolute left-3 top-2.5" />
-                        <button
-                          type="button"
-                          onClick={() => setIsPasswordVisible(!isPasswordVisible)}
-                          className="text-[10px] font-mono text-slate-400 absolute right-3 top-2 hover:text-slate-200 font-bold hover:bg-transparent"
-                        >
-                          {isPasswordVisible ? "HIDE" : "SHOW"}
-                        </button>
-                      </div>
-                      <p className="text-[8px] text-slate-500">Must be at least 6 characters and include a special char or number</p>
-                    </div>
-
-                    {/* Confirm Passcode for signup */}
-                    {activePage === "signup" && (
-                      <div className="space-y-1">
-                        <label className="font-mono uppercase tracking-wider text-[9px] font-bold text-slate-400 block">
-                          Confirm password
-                        </label>
-                        <div className="relative">
-                          <input 
-                            type={isPasswordVisible ? "text" : "password"}
-                            required
-                            placeholder="••••••••"
-                            value={confirmPassword}
-                            onChange={(e) => setConfirmPassword(e.target.value)}
-                            className="bg-slate-900 border border-teal-950/60 text-slate-200 block w-full pl-9 pr-3 py-2 rounded-lg text-sm focus:outline-none focus:border-teal-500 focus:bg-slate-950 transition-all font-bold placeholder-slate-500 text-slate-100"
-                          />
-                          <Lock className="h-4 w-4 text-slate-500 absolute left-3 top-2.5" />
-                        </div>
-                      </div>
-                    )}
-
-                    {/* Custom Voice Pitch standard select on signup */}
-                    {activePage === "signup" && (
-                      <div className="space-y-2 pt-1 font-sans">
-                        <label className="font-mono uppercase tracking-wider text-[9px] font-bold text-slate-400 block">
-                          Your Sa
-                        </label>
-                        <div className="grid grid-cols-3 gap-2">
-                          {[
-                            { label: "Male Sa", pitch: "C3", hz: 130.81 },
-                            { label: "Female Sa", pitch: "G3", hz: 196.00 },
-                            { label: "High Pitch", pitch: "A3", hz: 220.00 }
-                          ].map((pItem) => {
-                            const isSelected = baseTonicHz === pItem.hz;
-                            return (
-                              <button
-                                key={pItem.hz}
-                                type="button"
-                                onClick={() => setBaseTonicHz(pItem.hz)}
-                                className={`p-2 rounded-lg border text-center transition-all cursor-pointer ${
-                                  isSelected 
-                                    ? "bg-teal-500/20 border-teal-500 text-teal-400 font-bold"
-                                    : "bg-slate-900 border-teal-950/40 text-slate-400 hover:text-slate-200"
-                                }`}
-                              >
-                                <span className="block text-[10px] font-bold">{pItem.label}</span>
-                                <span className="text-[8px] font-mono opacity-80">{pItem.pitch} ({pItem.hz}Hz)</span>
-                              </button>
-                            );
-                          })}
-                        </div>
-                      </div>
-                    )}
-
-                    {/* Action buttons */}
-                    <button
-                      type="submit"
-                      className="w-full py-2.5 rounded-xl bg-gradient-to-r from-teal-500 to-emerald-600 text-slate-950 font-mono text-xs font-bold uppercase tracking-wider hover:opacity-95 shadow-lg hover:-translate-y-0.5 duration-300 cursor-pointer flex items-center justify-center gap-1.5"
-                    >
-                      <LogIn className="h-4 w-4" />
-                      {activePage === "login" ? "Log in" : "Create account"}
-                    </button>
-
-                  </form>
-                )}
-
-                {/* Succinct screen toggle option */}
-                {authStage === "form" && (
-                  <div className="mt-6 pt-4 border-t border-teal-950/40 text-center">
-                    <p className="text-xs text-slate-400 font-mono">
-                      {activePage === "login" ? "New here?" : "Already have an account?"}
-                      &nbsp;
-                      <button
-                        type="button"
-                        onClick={() => {
-                          setActivePage(activePage === "login" ? "signup" : "login");
-                          setAuthError("");
-                        }}
-                        className="text-teal-400 font-bold hover:underline cursor-pointer"
-                      >
-                        {activePage === "login" ? "Create an account" : "Log in"}
-                      </button>
-                    </p>
-                  </div>
-                )}
-
-              </div>
-            </div>
+            <ProfilePicker onChosen={enterProfile} />
           )}
         </main>
 
@@ -680,10 +353,10 @@ export default function App() {
               <span className="text-[#FBBF24] font-black">{streakDays} {streakDays === 1 ? "Day" : "Days"}</span>
             </div>
             <button
-              onClick={() => { setIsAuthenticated(false); setActivePage("welcome"); }}
+              onClick={() => { setCurrentProfile(null); setProfileId(null); setIsAuthenticated(false); setActivePage("profiles"); }}
               className="px-3 py-1.5 rounded-xl border border-slate-850 bg-[#0F1115] hover:border-[#7C3AED]/50 text-slate-400 hover:text-slate-200 text-[10px] font-mono font-bold uppercase transition-all cursor-pointer"
             >
-              Sign out
+              Switch singer
             </button>
           </div>
 
@@ -720,7 +393,8 @@ export default function App() {
         {activeTab === "progress" && <ProgressTab />}
         {activeTab === "practice" && <PracticeTab baseTonicHz={baseTonicHz} initialMode={practiceMode} />}
         {activeTab === "library" && <LibraryTab />}
-        {activeTab === "profile" && <ProfileTab baseTonicHz={baseTonicHz} vocalistName={vocalistName} />}
+        {activeTab === "profile" && <ProfileTab baseTonicHz={baseTonicHz} vocalistName={vocalistName} profileId={profileId}
+          onDeleted={() => { setProfileId(null); setIsAuthenticated(false); setActivePage("profiles"); }} />}
       </main>
 
       {/* Aesthetic classical credits footer */}

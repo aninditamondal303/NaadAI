@@ -2,7 +2,6 @@
  * Naad AI server.
  *
  * - Serves the app (Vite in development, the built files in production).
- * - Stores the singer's Sa (profile).
  * - Optional written feedback: an AI model comments on measurements that
  *   were made in the browser. It never sees audio and must not invent numbers.
  *   If no API key is set, the endpoint says so and the app shows only the
@@ -10,7 +9,6 @@
  */
 import express from "express";
 import path from "path";
-import fs from "fs";
 import dotenv from "dotenv";
 import { createServer as createViteServer } from "vite";
 import { GoogleGenAI } from "@google/genai";
@@ -23,61 +21,8 @@ const PORT = Number(process.env.PORT) || 3000;
 
 app.use(express.json({ limit: "200kb" }));
 
-// -------------------------------------------------------------
-// Profile (the singer's Sa)
-// NOTE: one file shared by everyone using this server. Per-user accounts are
-// planned (Phase 8); until then the app is meant for one singer per server.
-// -------------------------------------------------------------
-const PROFILE_FILE_PATH = path.join(process.cwd(), "data-vocal-twin.json");
-
-const INITIAL_PROFILE = {
-  digitalTwinId: "local_profile",
-  vocalProfile: { baseTonicHz: 130.81 }, // C3, a common male Sa; changed at sign-up or in "Find my Sa"
-};
-
-function loadUserProfile() {
-  try {
-    if (fs.existsSync(PROFILE_FILE_PATH)) {
-      const saved = JSON.parse(fs.readFileSync(PROFILE_FILE_PATH, "utf-8"));
-      const hz = Number(saved?.vocalProfile?.baseTonicHz);
-      return {
-        digitalTwinId: String(saved?.digitalTwinId || INITIAL_PROFILE.digitalTwinId),
-        vocalProfile: { baseTonicHz: Number.isFinite(hz) && hz > 40 && hz < 1000 ? hz : INITIAL_PROFILE.vocalProfile.baseTonicHz },
-      };
-    }
-  } catch (error) {
-    console.error("Couldn't read the profile file, using defaults:", error);
-  }
-  return INITIAL_PROFILE;
-}
-
-function saveUserProfile(profile: typeof INITIAL_PROFILE) {
-  try {
-    fs.writeFileSync(PROFILE_FILE_PATH, JSON.stringify(profile, null, 2), "utf-8");
-  } catch (error) {
-    console.error("Couldn't save the profile file:", error);
-  }
-}
-
 app.get("/api/health", (_req, res) => {
   res.json({ status: "ok", timestamp: new Date().toISOString() });
-});
-
-app.get("/api/profile", (_req, res) => {
-  res.json(loadUserProfile());
-});
-
-app.post("/api/profile", (req, res) => {
-  const hz = Number(req.body?.vocalProfile?.baseTonicHz);
-  if (!Number.isFinite(hz) || hz <= 40 || hz >= 1000) {
-    return res.status(400).json({ error: "Profile must include vocalProfile.baseTonicHz between 40 and 1000 Hz." });
-  }
-  const profile = {
-    digitalTwinId: String(req.body?.digitalTwinId || INITIAL_PROFILE.digitalTwinId).slice(0, 80),
-    vocalProfile: { baseTonicHz: hz },
-  };
-  saveUserProfile(profile);
-  res.json({ success: true, profile });
 });
 
 // -------------------------------------------------------------

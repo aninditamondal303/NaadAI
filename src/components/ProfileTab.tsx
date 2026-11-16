@@ -8,6 +8,7 @@ import { User } from 'lucide-react';
 import { centsBetween, signedCents, westernNote } from '../analysis/music';
 import { SWARA_NAMES, SWARA_SYMBOLS } from '../analysis/summary';
 import { clearHistory, loadHistory, onHistoryChange, type PracticeRecord } from '../lib/practiceHistory';
+import { deleteProfile, exportProfile } from '../lib/profiles';
 
 /** Minimum held time on a swara (across all recordings) before we describe it. */
 const MIN_SWARA_SEC = 5;
@@ -15,9 +16,11 @@ const MIN_SWARA_SEC = 5;
 interface ProfileTabProps {
   baseTonicHz: number;
   vocalistName?: string;
+  profileId?: string | null;
+  onDeleted?: () => void;
 }
 
-export const ProfileTab: React.FC<ProfileTabProps> = ({ baseTonicHz, vocalistName }) => {
+export const ProfileTab: React.FC<ProfileTabProps> = ({ baseTonicHz, vocalistName, profileId, onDeleted }) => {
   const [history, setHistory] = useState<PracticeRecord[]>(() => loadHistory());
   useEffect(() => onHistoryChange(() => setHistory(loadHistory())), []);
 
@@ -139,17 +142,36 @@ export const ProfileTab: React.FC<ProfileTabProps> = ({ baseTonicHz, vocalistNam
         </p>
       </div>
 
-      {history.length > 0 && (
-        <div className="flex justify-end">
-          <button
-            type="button"
-            onClick={() => { if (window.confirm("Delete all practice history saved in this browser? This can't be undone.")) clearHistory(); }}
-            className="px-3 py-1.5 rounded-lg border border-rose-900 text-rose-300 hover:bg-rose-950/40 text-[10px] font-mono font-bold uppercase cursor-pointer"
-          >
+      <div className="flex flex-wrap justify-end gap-2">
+        {profileId && (
+          <button type="button"
+            onClick={() => {
+              const blob = new Blob([exportProfile(profileId)], { type: "application/json" });
+              const a = document.createElement("a");
+              a.href = URL.createObjectURL(blob);
+              a.download = `naad-ai-${(vocalistName || "profile").replace(/\W+/g, "-").toLowerCase()}.json`;
+              a.click();
+              URL.revokeObjectURL(a.href);
+            }}
+            className="px-3 py-1.5 rounded-lg border border-slate-700 text-slate-300 hover:bg-slate-800 text-[10px] font-mono font-bold uppercase cursor-pointer">
+            Export my data
+          </button>
+        )}
+        {history.length > 0 && (
+          <button type="button"
+            onClick={() => { if (window.confirm("Delete all practice history saved for this singer? This can't be undone.")) clearHistory(); }}
+            className="px-3 py-1.5 rounded-lg border border-rose-900 text-rose-300 hover:bg-rose-950/40 text-[10px] font-mono font-bold uppercase cursor-pointer">
             Clear practice history
           </button>
-        </div>
-      )}
+        )}
+        {profileId && (
+          <button type="button"
+            onClick={() => { if (window.confirm(`Delete the profile "${vocalistName}" and all its history from this browser?`)) { deleteProfile(profileId); onDeleted?.(); } }}
+            className="px-3 py-1.5 rounded-lg border border-rose-900 text-rose-300 hover:bg-rose-950/40 text-[10px] font-mono font-bold uppercase cursor-pointer">
+            Delete profile
+          </button>
+        )}
+      </div>
     </div>
   );
 };

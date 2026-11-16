@@ -13,7 +13,8 @@
     "test": "vitest run",
     "eval:pitch": "tsx eval/pitch-benchmark.ts",
     "eval:sa": "tsx eval/sa-benchmark.ts",
-    "raag:review": "tsx eval/raag-review.ts"
+    "raag:review": "tsx eval/raag-review.ts",
+    "eval:real": "tsx eval/real-eval.ts"
   },
   "dependencies": {
     "@google/genai": "^2.4.0",
