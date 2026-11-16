@@ -61,7 +61,7 @@ export const VocalTwinRadar: React.FC<VocalTwinRadarProps> = ({ profileState, cu
               <span className="font-bold">{payload[0].value}%</span>
             </p>
             <p className="text-xs flex justify-between gap-4 font-mono">
-              <span className="text-cyan-400">Vocal Twin Core:</span>
+              <span className="text-cyan-400">Profile:</span>
               <span className="font-bold">{payload[1].value}%</span>
             </p>
           </div>
@@ -75,12 +75,12 @@ export const VocalTwinRadar: React.FC<VocalTwinRadarProps> = ({ profileState, cu
     <div id="vocal-twin-radar-card" className="w-full h-full bg-slate-950 p-3 rounded-xl border border-slate-800/80 shadow-xl flex flex-col justify-between">
       <div className="mb-2">
         <div className="flex items-center justify-between">
-          <h3 className="text-lg font-bold text-slate-100 font-sans tracking-wide">Vocal Twin Overlay Metrics</h3>
+          <h3 className="text-lg font-bold text-slate-100 font-sans tracking-wide">Your Practice Profile</h3>
           <span className="px-2.5 py-0.5 rounded-full text-[10px] font-mono font-medium tracking-wider bg-purple-900/40 text-purple-300 border border-purple-800/60 uppercase">
-            Telemetry Overlap
+            Profile
           </span>
         </div>
-        <p className="text-xs text-slate-400">Real-time spectral feedback mapped against your mathematical AI digital twin.</p>
+        <p className="text-xs text-slate-400">Your saved practice scores compared with your baseline.</p>
       </div>
 
       <div className="flex-grow w-full min-h-[250px] relative mt-1">
@@ -107,7 +107,7 @@ export const VocalTwinRadar: React.FC<VocalTwinRadarProps> = ({ profileState, cu
               fillOpacity={0.25} 
             />
             <Radar 
-              name="Vocal Twin Baseline" 
+              name="Baseline" 
               dataKey="digitalTwinBaseline" 
               stroke="#22d3ee" 
               fill="#22d3ee" 
@@ -124,7 +124,7 @@ export const VocalTwinRadar: React.FC<VocalTwinRadarProps> = ({ profileState, cu
       </div>
       
       <div className="mt-4 pt-3 border-t border-slate-900 flex justify-between items-center text-[10px] text-slate-500 font-mono">
-        <span>TWIN CLOUD ID: {profileState.digitalTwinId}</span>
+        <span>Profile ID: {profileState.digitalTwinId}</span>
         <span>STREAK: {profileState.runningScores.riyazStreakDays} DAYS</span>
       </div>
     </div>

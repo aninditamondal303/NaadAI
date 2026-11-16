@@ -1,5 +1,6 @@
 {
-  "name": "react-example",
+  "name": "naad-ai",
+  "description": "Riyaz (practice) companion for Hindustani classical vocalists",
   "private": true,
   "version": "0.0.0",
   "type": "module",

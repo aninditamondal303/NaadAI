@@ -179,22 +179,6 @@ export const MusicIntelligenceLab: React.FC<MusicIntelligenceLabProps> = ({
     { month: "Jun", sur: 91, taal: 84, hours: 45, ragas: 6, stability: 90 }
   ];
 
-  // 6. Bandish recommended lists
-  const bandishDatabase = {
-    beginner: [
-      { name: "Jaat Kahan Ho", taal: "Teental (16 Beats)", tempo: "Vilambit (Slow)", artist: "Kishori Amonkar", audioLink: "Aura of Dawn recordings" },
-      { name: "Piya Bin Nahi Aavat Chain", taal: "Kaherva (8 Beats)", tempo: "Madhya Laya", artist: "Ustad Rashid Khan", audioLink: "Masterworks volume 1" }
-    ],
-    intermediate: [
-      { name: "Eri Aali Piya Bina", taal: "Teental (16 Beats)", tempo: "Madhya Laya", artist: "Pandit Bhimsen Joshi", audioLink: "Kirana Lineage recordings" },
-      { name: "Suhani Raat Dhal Chuki", taal: "Dadra (6 Beats)", tempo: "Drut (Fast)", artist: "Pandit Jasraj", audioLink: "Mewati Devotional anthology" }
-    ],
-    advanced: [
-      { name: "Heeriyala Lalat Jhalat", taal: "Ektal (12 Beats)", tempo: "Drut Layakari", artist: "Ustad Amir Khan", audioLink: "Indore Merukhand references" },
-      { name: "Karam Karo Kartar", taal: "Jhaptal (10 Beats)", tempo: "Vilambit", artist: "Kumar Gandharva", audioLink: "Malwa folk-classical tapes" }
-    ]
-  };
-
   // 7. AI Practice Coach
   const coachRoutine = {
     focus: activeRaagId.toUpperCase(),
@@ -230,13 +214,13 @@ export const MusicIntelligenceLab: React.FC<MusicIntelligenceLabProps> = ({
             <span className="px-2 py-0.5 rounded text-[9px] font-bold font-mono bg-indigo-950/40 text-purple-400 border border-indigo-900/60 uppercase">
               ✦ PRO LAB
             </span>
-            <span className="text-[10px] uppercase font-mono text-slate-500 font-bold">NaadAI Music Informatics Lab</span>
+            <span className="text-[10px] uppercase font-mono text-slate-500 font-bold">Naad AI</span>
           </div>
           <h2 className="text-xl font-extrabold tracking-tight text-white leading-tight font-serif mt-0.5 flex items-center gap-2">
-            Advanced Musical Intelligence Matrix
+            Practice Insights
           </h2>
           <p className="text-xs text-slate-400 leading-normal font-sans">
-            Deep-tier digital signal processing (DSP) and cognitive raga-grammar intelligence.
+            Raag structure, practice history and suggestions.
           </p>
         </div>
 
@@ -298,14 +282,11 @@ export const MusicIntelligenceLab: React.FC<MusicIntelligenceLabProps> = ({
                       <PolarGrid stroke="#334155" />
                       <PolarAngleAxis dataKey="subject" tick={{ fill: '#94a3b8', fontSize: 9, fontWeight: 'bold', fontFamily: 'monospace' }} />
                       <PolarRadiusAxis angle={30} domain={[0, 100]} tick={{ fill: '#64748b', fontSize: 8 }} />
-                      <Radar name="Active Twin" dataKey="value" stroke={themeColors.primary} fill={themeColors.primary} fillOpacity={0.25} />
+                      <Radar name="You" dataKey="value" stroke={themeColors.primary} fill={themeColors.primary} fillOpacity={0.25} />
                     </RadarChart>
                   </ResponsiveContainer>
                 </div>
 
-                <div className="text-[9px] font-mono text-slate-500 text-center uppercase tracking-wide border-t border-slate-900/60 pt-2 text-purple-400 font-bold">
-                  ⚡ Persistent Twin Node: MAIN_SHISHYA_01_ACTIVE
-                </div>
               </div>
 
               {/* Musical Fingerprint Card */}
@@ -416,7 +397,7 @@ export const MusicIntelligenceLab: React.FC<MusicIntelligenceLabProps> = ({
                   Visual Raga Exploration Journey
                 </h4>
                 <p className="text-[10px] text-slate-500 font-sans leading-relaxed">
-                  Real-time cognitive parsing tracking how you explored the melodic boundaries of Raag {activeRaagId.toUpperCase()}.
+                  How your phrases moved through the swaras of Raag {activeRaagId.toUpperCase()}.
                 </p>
               </div>
 
@@ -708,7 +689,7 @@ export const MusicIntelligenceLab: React.FC<MusicIntelligenceLabProps> = ({
 
             {/* Mistake Localization interactive list */}
             <div className="space-y-3 pt-2">
-              <h5 className="text-xs font-mono font-extrabold uppercase text-slate-400">Cognitive Mistake Localization & Event Marks (Click jumps audio)</h5>
+              <h5 className="text-xs font-mono font-extrabold uppercase text-slate-400">Flagged Moments & Event Marks (Click jumps audio)</h5>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2.5">
                 {localizedMistakes.map((mis) => {
                   const isCurrent = Math.abs(playbackTime - mis.timeSec) < 15;
@@ -766,7 +747,7 @@ export const MusicIntelligenceLab: React.FC<MusicIntelligenceLabProps> = ({
                 <div>
                   <h4 className="text-xs font-extrabold uppercase font-mono text-purple-400 flex items-center gap-1.5">
                     <Flame className="h-3.5 w-3.5" />
-                    AI Riyāz Practice Coach
+                    Riyāz Practice Plan
                   </h4>
                   <p className="text-[10px] text-slate-500 font-sans mt-0.5">
                     Custom daily schedule compiling exercises targeting your specific weak swara metrics.
@@ -810,7 +791,7 @@ export const MusicIntelligenceLab: React.FC<MusicIntelligenceLabProps> = ({
                   <div className="flex justify-between items-center">
                     <h4 className="text-xs font-extrabold uppercase font-mono text-amber-500 flex items-center gap-1.5">
                       <Award className="h-3.5 w-3.5" />
-                      Digital-Twin Performance Readiness Scores
+                      Performance Readiness Scores
                     </h4>
                   </div>
 
@@ -869,65 +850,6 @@ export const MusicIntelligenceLab: React.FC<MusicIntelligenceLabProps> = ({
                   </div>
                 </div>
 
-              </div>
-            </div>
-
-            {/* Bandish Recommendation Engine Section */}
-            <div className="p-4 rounded-xl border border-slate-905 bg-slate-950/40 space-y-3">
-              <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
-                <div>
-                  <h4 className="text-xs font-extrabold uppercase font-mono text-emerald-400 flex items-center gap-1.5 mb-0.5">
-                    <BookOpen className="h-3.5 w-3.5" />
-                    Traditional Bandish Recommendation Engine
-                  </h4>
-                  <p className="text-[10px] text-slate-500 font-sans">
-                    Level-based classical melodies and performance instructions mapping to selected Raga structures.
-                  </p>
-                </div>
-
-                {/* Filter Selector */}
-                <div className="flex gap-1 p-0.5 bg-slate-900 border border-slate-805 rounded-xl font-mono text-[9px] w-full sm:w-auto">
-                  {["beginner", "intermediate", "advanced"].map((lvl) => (
-                    <button
-                      key={lvl}
-                      onClick={() => setSelectedBandishLevel(lvl as any)}
-                      className={`px-3 py-1.5 font-bold uppercase rounded-lg cursor-pointer transition-all ${
-                        selectedBandishLevel === lvl 
-                          ? "bg-emerald-600 text-white" 
-                          : "text-slate-400 hover:text-slate-205"
-                      }`}
-                    >
-                      {lvl}
-                    </button>
-                  ))}
-                </div>
-              </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-3.5">
-                {bandishDatabase[selectedBandishLevel].map((item, ind) => (
-                  <div key={ind} className="p-3.5 rounded-xl border border-slate-905 bg-slate-950 space-y-2">
-                    <div className="flex justify-between items-center text-xs">
-                      <h5 className="font-serif font-extrabold text-[15px] text-slate-100 italic leading-none">
-                        "{item.name}"
-                      </h5>
-                      <span className="px-2 py-0.5 rounded text-[8px] font-mono bg-emerald-550/10 text-emerald-305 border border-emerald-900/40">
-                        {item.taal}
-                      </span>
-                    </div>
-
-                    <p className="text-[10px] text-slate-400 font-mono">
-                      Tempo Category: <span className="text-white font-semibold">{item.tempo}</span>
-                    </p>
-
-                    <div className="bg-slate-900/60 p-2 border border-slate-905 rounded-xl font-mono text-[9.5px] leading-relaxed">
-                      <span className="text-slate-500 block uppercase font-bold text-[8px]">LEGENDARY ARTIST PATHWAY RECORDINGS</span>
-                      <div className="flex justify-between items-center mt-1">
-                        <span className="text-emerald-430 font-bold">{item.artist}</span>
-                        <span className="text-slate-400 text-right">{item.audioLink}</span>
-                      </div>
-                    </div>
-                  </div>
-                ))}
               </div>
             </div>
 

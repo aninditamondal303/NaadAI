@@ -204,8 +204,8 @@ export const LibraryTab: React.FC = () => {
 
         </div>
 
-        {/* Listening Recommendations and Commom mistakes */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        {/* Common mistakes */}
+        <div className="grid grid-cols-1 gap-4">
           
           {/* Section A: Common Mistakes warning */}
           <div className="bg-[#0F1115]/60 p-5 rounded-2xl border border-rose-950/30 space-y-3.5">
@@ -218,30 +218,6 @@ export const LibraryTab: React.FC = () => {
                 <li key={i}>{m}</li>
               ))}
             </ul>
-          </div>
-
-          {/* Section B: Listening recommendations */}
-          <div className="bg-[#0F1115]/60 p-5 rounded-2xl border border-slate-800 space-y-3.5">
-            <h4 className="text-xs font-mono font-bold text-[#FBBF24] uppercase tracking-widest flex items-center gap-1.5">
-              <Volume2 className="h-4 w-4" />
-              Famous Listening Recommendations
-            </h4>
-            <div className="space-y-2 text-xs">
-              <div className="flex items-center justify-between p-2 bg-[#151A2E]/50 border border-slate-900 rounded-lg">
-                <div>
-                  <span className="font-bold text-slate-200 block">Ustad Rashid Khan</span>
-                  <span className="text-[9px] font-mono text-slate-500">Traditional Vilambit Khayal rendition</span>
-                </div>
-                <ExternalLink className="h-3.5 w-3.5 text-[#38BDF8]" />
-              </div>
-              <div className="flex items-center justify-between p-2 bg-[#151A2E]/50 border border-[#1e293b/45] rounded-lg">
-                <div>
-                  <span className="font-bold text-slate-200 block">Pandit Bhimsen Joshi</span>
-                  <span className="text-[9px] font-mono text-slate-500">Drut Khayāl Tarana masterpiece</span>
-                </div>
-                <ExternalLink className="h-3.5 w-3.5 text-[#38BDF8]" />
-              </div>
-            </div>
           </div>
 
         </div>
@@ -322,7 +298,7 @@ export const LibraryTab: React.FC = () => {
             <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-500" />
             <input
               type="text"
-              placeholder="Search 84+ classical ragas by name, thaat scale, mood, time..."
+              placeholder="Search raags by name, thaat, mood or time..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="w-full bg-[#0F1115] text-slate-150 pl-10 pr-4 py-2.5 rounded-xl border border-slate-800 text-xs focus:outline-none focus:border-[#7C3AED] focus:bg-[#0F1115]/90 transition-all placeholder-slate-600 font-sans"
@@ -380,7 +356,7 @@ export const LibraryTab: React.FC = () => {
 
         {filteredRaags.length === 0 && (
           <div className="col-span-full py-16 text-center text-slate-500 font-serif text-sm border border-dashed border-slate-800 rounded-2xl">
-            No ragas found matching your query within the 84 major raga divisions. Try another search.
+            No raags match your search. Try another word.
           </div>
         )}
       </div>

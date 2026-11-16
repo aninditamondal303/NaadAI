@@ -58,17 +58,12 @@ export interface MusicalDiagnostics {
   gamakQualityScore: number;
 }
 
-export const TRADITIONAL_COMPOSITIONS: Record<string, { bandishes: string[]; listening: string[] }> = {
+export const TRADITIONAL_COMPOSITIONS: Record<string, { bandishes: string[] }> = {
   yaman: {
     bandishes: [
       "Eri Aali Piya Bina (Vilambit Ektaal - Traditional Khayal composition)",
       "Mera Man Bandh Leeno (Madhya Laya Teentaal composition)",
       "Langar Kankariya Ji Na Maro (Drut Teentaal composition)"
-    ],
-    listening: [
-      "Ustad Amir Khan - Yaman Vilambit 'Mera Man Bandh Leeno'",
-      "Kishori Amonkar - Raag Yaman 'Eri Aali Piya'",
-      "Pandit Bhimsen Joshi - Raag Yaman 'Kahe Sakhi Kaise Ke Karoon'"
     ]
   },
   bhairav: {
@@ -76,11 +71,6 @@ export const TRADITIONAL_COMPOSITIONS: Record<string, { bandishes: string[]; lis
       "Jago Mohan Pyare (Vilambit Khayal composition)",
       "Mero Man Har Leeno (Teentaal composition)",
       "Pratham Alaap Kare (Dhrupad Chautaal traditional piece)"
-    ],
-    listening: [
-      "Pandit Jasraj - Raag Bhairav Morning Arati 'Prabho Mere Man Te'",
-      "Kishori Amonkar - Raag Bhairav 'Mero Man Yara'",
-      "Ustad Amir Khan - Raag Bhairav Pristine Alap"
     ]
   },
   bageshree: {
@@ -88,11 +78,6 @@ export const TRADITIONAL_COMPOSITIONS: Record<string, { bandishes: string[]; lis
       "Kaun Gat Bhayi (Madhya Roopak bandish)",
       "Eri Maai Piya Bina (Drut Teentaal bandish)",
       "Kahe Maan Karo (Ektaal traditional composition)"
-    ],
-    listening: [
-      "Ustad Amir Khan - Raag Bageshree 'Chubhan Laagi Piya'",
-      "Pandit Bhimsen Joshi - 'Kaun Gat Bhayi' Live at Sawai Gandharva",
-      "Ustad Rashid Khan - Drut Bageshree composition"
     ]
   },
   darbari: {
@@ -100,11 +85,6 @@ export const TRADITIONAL_COMPOSITIONS: Record<string, { bandishes: string[]; lis
       "Anahat Naad Mahadeva (Vilambit Jhumra composition)",
       "Kinare Kinare Dariya (Teentaal composition)",
       "Ya Muhammad Shah (Traditional courtly Khayal composition)"
-    ],
-    listening: [
-      "Ustad Amir Khan - Sovereign Darbari 'Ya Maula Ya Jilani'",
-      "Pandit Bhimsen Joshi - 'Ya Muhammad Shah' (Rampur-Sahaswan style)",
-      "Kishori Amonkar - Majestic Darbari Jhumra"
     ]
   },
   malkauns: {
@@ -112,11 +92,6 @@ export const TRADITIONAL_COMPOSITIONS: Record<string, { bandishes: string[]; lis
       "Koyaliya Bole Dar Dar (Teentaal traditional composition)",
       "Mandar Baje (Madhya Laya Jhaptal composition)",
       "Tu Hai Niranjana (Drut Teentaal spiritual piece)"
-    ],
-    listening: [
-      "Ustad Amir Khan - Raag Malkauns 'Sughara Chatar Baiyan'",
-      "Pandit Bhimsen Joshi - 'Piranha Jane Ko' Live",
-      "Kumar Gandharva - Mystical Malkauns folk-fusion"
     ]
   },
   bhimpalasi: {
@@ -124,11 +99,6 @@ export const TRADITIONAL_COMPOSITIONS: Record<string, { bandishes: string[]; lis
       "Eri Maai Aaj Shubha Din (Roopak Tal traditional composition)",
       "Ja Re Kagava Sandesa (Madhya Jhaptal composition)",
       "Ab to Sun Le Pukaar (Drut Teentaal composition)"
-    ],
-    listening: [
-      "Kishori Amonkar - Breathtaking Bhimpalasi Alankars",
-      "Pandit Jasraj - 'Ab To Mori Sun Le Pukar' Live",
-      "Ustad Rashid Khan - Bhimpalasi Teentaal Tarana"
     ]
   }
 };
