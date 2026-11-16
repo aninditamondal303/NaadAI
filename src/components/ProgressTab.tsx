@@ -36,7 +36,7 @@ export const ProgressTab: React.FC = () => {
   const analyses = useMemo(() => history.filter((r): r is Extract<PracticeRecord, { kind: "analysis" }> => r.kind === "analysis"), [history]);
 
   const totalMinutes = useMemo(() => history.reduce((s, r) =>
-    s + (r.kind === "riyaz-timer" ? r.minutes : r.kind === "analysis" ? r.durationSec / 60 : 0), 0), [history]);
+    s + (r.kind === "riyaz-timer" ? r.minutes : "durationSec" in r ? r.durationSec / 60 : 0), 0), [history]);
   const streak = practiceStreakDays(history);
   const raags = new Set(analyses.map(a => a.raagId)).size;
   const week = minutesPerDay(history, 7).map(d => ({ ...d, minutes: Number(d.minutes.toFixed(1)) }));
@@ -58,6 +58,21 @@ export const ProgressTab: React.FC = () => {
     .slice(-20)
     .map(a => ({ date: shortDate(a.dateIso), longest: Number(a.longestPhraseSec!.toFixed(1)), typical: a.medianPhraseSec == null ? null : Number(a.medianPhraseSec.toFixed(1)) }));
 
+  // Highest clean speed (score >= 85) per palta / pakad, with the date it was first reached
+  const ladder = useMemo(() => {
+    const map = new Map<string, { raag: string; exercise: string; speed: number; date: string; attempts: number }>();
+    for (const r of history) {
+      if (r.kind !== "palta" && r.kind !== "pakad") continue;
+      const key = `${r.raagId}:${r.exerciseId}`;
+      const e = map.get(key) ?? { raag: r.raagName, exercise: r.exerciseName, speed: 0, date: "", attempts: 0 };
+      e.attempts++;
+      if (r.score >= 85 && r.speed > e.speed) { e.speed = r.speed; e.date = shortDate(r.dateIso); }
+      map.set(key, e);
+    }
+    return [...map.values()].sort((a, b) => a.raag.localeCompare(b.raag) || a.exercise.localeCompare(b.exercise));
+  }, [history]);
+  const SPEEDS = ["–", "Thah", "Dugun", "Tigun", "Chaugun"];
+
   // Range in cents relative to each session's Sa, so different Sa values compare fairly.
   const range = analyses.filter(a => a.lowest && a.highest).slice(-20).map((a, i) => ({
     n: `#${i + 1}`,
@@ -78,7 +93,7 @@ export const ProgressTab: React.FC = () => {
       </div>
 
       <p className="text-[11px] text-slate-500 px-1">
-        Built from what you have saved in this browser: recordings analysed in the Analyzer, Sa checks, Sa sadhana and timed riyaz sessions.
+        Built from what you have saved in this browser: recordings analysed in the Analyzer, Sa checks, Sa sadhana, paltas and timed riyaz sessions.
       </p>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
@@ -165,6 +180,25 @@ export const ProgressTab: React.FC = () => {
               </ResponsiveContainer>
             )}
           </div>
+        </div>
+
+        <div className="lg:col-span-2 bg-[#151A2E] p-5 rounded-2xl border border-slate-800 shadow-xl space-y-3">
+          <div>
+            <h4 className="text-sm font-bold text-slate-200">Laya ladder</h4>
+            <span className="text-[10px] font-mono text-slate-500">Highest speed sung cleanly (score 85+) for each palta and pakad</span>
+          </div>
+          {ladder.length === 0 ? <p className="text-xs text-slate-500">Practise a palta in the Paltas tab to start your laya ladder.</p> : (
+            <table className="w-full text-xs font-mono">
+              <thead><tr className="text-[9px] uppercase tracking-widest text-slate-500 text-left"><th className="py-1.5">Raag</th><th>Exercise</th><th>Highest clean speed</th><th>Reached</th><th>Attempts</th></tr></thead>
+              <tbody>
+                {ladder.map(l => (
+                  <tr key={l.raag + l.exercise} className="border-t border-slate-800 text-slate-200">
+                    <td className="py-1.5">{l.raag}</td><td>{l.exercise}</td><td>{SPEEDS[l.speed]}</td><td>{l.date || "–"}</td><td>{l.attempts}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          )}
         </div>
 
         <div className="lg:col-span-2 bg-[#151A2E] p-5 rounded-2xl border border-slate-800 shadow-xl space-y-4">

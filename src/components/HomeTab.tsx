@@ -13,6 +13,7 @@ import { RAAG_LIST, ComprehensiveRaag } from '../data/allRaags';
 import { addRecord, newId } from '../lib/practiceHistory';
 import { firstStringForRaag, STRING_ORDER, TanpuraEngine, type FirstString } from '../audio/tanpura';
 import { westernNote } from '../analysis/music';
+import type { AppTab } from '../types';
 
 // Pitch frequencies corresponding to classical standard scales (C3 base standard)
 
@@ -29,7 +30,7 @@ interface PracticeSession {
 }
 
 interface HomeTabProps {
-  setActiveTab: (tab: "home" | "tanpura" | "analyzer" | "journal" | "progress" | "library" | "profile") => void;
+  setActiveTab: (tab: AppTab) => void;
   setAnalyzerMode?: (mode: "scale" | "singing") => void;
   vocalistName?: string;
   baseTonicHz?: number;

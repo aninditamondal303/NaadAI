@@ -18,11 +18,11 @@ Reviewer: ____________________   Date: ____________
 - [ ] Avaroh: S' N D P M G R S
 - [ ] Vadi: G · Samvadi: N
 - [ ] Mood: Devotional, peaceful, serene, romantic
-- [ ] Pakad: N, R G R, P R, N, R S
-- [ ] Chalan 1: N, R G, R G M P
+- [ ] Pakad: N, R G R | P R | N, R S
+- [ ] Chalan 1: N, R G | R G M P
 - [ ] Chalan 2: M D N S'
-- [ ] Chalan 3: S' N D P, M G R S
-- [ ] Chalan 4: P R, N, R S
+- [ ] Chalan 3: S' N D P | M G R S
+- [ ] Chalan 4: P R | N, R S
 - [ ] Nyas swaras: G, P, N
 - [ ] Note: Uses tivra Ma. The aroh usually starts from mandra Ni (N, R G) rather than from Sa.
 - [ ] Compared with Shuddha Kalyan: Shuddha Kalyan ascends like Bhupali (S R G P D S'), leaving out Ma and Ni, and uses them only lightly in descent. Yaman uses tivra Ma and Ni freely in both directions.
@@ -40,8 +40,8 @@ Reviewer: ____________________   Date: ____________
 - [ ] Avaroh: S' D P G R S
 - [ ] Vadi: G · Samvadi: D
 - [ ] Mood: Pure joy, pristine clarity, deep resonance
-- [ ] Pakad: G R S D, S R G, P G, D P G R S
-- [ ] Chalan 1: S R G, P G, D P G R S
+- [ ] Pakad: G R S D, | S R G | P G | D P G R S
+- [ ] Chalan 1: S R G | P G | D P G R S
 - [ ] Chalan 2: G P D S'
 - [ ] Chalan 3: S' D P G R S
 - [ ] Nyas swaras: G, P, S
@@ -140,11 +140,11 @@ Reviewer: ____________________   Date: ____________
 - [ ] Avaroh: S' N d P m G r S
 - [ ] Vadi: d · Samvadi: r
 - [ ] Mood: Solemn, meditative, prayerful, divine
-- [ ] Pakad: S, G m d d P, G m r r S
+- [ ] Pakad: S | G m d d P | G m r r S
 - [ ] Chalan 1: S r G m P
 - [ ] Chalan 2: G m d d P
 - [ ] Chalan 3: m P d N S'
-- [ ] Chalan 4: S' N d P, m G r S
+- [ ] Chalan 4: S' N d P | m G r S
 - [ ] Nyas swaras: m, P, S
 - [ ] Note: Komal Re and komal Dha are sung with a slow andolan (gentle oscillation).
 - [ ] Compared with Kalingada: Same swaras, but Kalingada is lighter: komal Re and Dha are sung without Bhairav's slow andolan, and it moves more freely.
@@ -254,10 +254,10 @@ Reviewer: ____________________   Date: ____________
 - [ ] Avaroh: S' n D m P D m g R S
 - [ ] Vadi: m · Samvadi: S
 - [ ] Mood: Longing, sweet melancholy, romance
-- [ ] Pakad: S n D, S m g, m D n D, m g R S
+- [ ] Pakad: S n, D, | S m g | m D n D | m g R S
 - [ ] Chalan 1: S g m D n S'
-- [ ] Chalan 2: m D n D, m g
-- [ ] Chalan 3: S' n D m, g R S
+- [ ] Chalan 2: m D n D | m g
+- [ ] Chalan 3: S' n D m | g R S
 - [ ] Nyas swaras: m, D, S
 - [ ] Note: Pa is weak or omitted in the ascent; Ma is the central swara.
 - [ ] Compared with Bhimpalasi: Bhimpalasi rests on Pa and avoids Dha in the ascent; Bageshree centres on Ma and Dha with Pa used sparingly.
@@ -275,10 +275,10 @@ Reviewer: ____________________   Date: ____________
 - [ ] Avaroh: S' n D P m g R S
 - [ ] Vadi: m · Samvadi: S
 - [ ] Mood: Quiet passion, emotional soothing, warmth
-- [ ] Pakad: n, S m, m g P m, g m g R S
+- [ ] Pakad: n, S m | m g P m | g m g R S
 - [ ] Chalan 1: n, S g m P
 - [ ] Chalan 2: m P n S'
-- [ ] Chalan 3: S' n D P, m P g m g R S
+- [ ] Chalan 3: S' n D P | m P g m g R S
 - [ ] Nyas swaras: m, P, S
 - [ ] Note: Re and Dha are left out of the ascent (Audav-Sampurna).
 - [ ] Compared with Bageshree: Bageshree uses Pa only weakly and dwells on Dha (m D n D); Bhimpalasi rests on Pa and Ma and skips Dha in the ascent. Bageshree is a night raag, Bhimpalasi an afternoon raag.
@@ -439,10 +439,10 @@ Reviewer: ____________________   Date: ____________
 - [ ] Avaroh: S' n d m g S
 - [ ] Vadi: m · Samvadi: S
 - [ ] Mood: Mystical, deeply gravity-bound, intense focus
-- [ ] Pakad: d n d m, g m g S
-- [ ] Chalan 1: S g m, g m d
+- [ ] Pakad: d n d m | g m g S
+- [ ] Chalan 1: S g m | g m d
 - [ ] Chalan 2: m d n S'
-- [ ] Chalan 3: S' n d m, g m g S
+- [ ] Chalan 3: S' n d m | g m g S
 - [ ] Nyas swaras: m, g, S
 - [ ] Note: Pentatonic: Re and Pa are omitted. Sung with slow, heavy movements between swaras.
 - [ ] Compared with Chandrakauns: Chandrakauns uses shuddha Ni instead of komal Ni.
@@ -564,10 +564,10 @@ Reviewer: ____________________   Date: ____________
 - [ ] Avaroh: S' N d P M g r S
 - [ ] Vadi: d · Samvadi: g
 - [ ] Mood: Melancholy, supreme spiritual yearning
-- [ ] Pakad: d, N S r g, r g r S
-- [ ] Chalan 1: S r g, M d
+- [ ] Pakad: d, N, S r g | r g r S
+- [ ] Chalan 1: S r g | M d
 - [ ] Chalan 2: M d N S'
-- [ ] Chalan 3: S' N d, M g r g r S
+- [ ] Chalan 3: S' N d | M g r g r S
 - [ ] Nyas swaras: g, d, S
 - [ ] Note: Komal Re, komal Ga and komal Dha are sung low and with care; Pa is used sparingly (often skipped in the ascent).
 - [ ] Compared with Multani: Same scale, but Multani uses komal Re and Dha only weakly, rests on Pa and komal Ga, and starts phrases from mandra Ni (N, S g M P). Multani is an afternoon raag.
@@ -599,10 +599,10 @@ Reviewer: ____________________   Date: ____________
 - [ ] Avaroh: S' N D M G r S
 - [ ] Vadi: r · Samvadi: D
 - [ ] Mood: Sunset tension, transitional awe
-- [ ] Pakad: D, N, r G M G r, S
+- [ ] Pakad: D, N, r G M G r | S
 - [ ] Chalan 1: N, r G M D
-- [ ] Chalan 2: M D N r', N D
-- [ ] Chalan 3: M G r, S
+- [ ] Chalan 2: M D N r' | N D
+- [ ] Chalan 3: M G r | S
 - [ ] Nyas swaras: r, D
 - [ ] Note: Pa is omitted. Sa is used sparingly, which gives Marwa its restless, unresolved feel.
 - [ ] Compared with Puriya: Same swaras. Marwa emphasises komal Re and Dha and avoids resting on Sa; Puriya emphasises Ga and Ni and the lower half (mandra Ni).
@@ -621,9 +621,9 @@ Reviewer: ____________________   Date: ____________
 - [ ] Avaroh: S' N D M G r S
 - [ ] Vadi: G · Samvadi: N
 - [ ] Mood: Mystic shadows, profound reflection
-- [ ] Pakad: N, r G, M D G, M G r S
-- [ ] Chalan 1: N, r G, M G
-- [ ] Chalan 2: M D N, M D G
+- [ ] Pakad: N, r G | M D G | M G r S
+- [ ] Chalan 1: N, r G | M G
+- [ ] Chalan 2: M D N | M D G
 - [ ] Chalan 3: M G r S
 - [ ] Nyas swaras: G, N
 - [ ] Note: Pa is omitted. The raag is developed mainly in the lower and middle range.
