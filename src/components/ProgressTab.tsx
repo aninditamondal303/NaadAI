@@ -1,182 +1,143 @@
 /**
- * @license
- * SPDX-License-Identifier: Apache-2.0
+ * Progress: built only from the practice history saved in this browser
+ * (analyses, Sa checks and timed riyaz sessions). A new user sees empty
+ * charts with an explanation, never sample data.
  */
-
-import React, { useState } from 'react';
-import { 
-  BarChart, Bar, ResponsiveContainer, CartesianGrid, XAxis, YAxis, 
-  Tooltip, LineChart, Line, AreaChart, Area 
+import React, { useEffect, useMemo, useState } from 'react';
+import {
+  Bar, BarChart, CartesianGrid, Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis,
 } from 'recharts';
-import { Award, Flame, Hourglass, Bookmark, Compass, Sparkles } from 'lucide-react';
+import { Bookmark, Compass, Flame, Hourglass } from 'lucide-react';
+import { loadHistory, onHistoryChange, type PracticeRecord } from '../lib/practiceHistory';
+import { minutesPerDay, practiceStreakDays } from '../lib/stats';
+import { centsBetween } from '../analysis/music';
+
+const tooltipStyle = { backgroundColor: '#0F1115', borderColor: '#334155', borderRadius: '12px', fontSize: 11 };
+const shortDate = (iso: string) => new Date(iso).toLocaleDateString(undefined, { day: "numeric", month: "short" });
+
+const Empty: React.FC<{ children: React.ReactNode }> = ({ children }) => (
+  <div className="h-full flex items-center justify-center text-center text-xs text-slate-500 px-6">{children}</div>
+);
+
+const Stat: React.FC<{ icon: React.ReactNode; label: string; value: string }> = ({ icon, label, value }) => (
+  <div className="bg-[#151A2E] p-4 rounded-xl border border-slate-800/80 shadow-lg flex items-center gap-4">
+    <div className="h-10 w-10 shrink-0 rounded-xl bg-[#7C3AED]/20 border border-[#7C3AED]/30 flex items-center justify-center text-[#FBBF24]">{icon}</div>
+    <div>
+      <span className="text-[9px] font-mono text-slate-500 uppercase tracking-widest block">{label}</span>
+      <span className="text-2xl font-black font-mono text-slate-200">{value}</span>
+    </div>
+  </div>
+);
 
 export const ProgressTab: React.FC = () => {
-  // Practice hours dataset
-  const weeklyPracticeData = [
-    { day: "Mon", hours: 1.2, sessions: 2 },
-    { day: "Tue", hours: 0.8, sessions: 1 },
-    { day: "Wed", hours: 1.5, sessions: 3 },
-    { day: "Thu", hours: 2.0, sessions: 4 },
-    { day: "Fri", hours: 1.1, sessions: 2 },
-    { day: "Sat", hours: 2.4, sessions: 3 },
-    { day: "Sun", hours: 1.8, sessions: 2 },
-  ];
+  const [history, setHistory] = useState<PracticeRecord[]>(() => loadHistory());
+  useEffect(() => onHistoryChange(() => setHistory(loadHistory())), []);
 
-  // Vocal microtone stability & accuracy over sessions
-  const surAccuracyEvolutionData = [
-    { session: "#1", accuracy: 76, deviation: 22 },
-    { session: "#2", accuracy: 79, deviation: 19 },
-    { session: "#3", accuracy: 82, deviation: 15 },
-    { session: "#4", accuracy: 80, deviation: 16 },
-    { session: "#5", accuracy: 85, deviation: 11 },
-    { session: "#6", accuracy: 89, deviation: 9 },
-    { session: "#7", accuracy: 88, deviation: 8 },
-    { session: "#8", accuracy: 91, deviation: 6 },
-    { session: "#9", accuracy: 94, deviation: 4 },
-    { session: "#10", accuracy: 93, deviation: 5 }
-  ];
+  const analyses = useMemo(() => history.filter((r): r is Extract<PracticeRecord, { kind: "analysis" }> => r.kind === "analysis"), [history]);
 
-  // Frequency range extension (Low limit is stable, high boundary expands over days)
-  const rangeExtensionData = [
-    { age: "Day 1", lowNote: 130.81, lowLabel: "C3", highNote: 523.25, highLabel: "C5" },
-    { age: "Day 10", lowNote: 130.81, lowLabel: "C3", highNote: 587.33, highLabel: "D5" },
-    { age: "Day 20", lowNote: 130.81, lowLabel: "C3", highNote: 659.25, highLabel: "E5" },
-    { age: "Day 30", lowNote: 110.00, lowLabel: "A2", highNote: 698.46, highLabel: "F5" },
-    { age: "Day 40", lowNote: 110.00, lowLabel: "A2", highNote: 783.99, highLabel: "G5" }
-  ];
+  const totalMinutes = useMemo(() => history.reduce((s, r) =>
+    s + (r.kind === "riyaz-timer" ? r.minutes : r.kind === "analysis" ? r.durationSec / 60 : 0), 0), [history]);
+  const streak = practiceStreakDays(history);
+  const raags = new Set(analyses.map(a => a.raagId)).size;
+  const week = minutesPerDay(history, 7).map(d => ({ ...d, minutes: Number(d.minutes.toFixed(1)) }));
+
+  const accuracy = analyses.slice(-20).map((a, i) => ({
+    n: `#${analyses.length - Math.min(20, analyses.length) + i + 1}`,
+    date: shortDate(a.dateIso),
+    within20: a.heldWithin20CentsPct === null ? null : Number(a.heldWithin20CentsPct.toFixed(1)),
+    medianCents: a.medianAbsDeviationCents === null ? null : Number(a.medianAbsDeviationCents.toFixed(1)),
+  }));
+
+  // Range in cents relative to each session's Sa, so different Sa values compare fairly.
+  const range = analyses.filter(a => a.lowest && a.highest).slice(-20).map((a, i) => ({
+    n: `#${i + 1}`,
+    date: shortDate(a.dateIso),
+    low: Number((centsBetween(a.lowest!.hz, a.saHz) / 100).toFixed(1)),
+    high: Number((centsBetween(a.highest!.hz, a.saHz) / 100).toFixed(1)),
+    lowLabel: a.lowest!.label,
+    highLabel: a.highest!.label,
+  }));
 
   return (
     <div className="space-y-6">
-      
-      {/* Visual Stats Summary Bento Rows */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
-        
-        {/* Stat 1: Total Riyaz Hours */}
-        <div className="bg-[#151A2E] p-4 rounded-xl border border-slate-800/80 shadow-lg flex items-center gap-4">
-          <div className="h-10 w-10 shrink-0 rounded-xl bg-[#7C3AED]/20 border border-[#7C3AED]/30 flex items-center justify-center text-[#FBBF24]">
-            <Hourglass className="h-5 w-5 animate-pulse" />
-          </div>
-          <div>
-            <span className="text-[9px] font-mono text-slate-500 uppercase tracking-widest block">Total Riyaz Hours</span>
-            <span className="text-2xl font-black font-mono text-slate-200">10.8 <span className="text-xs text-slate-400 font-semibold uppercase">hrs</span></span>
-          </div>
-        </div>
-
-        {/* Stat 2: Active Streak */}
-        <div className="bg-[#151A2E] p-4 rounded-xl border border-slate-800/80 shadow-lg flex items-center gap-4">
-          <div className="h-10 w-10 shrink-0 rounded-xl bg-orange-950/20 border border-orange-700/30 flex items-center justify-center text-orange-400">
-            <Flame className="h-5 w-5 fill-current animate-bounce" />
-          </div>
-          <div>
-            <span className="text-[9px] font-mono text-slate-500 uppercase tracking-widest block">Practice Streak</span>
-            <span className="text-2xl font-black font-mono text-orange-400">14 <span className="text-xs text-slate-400 font-semibold uppercase font-sans">Days</span></span>
-          </div>
-        </div>
-
-        {/* Stat 3: Total Sessions */}
-        <div className="bg-[#151A2E] p-4 rounded-xl border border-slate-800/80 shadow-lg flex items-center gap-4">
-          <div className="h-10 w-10 shrink-0 rounded-xl bg-[#38BDF8]/20 border border-[#38BDF8]/30 flex items-center justify-center text-[#38BDF8]">
-            <Bookmark className="h-5 w-5" />
-          </div>
-          <div>
-            <span className="text-[9px] font-mono text-slate-500 uppercase tracking-widest block">Logged Sessions</span>
-            <span className="text-2xl font-black font-mono text-slate-200">17</span>
-          </div>
-        </div>
-
-        {/* Stat 4: Raga Mastery Index */}
-        <div className="bg-[#151A2E] p-4 rounded-xl border border-slate-800/80 shadow-lg flex items-center gap-4">
-          <div className="h-10 w-10 shrink-0 rounded-xl bg-emerald-950/25 border border-emerald-700/30 flex items-center justify-center text-emerald-400">
-            <Compass className="h-5 w-5" />
-          </div>
-          <div>
-            <span className="text-[9px] font-mono text-slate-500 uppercase tracking-widest block">Ragas Attempted</span>
-            <span className="text-2xl font-black font-mono text-slate-200">6</span>
-          </div>
-        </div>
-
+        <Stat icon={<Hourglass className="h-5 w-5" />} label="Practice time" value={totalMinutes >= 60 ? `${(totalMinutes / 60).toFixed(1)} h` : `${Math.round(totalMinutes)} min`} />
+        <Stat icon={<Flame className="h-5 w-5" />} label="Practice streak" value={`${streak} ${streak === 1 ? "day" : "days"}`} />
+        <Stat icon={<Bookmark className="h-5 w-5" />} label="Analysed recordings" value={String(analyses.length)} />
+        <Stat icon={<Compass className="h-5 w-5" />} label="Raags analysed" value={String(raags)} />
       </div>
 
-      {/* Main Charts double column block */}
+      <p className="text-[11px] text-slate-500 px-1">
+        Built from what you have saved in this browser: recordings analysed in the Analyzer, Sa checks and timed riyaz sessions.
+      </p>
+
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-        
-        {/* Chart A: Shuddha Swara Audition Accuracy over trials */}
-        <div className="bg-[#151A2E] p-5 rounded-2xl border border-slate-850/80 shadow-xl space-y-4">
+        <div className="bg-[#151A2E] p-5 rounded-2xl border border-slate-800 shadow-xl space-y-4">
           <div>
-            <h4 className="text-sm font-bold text-slate-200 font-sans tracking-wide">Swara Cent Deviation Accuracy</h4>
-            <span className="text-[10px] font-mono text-slate-500">Stability percentage and cent drift reduction across the last 10 practice takes</span>
+            <h4 className="text-sm font-bold text-slate-200">Swara accuracy per recording</h4>
+            <span className="text-[10px] font-mono text-slate-500">Held-note time within ±20 cents (%) and median distance from the swara (cents), last 20 recordings</span>
           </div>
-
           <div className="h-56">
-            <ResponsiveContainer width="100%" height="100%">
-              <AreaChart data={surAccuracyEvolutionData} margin={{ left: -25, right: 10, top: 10, bottom: 0 }}>
-                <defs>
-                  <linearGradient id="colorAcc" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="#7C3AED" stopOpacity={0.4}/>
-                    <stop offset="95%" stopColor="#7C3AED" stopOpacity={0.0}/>
-                  </linearGradient>
-                </defs>
-                <CartesianGrid strokeDasharray="3 3" stroke="#1e293b/30" />
-                <XAxis dataKey="session" tick={{ fill: '#64748b', fontSize: 9 }} />
-                <YAxis domain={[50, 100]} tick={{ fill: '#64748b', fontSize: 9 }} />
-                <Tooltip contentStyle={{ backgroundColor: '#0F1115', borderColor: '#334155', borderRadius: '12px', fontSize: 11 }} />
-                <Area type="monotone" name="Swar Accuracy (%)" dataKey="accuracy" stroke="#7C3AED" strokeWidth={2.5} fillOpacity={1} fill="url(#colorAcc)" />
-                <Line type="monotone" name="Dev Drifts (Cents)" dataKey="deviation" stroke="#38BDF8" strokeWidth={1.5} dot />
-              </AreaChart>
-            </ResponsiveContainer>
+            {accuracy.length === 0 ? <Empty>Analyse a recording in the Analyzer to see your swara accuracy here.</Empty> : (
+              <ResponsiveContainer width="100%" height="100%">
+                <LineChart data={accuracy} margin={{ left: -20, right: 10, top: 10, bottom: 0 }}>
+                  <CartesianGrid strokeDasharray="3 3" stroke="#1e293b" />
+                  <XAxis dataKey="date" tick={{ fill: '#64748b', fontSize: 9 }} />
+                  <YAxis yAxisId="pct" domain={[0, 100]} tick={{ fill: '#64748b', fontSize: 9 }} />
+                  <YAxis yAxisId="cents" orientation="right" tick={{ fill: '#64748b', fontSize: 9 }} />
+                  <Tooltip contentStyle={tooltipStyle} />
+                  <Line yAxisId="pct" name="Within ±20 cents (%)" dataKey="within20" stroke="#7C3AED" strokeWidth={2} dot connectNulls={false} />
+                  <Line yAxisId="cents" name="Median distance (cents)" dataKey="medianCents" stroke="#38BDF8" strokeWidth={1.5} dot connectNulls={false} />
+                </LineChart>
+              </ResponsiveContainer>
+            )}
           </div>
         </div>
 
-        {/* Chart B: Practice Volume (BPM representation of Hours) */}
-        <div className="bg-[#151A2E] p-5 rounded-2xl border border-slate-850/80 shadow-xl space-y-4">
+        <div className="bg-[#151A2E] p-5 rounded-2xl border border-slate-800 shadow-xl space-y-4">
           <div>
-            <h4 className="text-sm font-bold text-slate-200 font-sans tracking-wide">Riyāz Volume Schedule</h4>
-            <span className="text-[10px] font-mono text-slate-500">Practice duration workload and trial frequencies logged during the last 7 days</span>
+            <h4 className="text-sm font-bold text-slate-200">Practice time, last 7 days</h4>
+            <span className="text-[10px] font-mono text-slate-500">Minutes from timed riyaz sessions and analysed recordings</span>
           </div>
-
           <div className="h-56">
-            <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={weeklyPracticeData} margin={{ left: -25, right: 10, top: 10, bottom: 0 }}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#1e293b/30" />
-                <XAxis dataKey="day" tick={{ fill: '#64748b', fontSize: 9 }} />
-                <YAxis tick={{ fill: '#64748b', fontSize: 9 }} />
-                <Tooltip contentStyle={{ backgroundColor: '#0F1115', borderColor: '#334155', borderRadius: '12px', fontSize: 11 }} />
-                <Bar name="Clocked Hours" dataKey="hours" fill="#38BDF8" radius={[4, 4, 0, 0]} maxBarSize={30} />
-              </BarChart>
-            </ResponsiveContainer>
+            {totalMinutes === 0 ? <Empty>Start a timed riyaz on the Home tab or analyse a recording to log practice time.</Empty> : (
+              <ResponsiveContainer width="100%" height="100%">
+                <BarChart data={week} margin={{ left: -20, right: 10, top: 10, bottom: 0 }}>
+                  <CartesianGrid strokeDasharray="3 3" stroke="#1e293b" />
+                  <XAxis dataKey="label" tick={{ fill: '#64748b', fontSize: 9 }} />
+                  <YAxis tick={{ fill: '#64748b', fontSize: 9 }} />
+                  <Tooltip contentStyle={tooltipStyle} />
+                  <Bar name="Minutes" dataKey="minutes" fill="#38BDF8" radius={[4, 4, 0, 0]} maxBarSize={30} />
+                </BarChart>
+              </ResponsiveContainer>
+            )}
           </div>
         </div>
 
-        {/* Chart C: Vocal Range Growth */}
-        <div className="lg:col-span-2 bg-[#151A2E] p-5 rounded-2xl border border-slate-850/80 shadow-xl space-y-4">
-          <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-1">
-            <div>
-              <h4 className="text-sm font-bold text-slate-200 font-sans tracking-wide">Vocal Range & Saptak Growth (Pitch Reach)</h4>
-              <span className="text-[10px] font-mono text-slate-500">Sustained musical limits mapping frequency expansion over 40-day periodic development</span>
-            </div>
-            <div className="flex gap-2 text-[9px] font-mono uppercase bg-[#0F1115] px-2.5 py-1 rounded-lg border border-slate-800">
-              <span className="text-[#38BDF8] font-bold">Stable Base: C3 (male)</span>
-              <span className="text-slate-500">•</span>
-              <span className="text-[#FBBF24] font-bold">Target reach: G5 (vocal range ceiling)</span>
-            </div>
+        <div className="lg:col-span-2 bg-[#151A2E] p-5 rounded-2xl border border-slate-800 shadow-xl space-y-4">
+          <div>
+            <h4 className="text-sm font-bold text-slate-200">Range of held notes</h4>
+            <span className="text-[10px] font-mono text-slate-500">Lowest and highest held note per recording, in semitones from Sa (0 = Sa, 12 = taar Sa, −5 = mandra Pa)</span>
           </div>
-
           <div className="h-48">
-            <ResponsiveContainer width="100%" height="100%">
-              <LineChart data={rangeExtensionData} margin={{ left: -10, right: 15, top: 10, bottom: 0 }}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#1e293b/30" />
-                <XAxis dataKey="age" tick={{ fill: '#64748b', fontSize: 9 }} />
-                <YAxis unit="Hz" tick={{ fill: '#64748b', fontSize: 9 }} />
-                <Tooltip contentStyle={{ backgroundColor: '#0F1115', borderColor: '#334155', borderRadius: '12px', fontSize: 11 }} />
-                <Line type="monotone" name="High Saptak Boundary (Hz)" dataKey="highNote" stroke="#FBBF24" strokeWidth={3} dot={{ r: 5 }} activeDot={{ r: 8 }} />
-                <Line type="monotone" name="Low Saptak Boundary (Hz)" dataKey="lowNote" stroke="#38BDF8" strokeWidth={2} strokeDasharray="4 4" />
-              </LineChart>
-            </ResponsiveContainer>
+            {range.length === 0 ? <Empty>Your range will appear here after you analyse recordings with held notes.</Empty> : (
+              <ResponsiveContainer width="100%" height="100%">
+                <LineChart data={range} margin={{ left: -20, right: 15, top: 10, bottom: 0 }}>
+                  <CartesianGrid strokeDasharray="3 3" stroke="#1e293b" />
+                  <XAxis dataKey="date" tick={{ fill: '#64748b', fontSize: 9 }} />
+                  <YAxis tick={{ fill: '#64748b', fontSize: 9 }} />
+                  <Tooltip
+                    contentStyle={tooltipStyle}
+                    formatter={(v: any, name: any, p: any) => [`${v} (${name === "Highest" ? p.payload.highLabel : p.payload.lowLabel})`, name]}
+                  />
+                  <Line name="Highest" dataKey="high" stroke="#FBBF24" strokeWidth={2} dot />
+                  <Line name="Lowest" dataKey="low" stroke="#38BDF8" strokeWidth={2} dot />
+                </LineChart>
+              </ResponsiveContainer>
+            )}
           </div>
         </div>
-
       </div>
-
     </div>
   );
 };

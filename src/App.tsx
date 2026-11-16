@@ -715,7 +715,7 @@ export default function App() {
         {activeTab === "journal" && <JournalTab />}
         {activeTab === "progress" && <ProgressTab />}
         {activeTab === "library" && <LibraryTab />}
-        {activeTab === "profile" && <ProfileTab />}
+        {activeTab === "profile" && <ProfileTab baseTonicHz={baseTonicHz} vocalistName={vocalistName} />}
       </main>
 
       {/* Aesthetic classical credits footer */}

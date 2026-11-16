@@ -10,6 +10,7 @@ import {
   Clock, Volume2, Sliders, Settings, Square, RotateCcw, Award
 } from 'lucide-react';
 import { ALL_84_RAAGS, ComprehensiveRaag } from '../data/allRaags';
+import { addRecord, newId } from '../lib/practiceHistory';
 
 // Pitch frequencies corresponding to classical standard scales (C3 base standard)
 const NOTE_PITCHES = [
@@ -240,6 +241,7 @@ export const HomeTab: React.FC<HomeTabProps> = ({
 
   // Practice session state
   const [activePractice, setActivePractice] = useState<PracticeSession | null>(null);
+  const [savedMessage, setSavedMessage] = useState<string | null>(null);
   const [selectedPracticeRaag, setSelectedPracticeRaag] = useState<string>("yaman");
   const [selectedPracticeScale, setSelectedPracticeScale] = useState<string>("C#");
   const [selectedPracticeDuration, setSelectedPracticeScaleDuration] = useState<number>(30);
@@ -453,13 +455,22 @@ export const HomeTab: React.FC<HomeTabProps> = ({
     stopPracticeTanpura();
     
     if (saveToJournal && activePractice) {
-      // Calculate practice elapsed
+      // Real elapsed time of this timed session
       const totalSeconds = activePractice.durationMins * 60;
-      const actualElapsedSeconds = totalSeconds - activePractice.secondsRemaining;
-      const elapsedMins = Math.floor(actualElapsedSeconds / 60);
-      
-      // Increment streak
-      alert(`Riyāz Session Log Saved! You completed ${elapsedMins || 1} minutes of disciplined practice on ${activePractice.raagName} (${activePractice.scaleLabel} Standard). Pranam.`);
+      const elapsedMinutes = (totalSeconds - activePractice.secondsRemaining) / 60;
+      if (elapsedMinutes >= 0.5) {
+        addRecord({
+          kind: "riyaz-timer",
+          id: newId(),
+          dateIso: new Date().toISOString(),
+          raagName: activePractice.raagName,
+          minutes: Number(elapsedMinutes.toFixed(1)),
+        });
+        setSavedMessage(`Saved ${Math.round(elapsedMinutes)} min of riyaz on ${activePractice.raagName}.`);
+      } else {
+        setSavedMessage("Sessions shorter than 30 seconds are not saved.");
+      }
+      window.setTimeout(() => setSavedMessage(null), 4000);
     }
     setActivePractice(null);
   };
@@ -585,6 +596,9 @@ export const HomeTab: React.FC<HomeTabProps> = ({
 
   return (
     <div className="space-y-6">
+      {savedMessage && (
+        <div className="p-3 rounded-xl border border-emerald-600/40 bg-emerald-500/10 text-emerald-200 text-xs" role="status">{savedMessage}</div>
+      )}
       
       {/* IMMERSIVE RIYAZ PRACTICE ACTIVE COMPANION SCREEN */}
       {activePractice && currentPracticeDetails ? (
