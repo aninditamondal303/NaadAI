@@ -4,6 +4,7 @@
  */
 import React from 'react';
 import { signedCents, westernNote } from '../../analysis/music';
+import { mmss } from '../../analysis/rules';
 import type { TakeMeasurements } from '../../analysis/summary';
 import type { PitchTrack } from '../../analysis/types';
 import { PitchContour } from './PitchContour';
@@ -74,8 +75,51 @@ export const TakeReport: React.FC<TakeReportProps> = ({ m, track, raagName, allo
 
       <div className="bg-[#151A2E] p-5 rounded-2xl border border-slate-800 space-y-2">
         <h3 className="text-xs font-mono font-bold text-slate-300 uppercase tracking-widest">Pitch over time</h3>
-        <p className="text-[11px] text-slate-500">Measured pitch in cents above Sa. Lines show the raag's swaras; the gold line is Sa. Gaps are silence or breath.</p>
-        <PitchContour track={track} saHz={m.saHz} allowedSwaras={allowedSwaras} />
+        <p className="text-[11px] text-slate-500">
+          Measured pitch in cents above Sa: meends show as smooth curves between swaras. Lines show the raag's swaras; the gold line is Sa.
+          Gaps are silence or breath. Red bands: swaras outside the raag; blue bands: measured oscillations.
+        </p>
+        <PitchContour track={track} saHz={m.saHz} allowedSwaras={allowedSwaras}
+          marks={[...m.ruleFlags.map(f => ({ startSec: f.atSec, durSec: f.durSec, kind: "flag" as const })), ...m.oscillations.map(o => ({ startSec: o.startSec, durSec: o.durSec, kind: "oscillation" as const }))]} />
+      </div>
+
+      <div className="bg-[#151A2E] p-5 rounded-2xl border border-slate-800 space-y-2">
+        <h3 className="text-xs font-mono font-bold text-slate-300 uppercase tracking-widest">Raag rule check</h3>
+        {m.ruleFlags.length === 0 ? (
+          <p className="text-xs text-emerald-300">No swara outside Raag {raagName} was held for 0.4 s or longer.</p>
+        ) : (
+          <ul className="space-y-1 text-xs font-mono">
+            {m.ruleFlags.map((f, i) => (
+              <li key={i} className="text-rose-300">
+                {mmss(f.atSec)} · {f.name} ({f.label}) held {f.durSec.toFixed(1)} s · not in Raag {raagName}
+              </li>
+            ))}
+          </ul>
+        )}
+        <p className="text-[10px] text-slate-500">Only clear holds of 0.4 s or more are flagged. Short touches and passing notes are allowed and ignored.</p>
+      </div>
+
+      <div className="bg-[#151A2E] p-5 rounded-2xl border border-slate-800 space-y-2">
+        <h3 className="text-xs font-mono font-bold text-slate-300 uppercase tracking-widest">Oscillations (andolan, gamak)</h3>
+        {m.oscillations.length === 0 ? (
+          <p className="text-xs text-slate-400">No regular oscillation (at least two full swings of 20 cents or more) was found.</p>
+        ) : (
+          <table className="w-full text-xs font-mono">
+            <thead><tr className="text-[9px] uppercase tracking-widest text-slate-500 text-left"><th className="py-1.5">Time</th><th>Around</th><th>Speed</th><th>Width</th><th>Swings</th></tr></thead>
+            <tbody>
+              {m.oscillations.map((o, i) => (
+                <tr key={i} className="border-t border-slate-800 text-slate-200">
+                  <td className="py-1.5">{mmss(o.startSec)} ({o.durSec.toFixed(1)} s)</td>
+                  <td>{o.centreLabel}</td>
+                  <td>{o.rateHz.toFixed(1)} Hz <span className="text-slate-500">({o.speed === "slow" ? "slow, andolan-like" : "fast, gamak/vibrato-like"})</span></td>
+                  <td>±{o.widthCents.toFixed(0)} cents</td>
+                  <td>{o.cycles.toFixed(1)}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        )}
+        <p className="text-[10px] text-slate-500">These are measurements only: speed is swings per second, width is half the distance between the highest and lowest point. How an ornament should sound is for you and your guru to decide.</p>
       </div>
 
       <div className="bg-[#151A2E] p-5 rounded-2xl border border-slate-800 space-y-3">

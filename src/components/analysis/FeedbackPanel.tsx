@@ -16,8 +16,12 @@ export function feedbackPayload(m: TakeMeasurements, raagName: string) {
     heldSec: Number(m.heldSec.toFixed(1)),
     heldWithin20CentsPct: m.heldWithin20CentsPct === null ? null : Number(m.heldWithin20CentsPct.toFixed(1)),
     medianAbsDeviationCents: m.medianAbsDeviationCents === null ? null : Number(m.medianAbsDeviationCents.toFixed(1)),
+    longestPhraseSec: m.longestPhraseSec === null ? null : Number(m.longestPhraseSec.toFixed(1)),
+    medianPhraseSec: m.medianPhraseSec === null ? null : Number(m.medianPhraseSec.toFixed(1)),
     lowestNote: m.lowestNote?.label ?? null,
     highestNote: m.highestNote?.label ?? null,
+    ruleFlags: m.ruleFlags.map(f => ({ atSec: Number(f.atSec.toFixed(1)), swara: `${f.label} (${f.name})`, heldSec: Number(f.durSec.toFixed(1)) })),
+    oscillations: m.oscillations.map(o => ({ atSec: Number(o.startSec.toFixed(1)), around: o.centreLabel, rateHz: Number(o.rateHz.toFixed(1)), widthCents: Math.round(o.widthCents) })),
     swaras: m.swaras.map(s => ({
       swara: `${s.symbol} (${s.name})`,
       inRaag: s.inRaag,

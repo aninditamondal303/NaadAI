@@ -3,7 +3,7 @@
  *   npx tsx eval/make-wav.ts <out.wav> <sa|yaman> [saHz]
  */
 import { writeFileSync } from "node:fs";
-import { steady, synthVoice, SWARA_CENTS, type Segment } from "./synth";
+import { oscillating, steady, synthVoice, SWARA_CENTS, type Segment } from "./synth";
 
 const [out, kind = "yaman", saArg = "138.59"] = process.argv.slice(2);
 if (!out) throw new Error("usage: make-wav.ts <out.wav> <sa|yaman> [saHz]");
@@ -11,7 +11,18 @@ const sa = Number(saArg);
 const at = (sw: string, oct = 0) => sa * Math.pow(2, (SWARA_CENTS[sw] + 1200 * oct) / 1200);
 
 let segs: Segment[];
-if (kind === "sa") {
+if (kind === "yaman-mistakes") {
+  // Yaman phrase with a held shuddha Ma (not in Yaman) and an andolan on Ga
+  segs = [
+    { durSec: 0.3, f0: null }, { durSec: 1.5, f0: steady(sa) }, { durSec: 0.1, f0: null },
+    { durSec: 0.8, f0: steady(at("R")) }, { durSec: 0.1, f0: null },
+    { durSec: 3.0, f0: oscillating(at("G"), 30, 2) }, { durSec: 0.5, f0: null },
+    { durSec: 1.2, f0: steady(at("m")) }, { durSec: 0.1, f0: null },
+    { durSec: 1.0, f0: steady(at("G")) }, { durSec: 0.1, f0: null },
+    { durSec: 1.0, f0: steady(at("R")) }, { durSec: 0.1, f0: null },
+    { durSec: 1.5, f0: steady(sa) }, { durSec: 0.3, f0: null },
+  ];
+} else if (kind === "sa") {
   segs = [{ durSec: 0.5, f0: null }, { durSec: 8, f0: steady(sa) }, { durSec: 0.5, f0: null }];
 } else {
   const notes: [string, number, number][] = [
