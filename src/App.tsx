@@ -8,7 +8,7 @@ import { Music, Award, Sparkles, RefreshCw, Compass, AlertTriangle, FileText, Se
 import { DigitalTwinState } from './types';
 import { loadHistory, onHistoryChange } from './lib/practiceHistory';
 import { practiceStreakDays } from './lib/stats';
-import { getExpanded84Raags } from './data/allRaags';
+import { RAAG_LIST } from './data/allRaags';
 import { Backdrop } from './components/Backdrop';
 
 // Modular Tab components
@@ -20,7 +20,7 @@ import { ProgressTab } from './components/ProgressTab';
 import { LibraryTab } from './components/LibraryTab';
 import { ProfileTab } from './components/ProfileTab';
 
-const RAAGS = getExpanded84Raags();
+const RAAGS = RAAG_LIST;
 
 export default function App() {
   const [baseTonicHz, setBaseTonicHz] = useState<number>(130.81); // default Male standard Sa (C3)

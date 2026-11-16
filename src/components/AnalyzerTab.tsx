@@ -16,7 +16,7 @@ import { rmsOf, trackPitch, VOICING, windowSizeFor } from '../analysis/track';
 import { DEFAULT_PITCH_SETTINGS, type PitchTrack } from '../analysis/types';
 import { decodeAudioFile } from '../audio/decode';
 import { MicSession } from '../audio/mic';
-import { ALL_84_RAAGS } from '../data/allRaags';
+import { RAAG_LIST } from '../data/allRaags';
 import { addRecord, newId } from '../lib/practiceHistory';
 import { TakeReport } from './analysis/TakeReport';
 
@@ -28,7 +28,7 @@ interface AnalyzerTabProps {
   initialMode?: AnalyzerMode;
 }
 
-const RAAG_OPTIONS = [...ALL_84_RAAGS]
+const RAAG_OPTIONS = [...RAAG_LIST]
   .filter(r => r.allowedSwaras && r.allowedSwaras.length > 0)
   .map(r => ({ id: r.id, name: r.name.replace(/^Raag\s+/i, ""), allowedSwaras: r.allowedSwaras }))
   .sort((a, b) => a.name.localeCompare(b.name));
