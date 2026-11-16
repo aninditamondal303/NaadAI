@@ -104,8 +104,9 @@ export const TakeReport: React.FC<TakeReportProps> = ({ m, track, raagName, allo
         {m.oscillations.length === 0 ? (
           <p className="text-xs text-slate-400">No regular oscillation (at least two full swings of 20 cents or more) was found.</p>
         ) : (
-          <table className="w-full text-xs font-mono">
-            <thead><tr className="text-[9px] uppercase tracking-widest text-slate-500 text-left"><th className="py-1.5">Time</th><th>Around</th><th>Speed</th><th>Width</th><th>Swings</th></tr></thead>
+          <div className="overflow-x-auto">
+          <table className="w-full text-xs font-mono whitespace-nowrap">
+            <thead><tr className="text-[9px] uppercase tracking-widest text-slate-500 text-left"><th className="py-1.5 pr-3">Time</th><th className="pr-3">Around</th><th className="pr-3">Speed</th><th className="pr-3">Width</th><th>Swings</th></tr></thead>
             <tbody>
               {m.oscillations.map((o, i) => (
                 <tr key={i} className="border-t border-slate-800 text-slate-200">
@@ -118,6 +119,7 @@ export const TakeReport: React.FC<TakeReportProps> = ({ m, track, raagName, allo
               ))}
             </tbody>
           </table>
+          </div>
         )}
         <p className="text-[10px] text-slate-500">These are measurements only: speed is swings per second, width is half the distance between the highest and lowest point. How an ornament should sound is for you and your guru to decide.</p>
       </div>
@@ -128,7 +130,7 @@ export const TakeReport: React.FC<TakeReportProps> = ({ m, track, raagName, allo
           <p className="text-xs text-slate-400">No note was held for 0.25 s or longer, so there is nothing to measure per swara.</p>
         ) : (
           <div className="overflow-x-auto">
-            <table className="w-full text-xs font-mono">
+            <table className="w-full text-xs font-mono whitespace-nowrap">
               <thead>
                 <tr className="text-[9px] uppercase tracking-widest text-slate-500 text-left">
                   <th className="py-2 pr-3">Swara</th>

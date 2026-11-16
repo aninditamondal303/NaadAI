@@ -302,7 +302,7 @@ export default function App() {
 
       {/* Modern, elegant Midnight Mehfil header */}
       <header className="relative z-20 border-b border-[#7C3AED]/25 bg-[#151A2E]/85 backdrop-blur-md px-6 py-2">
-        <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-4">
+        <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-2 md:gap-4">
           
           <div className="flex items-center gap-3">
             <div className="h-10 w-10 rounded-xl bg-gradient-to-br from-[#7C3AED] to-[#38BDF8] flex items-center justify-center shadow-lg shadow-[#7C3AED]/30 select-none">
@@ -315,7 +315,7 @@ export default function App() {
           </div>
 
           {/* Core navigation tabs */}
-          <nav className="flex flex-wrap justify-center gap-1 font-mono text-[11px] font-bold">
+          <nav className="w-full md:w-auto flex flex-nowrap md:flex-wrap overflow-x-auto md:overflow-visible justify-start md:justify-center gap-1 pb-1 md:pb-0 font-mono text-[11px] font-bold">
             {[
               { id: "home", label: "Home", icon: Home },
               { id: "tanpura", label: "Tanpura & Taal", icon: Music },
@@ -333,7 +333,7 @@ export default function App() {
                   key={tab.id}
                   type="button"
                   onClick={() => setActiveTab(tab.id as any)}
-                  className={`px-3 py-2 rounded-xl flex items-center gap-1.5 transition-all cursor-pointer ${
+                  className={`shrink-0 whitespace-nowrap px-3 py-2 rounded-xl flex items-center gap-1.5 transition-all cursor-pointer ${
                     isActive 
                       ? "bg-[#7C3AED] text-slate-950 font-black shadow-lg shadow-[#7C3AED]/25 scale-102"
                       : "text-slate-400 hover:text-slate-200 hover:bg-slate-900/35"
