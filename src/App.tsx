@@ -19,6 +19,8 @@ import { JournalTab } from './components/JournalTab';
 import { ProgressTab } from './components/ProgressTab';
 import { LibraryTab } from './components/LibraryTab';
 import { ProfileTab } from './components/ProfileTab';
+import { PracticeTab } from './components/PracticeTab';
+import type { AppTab } from './types';
 
 const RAAGS = RAAG_LIST;
 
@@ -35,7 +37,7 @@ export default function App() {
   const [dashboardView, setDashboardView] = useState<"practice" | "informatics">("practice");
   
   // Seven active menu tabs for classical musicians
-  const [activeTab, setActiveTab] = useState<"home" | "tanpura" | "analyzer" | "journal" | "progress" | "library" | "profile">("home");
+  const [activeTab, setActiveTab] = useState<AppTab>("home");
   const [analyzerMode, setAnalyzerMode] = useState<"scale" | "singing">("singing");
 
   // Custom raga selection and filter states
@@ -643,10 +645,11 @@ export default function App() {
             {[
               { id: "home", label: "Home", icon: Home },
               { id: "tanpura", label: "Tanpura & Taal", icon: Music },
-              { id: "analyzer", label: "Raga Analyzer", icon: Activity },
-              { id: "journal", label: "Riyaz Journal", icon: BookOpen },
+              { id: "analyzer", label: "Analyzer", icon: Activity },
+              { id: "practice", label: "Paltas", icon: Award },
+              { id: "journal", label: "Journal", icon: BookOpen },
               { id: "progress", label: "Progress", icon: BarChart2 },
-              { id: "library", label: "Raga Library", icon: Compass },
+              { id: "library", label: "Library", icon: Compass },
               { id: "profile", label: "Profile", icon: User }
             ].map((tab) => {
               const Icon = tab.icon;
@@ -713,6 +716,7 @@ export default function App() {
         )}
         {activeTab === "journal" && <JournalTab />}
         {activeTab === "progress" && <ProgressTab />}
+        {activeTab === "practice" && <PracticeTab baseTonicHz={baseTonicHz} />}
         {activeTab === "library" && <LibraryTab />}
         {activeTab === "profile" && <ProfileTab baseTonicHz={baseTonicHz} vocalistName={vocalistName} />}
       </main>

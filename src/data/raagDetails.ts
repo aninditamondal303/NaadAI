@@ -9,7 +9,8 @@
  * `npm run raag:review` prints a checklist for that review.
  *
  * Notation: S r R g G m M P d D n N (lowercase r g d n = komal, m = shuddha
- * Ma, M = tivra Ma), "," = mandra (N,), "'" = taar (S').
+ * Ma, M = tivra Ma), "," after a swara = mandra (N,), "'" = taar (S'),
+ * "|" = a break between phrases.
  */
 
 export interface SimilarRaag {
@@ -35,8 +36,8 @@ const pending = { status: "pending" as const };
 
 export const RAAG_DETAILS: Record<string, RaagDetails> = {
   yaman: {
-    pakad: "N, R G R, P R, N, R S",
-    chalan: ["N, R G, R G M P", "M D N S'", "S' N D P, M G R S", "P R, N, R S"],
+    pakad: "N, R G R | P R | N, R S",
+    chalan: ["N, R G | R G M P", "M D N S'", "S' N D P | M G R S", "P R | N, R S"],
     nyas: ["G", "P", "N"],
     specialNotes: "Uses tivra Ma. The aroh usually starts from mandra Ni (N, R G) rather than from Sa.",
     similar: [
@@ -52,8 +53,8 @@ export const RAAG_DETAILS: Record<string, RaagDetails> = {
     review: pending,
   },
   bhupali: {
-    pakad: "G R S D, S R G, P G, D P G R S",
-    chalan: ["S R G, P G, D P G R S", "G P D S'", "S' D P G R S"],
+    pakad: "G R S D, | S R G | P G | D P G R S",
+    chalan: ["S R G | P G | D P G R S", "G P D S'", "S' D P G R S"],
     nyas: ["G", "P", "S"],
     specialNotes: "Pentatonic: Ma and Ni are omitted (varjit).",
     similar: [
@@ -70,8 +71,8 @@ export const RAAG_DETAILS: Record<string, RaagDetails> = {
     review: pending,
   },
   bhairav: {
-    pakad: "S, G m d d P, G m r r S",
-    chalan: ["S r G m P", "G m d d P", "m P d N S'", "S' N d P, m G r S"],
+    pakad: "S | G m d d P | G m r r S",
+    chalan: ["S r G m P", "G m d d P", "m P d N S'", "S' N d P | m G r S"],
     nyas: ["m", "P", "S"],
     specialNotes: "Komal Re and komal Dha are sung with a slow andolan (gentle oscillation).",
     similar: [
@@ -91,8 +92,8 @@ export const RAAG_DETAILS: Record<string, RaagDetails> = {
     review: pending,
   },
   malkauns: {
-    pakad: "d n d m, g m g S",
-    chalan: ["S g m, g m d", "m d n S'", "S' n d m, g m g S"],
+    pakad: "d n d m | g m g S",
+    chalan: ["S g m | g m d", "m d n S'", "S' n d m | g m g S"],
     nyas: ["m", "g", "S"],
     specialNotes: "Pentatonic: Re and Pa are omitted. Sung with slow, heavy movements between swaras.",
     similar: [
@@ -105,8 +106,8 @@ export const RAAG_DETAILS: Record<string, RaagDetails> = {
     review: pending,
   },
   bhimpalasi: {
-    pakad: "n, S m, m g P m, g m g R S",
-    chalan: ["n, S g m P", "m P n S'", "S' n D P, m P g m g R S"],
+    pakad: "n, S m | m g P m | g m g R S",
+    chalan: ["n, S g m P", "m P n S'", "S' n D P | m P g m g R S"],
     nyas: ["m", "P", "S"],
     specialNotes: "Re and Dha are left out of the ascent (Audav-Sampurna).",
     similar: [
@@ -120,8 +121,8 @@ export const RAAG_DETAILS: Record<string, RaagDetails> = {
     review: pending,
   },
   bageshree: {
-    pakad: "S n D, S m g, m D n D, m g R S",
-    chalan: ["S g m D n S'", "m D n D, m g", "S' n D m, g R S"],
+    pakad: "S n, D, | S m g | m D n D | m g R S",
+    chalan: ["S g m D n S'", "m D n D | m g", "S' n D m | g R S"],
     nyas: ["m", "D", "S"],
     specialNotes: "Pa is weak or omitted in the ascent; Ma is the central swara.",
     similar: [
@@ -134,8 +135,8 @@ export const RAAG_DETAILS: Record<string, RaagDetails> = {
     review: pending,
   },
   marwa: {
-    pakad: "D, N, r G M G r, S",
-    chalan: ["N, r G M D", "M D N r', N D", "M G r, S"],
+    pakad: "D, N, r G M G r | S",
+    chalan: ["N, r G M D", "M D N r' | N D", "M G r | S"],
     nyas: ["r", "D"],
     specialNotes: "Pa is omitted. Sa is used sparingly, which gives Marwa its restless, unresolved feel.",
     similar: [
@@ -149,8 +150,8 @@ export const RAAG_DETAILS: Record<string, RaagDetails> = {
     review: pending,
   },
   puriya: {
-    pakad: "N, r G, M D G, M G r S",
-    chalan: ["N, r G, M G", "M D N, M D G", "M G r S"],
+    pakad: "N, r G | M D G | M G r S",
+    chalan: ["N, r G | M G", "M D N | M D G", "M G r S"],
     nyas: ["G", "N"],
     specialNotes: "Pa is omitted. The raag is developed mainly in the lower and middle range.",
     similar: [
@@ -164,8 +165,8 @@ export const RAAG_DETAILS: Record<string, RaagDetails> = {
     review: pending,
   },
   todi: {
-    pakad: "d, N S r g, r g r S",
-    chalan: ["S r g, M d", "M d N S'", "S' N d, M g r g r S"],
+    pakad: "d, N, S r g | r g r S",
+    chalan: ["S r g | M d", "M d N S'", "S' N d | M g r g r S"],
     nyas: ["g", "d", "S"],
     specialNotes: "Komal Re, komal Ga and komal Dha are sung low and with care; Pa is used sparingly (often skipped in the ascent).",
     similar: [

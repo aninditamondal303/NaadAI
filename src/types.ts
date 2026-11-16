@@ -1,3 +1,5 @@
+export type AppTab = "home" | "tanpura" | "analyzer" | "practice" | "journal" | "progress" | "library" | "profile";
+
 /**
  * @license
  * SPDX-License-Identifier: Apache-2.0

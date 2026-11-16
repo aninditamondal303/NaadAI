@@ -52,6 +52,23 @@ export type PracticeRecord =
       wobbleCents: number;
     }
   | {
+      kind: "palta" | "pakad";
+      id: string;
+      dateIso: string;
+      raagId: string;
+      raagName: string;
+      /** palta pattern id, or "pakad" */
+      exerciseId: string;
+      exerciseName: string;
+      /** 1 thah, 2 dugun, 3 tigun, 4 chaugun */
+      speed: number;
+      bpm: number;
+      /** 0–100 */
+      score: number;
+      notes: number;
+      durationSec: number;
+    }
+  | {
       kind: "riyaz-timer";
       id: string;
       dateIso: string;

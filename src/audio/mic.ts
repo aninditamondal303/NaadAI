@@ -29,6 +29,8 @@ export class MicSession {
   /** Last ~0.25 s of audio, always kept for the live tuner and level meter. */
   private ring: Float32Array;
   private ringPos = 0;
+  /** Audio-clock time (s) of the first recorded sample. */
+  recordingStartTime = 0;
 
   private constructor(ctx: AudioContext, stream: MediaStream, node: AudioWorkletNode) {
     this.ctx = ctx;
@@ -97,6 +99,45 @@ export class MicSession {
     this.chunks = [];
     this.total = 0;
     this.recording = true;
+    this.recordingStartTime = this.ctx.currentTime;
+  }
+
+  /** The AudioContext the microphone runs on; schedule clicks on it to share one clock. */
+  get context(): AudioContext {
+    return this.ctx;
+  }
+
+  /**
+   * Estimated round-trip delay (s) between a sound being scheduled and the
+   * singer's response reaching the recording: output latency + input latency.
+   * Browsers report these only approximately.
+   */
+  get roundTripLatency(): number {
+    const out = (this.ctx as any).outputLatency ?? this.ctx.baseLatency ?? 0.02;
+    const settings = this.stream.getAudioTracks()[0]?.getSettings() as any;
+    const inp = typeof settings?.latency === "number" ? settings.latency : 0.02;
+    return Math.min(0.3, Math.max(0, out + inp));
+  }
+
+  /** Copy of the recorded samples between two sample indices (clamped to what's recorded). */
+  recordedRange(from: number, to: number): Float32Array {
+    from = Math.max(0, Math.floor(from));
+    to = Math.min(this.total, Math.floor(to));
+    const out = new Float32Array(Math.max(0, to - from));
+    let pos = 0;
+    for (const c of this.chunks) {
+      const cStart = pos, cEnd = pos + c.length;
+      pos = cEnd;
+      if (cEnd <= from) continue;
+      if (cStart >= to) break;
+      const a = Math.max(from, cStart), b = Math.min(to, cEnd);
+      out.set(c.subarray(a - cStart, b - cStart), a - from);
+    }
+    return out;
+  }
+
+  get recordedSamples(): number {
+    return this.total;
   }
 
   get recordedSeconds(): number {
