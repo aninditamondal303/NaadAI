@@ -11,7 +11,8 @@
     "clean": "rm -rf dist server.cjs",
     "lint": "tsc --noEmit",
     "test": "vitest run",
-    "eval:pitch": "tsx eval/pitch-benchmark.ts"
+    "eval:pitch": "tsx eval/pitch-benchmark.ts",
+    "eval:sa": "tsx eval/sa-benchmark.ts"
   },
   "dependencies": {
     "@google/genai": "^2.4.0",

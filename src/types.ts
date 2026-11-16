@@ -93,7 +93,7 @@ export const SWARAS_MAP: Swara[] = [
   { index: 7, name: "Pancham (Pa)", symbol: "P", isAccidental: false, colorCode: "emerald" },
   { index: 8, name: "Komal Dhaivat (dha)", symbol: "d", isAccidental: true, colorCode: "amber" },
   { index: 9, name: "Shuddha Dhaivat (Dha)", symbol: "D", isAccidental: false, colorCode: "sky" },
-  { index: 10, name: "Komal Rishabh (ni)", symbol: "n", isAccidental: true, colorCode: "amber" },
+  { index: 10, name: "Komal Nishad (ni)", symbol: "n", isAccidental: true, colorCode: "amber" },
   { index: 11, name: "Shuddha Nishad (Ni)", symbol: "N", isAccidental: false, colorCode: "indigo" }
 ];
 
