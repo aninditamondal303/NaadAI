@@ -3,14 +3,16 @@
  * Gaps are silence or breath. Nothing is smoothed or invented.
  */
 import React, { useMemo } from 'react';
-import { CartesianGrid, Line, LineChart, ReferenceLine, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
+import { CartesianGrid, Line, LineChart, ReferenceArea, ReferenceLine, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
 import { centsBetween } from '../../analysis/music';
 import { noteLabel } from '../../analysis/summary';
 import type { PitchTrack } from '../../analysis/types';
 
 const MAX_POINTS = 4000;
 
-export const PitchContour: React.FC<{ track: PitchTrack; saHz: number; allowedSwaras?: number[] }> = ({ track, saHz, allowedSwaras }) => {
+export interface ContourMark { startSec: number; durSec: number; kind: "flag" | "oscillation" }
+
+export const PitchContour: React.FC<{ track: PitchTrack; saHz: number; allowedSwaras?: number[]; marks?: ContourMark[] }> = ({ track, saHz, allowedSwaras, marks = [] }) => {
   const { data, minC, maxC } = useMemo(() => {
     const step = Math.max(1, Math.ceil(track.frames.length / MAX_POINTS));
     const pts: { t: number; c: number | null }[] = [];
@@ -48,6 +50,10 @@ export const PitchContour: React.FC<{ track: PitchTrack; saHz: number; allowedSw
               strokeDasharray={g.cents % 1200 === 0 ? undefined : "3 3"}
               label={{ value: g.label, position: "left", fill: "#94a3b8", fontSize: 10 }}
             />
+          ))}
+          {marks.map((m, i) => (
+            <ReferenceArea key={`m${i}`} x1={m.startSec} x2={m.startSec + m.durSec} y1={lo} y2={hi}
+              fill={m.kind === "flag" ? "#f43f5e" : "#38BDF8"} fillOpacity={m.kind === "flag" ? 0.18 : 0.1} ifOverflow="hidden" />
           ))}
           <XAxis dataKey="t" type="number" domain={["dataMin", "dataMax"]} tick={{ fill: "#64748b", fontSize: 10 }} tickFormatter={(v: number) => `${Math.round(v)} s`} />
           <YAxis domain={[lo, hi]} tick={false} width={36} />

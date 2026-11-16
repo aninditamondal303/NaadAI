@@ -13,6 +13,10 @@
 import { centsBetween, hzFromCents } from "./music";
 import { detectSa, median, type SaDetection } from "./sa";
 import type { PitchTrack } from "./types";
+import type { RuleFlag } from "./rules";
+import type { Oscillation } from "./ornaments";
+import { checkRaagRules } from "./rules";
+import { findOscillations } from "./ornaments";
 
 export const SWARA_SYMBOLS = ["S", "r", "R", "g", "G", "m", "M", "P", "d", "D", "n", "N"] as const;
 export const SWARA_NAMES = [
@@ -80,6 +84,10 @@ export interface TakeMeasurements {
   phrases: Phrase[];
   longestPhraseSec: number | null;
   medianPhraseSec: number | null;
+  /** Clearly held swaras that are not in the raag (empty when no raag given). */
+  ruleFlags: RuleFlag[];
+  /** Measured oscillations (andolan, gamak, vibrato-like movement). */
+  oscillations: Oscillation[];
 }
 
 export const MIN_HELD_SEC = 0.25;
@@ -192,7 +200,7 @@ export function summariseTake(track: PitchTrack, opts: SummariseOptions = {}): T
   if (!Number.isFinite(saHz)) {
     return {
       ...base, heldSec: 0, heldWithin20CentsPct: null, medianAbsDeviationCents: null,
-      lowestNote: null, highestNote: null, swaras: [], heldNotes: [],
+      lowestNote: null, highestNote: null, swaras: [], heldNotes: [], ruleFlags: [], oscillations: [],
     };
   }
 
@@ -243,5 +251,7 @@ export function summariseTake(track: PitchTrack, opts: SummariseOptions = {}): T
     highestNote: sorted.length ? asNote(sorted[sorted.length - 1]) : null,
     swaras,
     heldNotes: held,
+    ruleFlags: opts.allowedSwaras ? checkRaagRules(held, opts.allowedSwaras) : [],
+    oscillations: findOscillations(track, saHz),
   };
 }

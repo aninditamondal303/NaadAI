@@ -16,7 +16,7 @@ You receive ONLY measurements made by a pitch tracker. You did not hear the reco
 
 Rules you must follow:
 1. Use only the numbers given. Never invent, estimate or round into new numbers. If you mention a number, it must appear in the data.
-2. Only discuss what was measured: Sa, held notes, how close held swaras were to their positions, wobble, hold lengths, range, and swaras outside the raag's list. Do not comment on rhythm, taal, laya, tone, voice quality, emotion, lyrics, meend, gamak, murki or taans: they were not measured.
+2. Only discuss what was measured: Sa, held notes, how close held swaras were to their positions, wobble, hold lengths, range, breath, swaras outside the raag's list (ruleFlags, with times) and measured oscillations (speed in Hz and width in cents). Report oscillations as measurements; do not say whether an ornament was good or bad. Do not comment on rhythm, taal, laya, tone, voice quality, emotion, lyrics, murki or taans: they were not measured.
 3. Do not quote, imitate or name any real musician, living or dead.
 4. "Median position" is measured from equal-tempered positions. Traditional intonation differs a little for some swaras (for example Ga and Ni are often slightly lower, komal Re in Bhairav-family raags is often lower), so treat differences under about 15 cents as normal variation, not errors.
 5. Be strict only about raag grammar: a swara marked inRaag=false that was held for a noticeable time deserves a clear mention. Be gentle about personal style.
@@ -40,6 +40,9 @@ export interface FeedbackSwara {
   wobbleCents: number;
 }
 
+export interface FeedbackFlag { atSec: number; swara: string; heldSec: number }
+export interface FeedbackOscillation { atSec: number; around: string; rateHz: number; widthCents: number }
+
 export interface FeedbackMeasurements {
   raagName: string;
   saHz: number;
@@ -51,7 +54,11 @@ export interface FeedbackMeasurements {
   medianAbsDeviationCents: number | null;
   lowestNote: string | null;
   highestNote: string | null;
+  longestPhraseSec: number | null;
+  medianPhraseSec: number | null;
   swaras: FeedbackSwara[];
+  ruleFlags: FeedbackFlag[];
+  oscillations: FeedbackOscillation[];
 }
 
 const num = (v: unknown, min: number, max: number): number | null => {
@@ -88,7 +95,22 @@ export function sanitiseMeasurements(raw: any): FeedbackMeasurements | null {
     });
   }
 
+  const ruleFlags: FeedbackFlag[] = [];
+  for (const f of Array.isArray(raw.ruleFlags) ? raw.ruleFlags.slice(0, 50) : []) {
+    const atSec = num(f?.atSec, 0, 3600), heldSec = num(f?.heldSec, 0, 3600), swara = str(f?.swara, 30);
+    if (atSec === null || heldSec === null || !swara) return null;
+    ruleFlags.push({ atSec, swara, heldSec });
+  }
+  const oscillations: FeedbackOscillation[] = [];
+  for (const o of Array.isArray(raw.oscillations) ? raw.oscillations.slice(0, 50) : []) {
+    const atSec = num(o?.atSec, 0, 3600), rateHz = num(o?.rateHz, 0, 20), widthCents = num(o?.widthCents, 0, 1200), around = str(o?.around, 8);
+    if (atSec === null || rateHz === null || widthCents === null || !around) return null;
+    oscillations.push({ atSec, around, rateHz, widthCents });
+  }
+
   return {
+    ruleFlags,
+    oscillations,
     raagName,
     saHz,
     saSource: raw.saSource === "detected" ? "detected" : "profile",
@@ -97,6 +119,8 @@ export function sanitiseMeasurements(raw: any): FeedbackMeasurements | null {
     heldSec,
     heldWithin20CentsPct: num(raw.heldWithin20CentsPct, 0, 100),
     medianAbsDeviationCents: num(raw.medianAbsDeviationCents, 0, 100),
+    longestPhraseSec: num(raw.longestPhraseSec, 0, 3600),
+    medianPhraseSec: num(raw.medianPhraseSec, 0, 3600),
     lowestNote: str(raw.lowestNote, 8),
     highestNote: str(raw.highestNote, 8),
     swaras,
@@ -116,7 +140,10 @@ Field meanings:
 - heldWithin20CentsPct: share of held-note time within 20 cents of the swara position.
 - medianAbsDeviationCents: typical distance of held notes from the swara position.
 - lowestNote / highestNote: range of held notes (comma = mandra, apostrophe = taar).
+- longestPhraseSec / medianPhraseSec: phrase lengths between breaths (a silence of 0.3 s or more).
 - swaras[].medianPositionCents: + means sharp, - means flat, relative to the equal-tempered position.
 - swaras[].wobbleCents: how much held notes on that swara moved around their own centre.
-- swaras[].inRaag: false means the swara is not in this app's list for the raag.`;
+- swaras[].inRaag: false means the swara is not in this app's list for the raag.
+- ruleFlags: swaras outside the raag held for 0.4 s or more, with the time (s) they started.
+- oscillations: regular swings in pitch (andolan, gamak or vibrato-like): speed in swings per second and width in ± cents.`;
 }
