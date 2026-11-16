@@ -26,6 +26,24 @@ Measures (standard melody-extraction measures, plus a stricter ±20-cent one):
 - **Voicing recall**: share of sung moments that got a pitch at all.
 - **False pitch in silence**: share of silent or breath moments where a pitch was wrongly reported.
 
+## Sa detection benchmark
+
+```bash
+npm run eval:sa
+```
+
+56 synthetic 20-second alaap-like phrases (Yaman, Bhairav, Bhupali, Malkauns,
+each at 14 Sa values from 110 Hz to 233 Hz), tested three ways:
+
+- **raag + voice type known**: the normal case in the app. The singer has
+  chosen the raag, and their profile says roughly where their Sa is (male or
+  female), which is used only to choose the octave.
+- **raag known**: no hint about the octave.
+- **nothing known**: only the Sa + Pa relationship. This often confuses Sa with
+  Ma (or Pa), so the app doesn't rely on it.
+
+Results are in `results/sa-benchmark.md`.
+
 ### Test clips: synthetic for now
 
 `synth.ts` builds voice-like test signals (harmonics shaped like an open "aa"
