@@ -14,6 +14,10 @@ import { addRecord, newId } from '../lib/practiceHistory';
 import { firstStringForRaag, STRING_ORDER, TanpuraEngine, type FirstString } from '../audio/tanpura';
 import { westernNote } from '../analysis/music';
 import type { AppTab } from '../types';
+import type { AnalyzerMode } from './AnalyzerTab';
+import { TodayPanel } from './home/TodayPanel';
+import { RAAG_DETAILS } from '../data/raagDetails';
+import { generatePaltas } from '../practice/paltas';
 
 // Pitch frequencies corresponding to classical standard scales (C3 base standard)
 
@@ -31,202 +35,21 @@ interface PracticeSession {
 
 interface HomeTabProps {
   setActiveTab: (tab: AppTab) => void;
-  setAnalyzerMode?: (mode: "scale" | "singing") => void;
+  setAnalyzerMode?: (mode: AnalyzerMode) => void;
+  setPracticeMode?: (mode: "palta" | "pakad" | "ear") => void;
   vocalistName?: string;
   baseTonicHz?: number;
 }
 
-// Complete classical profiles for the core interactive practice raga list
-const PRACTICE_RAAG_CATALOGUE: Record<string, {
-  pakad: string;
-  aroha: string;
-  avaroha: string;
-  goals: string[];
-  bandish: {
-    title: string;
-    description: string;
-    tal: string;
-    laya: string;
-    sthayiLyrics: string;
-    sthayiSwaralipi: string[];
-    antaraLyrics: string;
-    antaraSwaralipi: string[];
-    sargam: string[];
-  };
-  paltas: string[];
-}> = {
-  yaman: {
-    pakad: "N, R G R | G M_ D N | S' N D P | M_ G R S",
-    aroha: "N, R G M_ D N S'",
-    avaroha: "S' N D P M_ G R S",
-    goals: [
-      "Master the subtle glide (Meend) between Gandhar and Shuddha Rishabh.",
-      "Lock cent-zero tuning with the Tivra Madhyam harmonic pivot.",
-      "Sustain pristine resting silence on Gandhar (Vadi) and Nishad (Samvadi)."
-    ],
-    bandish: {
-      title: "Eri Aali Piya Bina",
-      description: "A legendary classical composition depicting the sweet longing of separation in late-evening twilight.",
-      tal: "Teentaal (16 Beats)",
-      laya: "Madhya Laya (Medium tempo)",
-      sthayiLyrics: "Eri aali piya bina sakhi kala na parata mohe, ghadi pala chhin dina jiyara dharata nahi...",
-      sthayiSwaralipi: [
-        "Beats: 1     2    3    4   | 5    6    7    8   | 9    10   11   12  | 13   14   15   16",
-        "Swar:  G_   R_   G_   P_  | M_   D_   P_   M_  | G_   R_   S_   -_  | N,_  R_   G_   M_",
-        "Words: E_   ri   aa   li  | pi   ya   bi   na  | sa   khi  -_   -_  | ka   la   na   pa",
-        "Swar:  P_   D_   N_   D_  | P_   M_   G_   R_  | S_   -_   -_   -_  | -_   -_   -_   -_",
-        "Words: ra   ta   mo   he  | gha  di   pa   la  | chhi n_   -_   -_  | -_   -_   -_   -_"
-      ],
-      antaraLyrics: "Jab se piya pardesh gail, batiyan takata batiyan bheege, ankhiyaan dharata nahi dhaar...",
-      antaraSwaralipi: [
-        "Beats: 1     2    3    4   | 5    6    7    8   | 9    10   11   12  | 13   14   15   16",
-        "Swar:  G_   G_   M_   P_  | P_   M_   N_   S'_ | S'_  S'_  R'_  R'_ | S'_  -_   S'_  N_",
-        "Words: Ja   b_   se   pi  | ya   pa   r_   de  | sh   ga   i_   l_  | ba_  -_   ti   ya",
-        "Swar:  D_   N_   S'_  N_  | D_   P_   M_   G_  | G_   R_   S_   -_  | -_   -_   -_   -_",
-        "Words: n_   ta   ka   ta  | ba   ti   ya   n_  | bhee __   ge   -_  | -_   -_   -_   -_"
-      ],
-      sargam: [
-        "Sargam Line 1: N, R G M_ D P M_ G R S",
-        "Sargam Line 2: G M_ D N S' N D P M_ G R S",
-        "Sargam Line 3: N, R G M_ D N S' R' S' N D P M_ G R S"
-      ]
-    },
-    paltas: [
-      "Palta 1 (Ascending): N, R G | R G M_ | G M_ D | M_ D N | D N S'",
-      "Palta 1 (Descending): S' N D | N D P | D P M_ | P M_ G | M_ G R | G R S",
-      "Palta 2 (Ascending): S G R G | R M_ G M_ | G D M_ D | M_ N D N | D S' N S'",
-      "Palta 2 (Descending): S' D N D | N P D P | D M_ P M_ | P G M_ G | M_ R G R | G S R S"
-    ]
-  },
-  bhairav: {
-    pakad: "S G m P d_ P | G m r_ S | G m d_ P r_ S",
-    aroha: "S r_ G m P d_ N S'",
-    avaroha: "S' N d_ P m G r_ S",
-    goals: [
-      "Perfect the heavy resonant oscillation (Andolan) on Komal Rishabh (r) and Komal Dhaivat (d).",
-      "Establish complete vocal control on the long meditative morning microtones.",
-      "Sync pitch intervals precisely on Shuddha Madhyam and Pancham."
-    ],
-    bandish: {
-      title: "Jago Mohan Pyare",
-      description: "An auspicious transition morning composition invoking spiritual wakefulness, warm sunshine, and gratitude.",
-      tal: "Teentaal (16 Beats)",
-      laya: "Madhya Laya",
-      sthayiLyrics: "Jago mohan pyare ab bhor bhayi hai, nanda ke dulare, jago mohan pyare ab bhor bhayi...",
-      sthayiSwaralipi: [
-        "Beats: 1     2    3    4   | 5    6    7    8   | 9    10   11   12  | 13   14   15   16",
-        "Swar:  S_   r_   G_   m_  | P_   -_   d_   P_  | m_   G_   r_   S_  | -_   S_   r_   G_",
-        "Words: Ja   go   mo   ha  | n_   -_   pya  re  | a_   b_   bho  r_  | -_   bha  yi   hai"
-      ],
-      antaraLyrics: "Panchhi bana bole sagare ban upaban, phoolan sugandh pasare, jaago mohan...",
-      antaraSwaralipi: [
-        "Beats: 1     2    3    4   | 5    6    7    8   | 9    10   11   12  | 13   14   15   16",
-        "Swar:  m_   m_   P_   d_  | N_   N_   S'_  -_  | S'_  N_   d_   P_  | m_   G_   r_   S_",
-        "Words: Pa   n_   chhi b_  | a_   n_   bo   le  | sa   g_   a_   re  | ba   n_   u   pa"
-      ],
-      sargam: [
-        "Sargam Line 1: S r G m P d N S'",
-        "Sargam Line 2: S' N d P m G r S",
-        "Sargam Line 3: S G m P | m P d P | P d N S' | S' N d P r S"
-      ]
-    },
-    paltas: [
-      "Palta 1 (Andolan Gym): S r_ S - | r_ G r_ - | G m G - | m P m - | P d_ P -",
-      "Palta 2 (Ascending): S r_ G | r_ G m | G m P | m P d_ | P d_ N | d_ N S'",
-      "Palta 2 (Descending): S' N d_ | N d_ P | d_ P m | P m G | m G r_ | G r_ S"
-    ]
-  },
-  bageshree: {
-    pakad: "S R g m | D n D m | g R S",
-    aroha: "S g m D n S'",
-    avaroha: "S' n D m g R S",
-    goals: [
-      "Master the slow, smooth slide between Madhyam and Komal Gandhar.",
-      "Emphasize Shuddha Madhyam as the primary resting king note (Vadi).",
-      "Express elegiac beauty and deep, soft moonlight longing through slow compositions."
-    ],
-    bandish: {
-      title: "Kaun Gata Tum Bin Prabhiya",
-      description: "An elegant midnight romantic classic expressing prayerful devotion and melodic surrender.",
-      tal: "Teentaal (16 Beats)",
-      laya: "Madhya Laya",
-      sthayiLyrics: "Kaun gata tum bin prabhu swara ke sanyog bandhan sohe, tum sikhawat sur-taal...",
-      sthayiSwaralipi: [
-        "Beats: 1     2    3    4   | 5    6    7    8   | 9    10   11   12  | 13   14   15   16",
-        "Swar:  S_   R_   g_   m_  | D_   -_   n_   D_  | m_   g_   R_   S_  | S_   g_   m_   D_",
-        "Words: Ka   u_   n_   ga  | ta   -_   tu   m_  | bi   n_   pr_  bhu | swa  ra   ke   sa"
-      ],
-      antaraLyrics: "Sur gyaan dhyan tum hi deenhe saraswati kripa barasae mohe pritam...",
-      antaraSwaralipi: [
-        "Beats: 1     2    3    4   | 5    6    7    8   | 9    10   11   12  | 13   14   15   16",
-        "Swar:  m_   m_   D_   n_  | S'_  S'_  S'_  -_  | n_   D_   m_   g_  | R_   g_   S_   -_",
-        "Words: Su   r_   gya  a_  | n_   dhya a_   -_  | tu   m_   hi_  de  | e_   nh   e_   _-"
-      ],
-      sargam: [
-        "Sargam Line 1: S g m D n S'",
-        "Sargam Line 2: S' n D m g R S",
-        "Sargam Line 3: g m D n D m g R S"
-      ]
-    },
-    paltas: [
-      "Palta 1 (Ascending): S g m | R m D | m D n | D n S'",
-      "Palta 1 (Descending): S' n D | n D m | D m g | m g R | g R S",
-      "Palta 2: S g R S | R m g R | m D m g | D n D m | n S' n D"
-    ]
-  },
-  bhupali: {
-    pakad: "G R S D, S R G | P G R S G R S",
-    aroha: "S R G P D S'",
-    avaroha: "S' D P G R S",
-    goals: [
-      "Sing clean, pure pentatonic leaps skipping Madhyam and Nishad completely.",
-      "Lock the major-third Gandhar resonance in high pitch registers.",
-      "Sustain immense positive, peaceful morning-like radiance in an evening scale."
-    ],
-    bandish: {
-      title: "Jab Se Tum Sang Neha Lagae",
-      description: "A bright, beautiful composition in sweet Teentaal celebrating spiritual joy and pristine clarity.",
-      tal: "Teentaal (16 Beats)",
-      laya: "Chhota Laya (Medium Up)",
-      sthayiLyrics: "Jab se tum sang neha lagae, din nahi chain, rain nahi nindya, sakhi re bin sajan...",
-      sthayiSwaralipi: [
-        "Beats: 1     2    3    4   | 5    6    7    8   | 9    10   11   12  | 13   14   15   16",
-        "Swar:  S_   R_   G_   -_  | P_   G_   R_   S_  | D_   R_   S_   -_  | S_   R_   G_   P_",
-        "Words: Ja   b_   se   -_  | tu   m_   sa   ng  | ne   ha   -_   -_  | la   ga   e_   din"
-      ],
-      antaraLyrics: "Priyatam tum bin kal na parat hai, rain birah dukh barasat naina...",
-      antaraSwaralipi: [
-        "Beats: 1     2    3    4   | 5    6    7    8   | 9    10   11   12  | 13   14   15   16",
-        "Swar:  G_   G_   P_   D_  | S'_  S'_  S'_  -_  | D_   P_   G_   R_  | S_   R_   S_   -_",
-        "Words: Pri  ya   ta   m_  | tu   m_   bi   n_  | ka   l_   na   pa  | ra   t_   ha   i_"
-      ],
-      sargam: [
-        "Sargam Line 1: S R G P D S'",
-        "Sargam Line 2: S' D P G R S",
-        "Sargam Line 3: G R S D, S R G P G R S"
-      ]
-    },
-    paltas: [
-      "Palta 1 (Ascending): S R G | R G P | G P D | P D S'",
-      "Palta 1 (Descending): S' D P | D P G | P G R | G R S",
-      "Palta 2: S R G P | R G P D | G P D S' | P D S' R'"
-    ]
-  }
-};
 
 export const HomeTab: React.FC<HomeTabProps> = ({
   setActiveTab,
   setAnalyzerMode,
+  setPracticeMode,
   vocalistName = "Shishya",
   baseTonicHz = 138.59
 }) => {
   const [currentHour, setCurrentHour] = useState(new Date().getHours());
-  const [todayRiyazCompleted, setTodayRiyazCompleted] = useState<Record<string, boolean>>({
-    kharaj: false,
-    alankar: true,
-    yaman_meend: false,
-    sargam: false
-  });
 
   // Practice session state
   const [activePractice, setActivePractice] = useState<PracticeSession | null>(null);
@@ -385,90 +208,13 @@ export const HomeTab: React.FC<HomeTabProps> = ({
     tanpuraRef.current?.setOptions({ volume: newVolume / 100 });
   };
 
-  // Determine current Prahar Raga based on hour of the day
-  const getPraharDetails = (hour: number) => {
-    if (hour >= 6 && hour < 9) {
-      return {
-        praharNum: "1st Prahar (Dawn)",
-        raagName: "Raag Bhairav",
-        scale: "S r G m P d N S'",
-        timeStr: "Morning (06:00 - 09:00)",
-        ragaId: "bhairav"
-      };
-    } else if (hour >= 9 && hour < 12) {
-      return {
-        praharNum: "2nd Prahar (Morning)",
-        raagName: "Raag Todi",
-        scale: "S r g M d N S'",
-        timeStr: "Mid-day (09:00 - 12:00)",
-        ragaId: "todi_thaat"
-      };
-    } else if (hour >= 12 && hour < 15) {
-      return {
-        praharNum: "3rd Prahar (Noon)",
-        raagName: "Raag Bhimpalasi",
-        scale: "S g m P N S' / S' n D P m g R S",
-        timeStr: "Afternoon (12:00 - 15:00)",
-        ragaId: "bhimpalasi"
-      };
-    } else if (hour >= 15 && hour < 18) {
-      return {
-        praharNum: "4th Prahar (Late Afternoon)",
-        raagName: "Raag Patdeep",
-        scale: "S R g m P D N S' | S' N D P m g R S",
-        timeStr: "Late Afternoon (15:00 - 18:00)",
-        ragaId: "patdeep"
-      };
-    } else if (hour >= 18 && hour < 21) {
-      return {
-        praharNum: "5th Prahar (Twilight)",
-        raagName: "Raag Yaman",
-        scale: "N' R G M D N S' | S' N D P M G R S",
-        timeStr: "Sunset / Dusk (18:00 - 21:00)",
-        ragaId: "yaman"
-      };
-    } else if (hour >= 21 && hour < 24) {
-      return {
-        praharNum: "6th Prahar (Early Night)",
-        raagName: "Raag Bageshree",
-        scale: "S R g m D n S' | S' n D m g R S",
-        timeStr: "Nightfall (21:00 - 00:00)",
-        ragaId: "bageshree"
-      };
-    } else if (hour >= 0 && hour < 3) {
-      return {
-        praharNum: "7th Prahar (Deep Night)",
-        raagName: "Raag Darbari",
-        scale: "S R g m P d n S' | S' d n P m g R S",
-        timeStr: "Midnight (00:00 - 03:00)",
-        ragaId: "darbari_kanada"
-      };
-    } else {
-      return {
-        praharNum: "8th Prahar (Pre-Dawn)",
-        raagName: "Raag Malkauns",
-        scale: "S g m d n S' | S' n d m g S",
-        timeStr: "Dawn-break (03:00 - 06:00)",
-        ragaId: "malkauns"
-      };
-    }
-  };
 
-  const prahar = getPraharDetails(currentHour);
-
-  const handleAction = (tab: any, mode?: any) => {
-    if (mode && setAnalyzerMode) {
-      setAnalyzerMode(mode);
-    }
+  const handleAction = (tab: AppTab, mode?: string) => {
+    if (tab === "analyzer" && mode) setAnalyzerMode?.(mode as AnalyzerMode);
+    if (tab === "practice") setPracticeMode?.((mode as "palta" | "pakad" | "ear") ?? "palta");
     setActiveTab(tab);
   };
 
-  const toggleTodo = (key: string) => {
-    setTodayRiyazCompleted(prev => ({
-      ...prev,
-      [key]: !prev[key]
-    }));
-  };
 
   // Human countdown converter helper
   const renderFormattedSeconds = (secTotal: number) => {
@@ -478,7 +224,6 @@ export const HomeTab: React.FC<HomeTabProps> = ({
   };
 
   // Get active practice raag details
-  const currentPracticeDetails = activePractice ? PRACTICE_RAAG_CATALOGUE[activePractice.raagId] : null;
 
   return (
     <div className="space-y-6">
@@ -487,7 +232,7 @@ export const HomeTab: React.FC<HomeTabProps> = ({
       )}
       
       {/* IMMERSIVE RIYAZ PRACTICE ACTIVE COMPANION SCREEN */}
-      {activePractice && currentPracticeDetails ? (
+      {activePractice ? (
         <div className="space-y-6 animate-in fade-in zoom-in-95 duration-500" id="riyaz-practice-dashboard">
           
           {/* Active Status header panel */}
@@ -645,146 +390,45 @@ export const HomeTab: React.FC<HomeTabProps> = ({
 
             </div>
 
-            {/* RIGHT COLUMN: Raga blueprint info tabs, goals, and Swaralipi composition */}
+            {/* RIGHT COLUMN: raag facts from the library, its pakad, and generated paltas */}
             <div className="lg:col-span-8 space-y-6">
-              
-              {/* Raga traditional descriptors & goals card */}
-              <div className="bg-[#151A2E] p-6 rounded-2xl border border-slate-850 shadow-xl space-y-4">
-                <div className="flex flex-wrap items-center justify-between border-b border-slate-850 pb-2">
-                  <h3 className="text-xs font-mono font-bold text-slate-400 uppercase tracking-widest">Raga Melody Blueprint</h3>
-                  <span className="text-[10px] font-mono text-[#38BDF8] border border-indigo-950 px-2 py-0.5 bg-[#38BDF8]/5 rounded-full uppercase">Hindustani Grammar Profile</span>
-                </div>
-
-                <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs font-mono">
-                  <div className="bg-[#0F1115] p-3 rounded-xl border border-slate-850/40">
-                    <span className="text-[8px] text-slate-500 block uppercase font-bold">Thaat Srot</span>
-                    <span className="text-slate-250 font-black block mt-0.5">Kalyan Foundation</span>
-                  </div>
-                  <div className="bg-[#0F1115] p-3 rounded-xl border border-slate-850/40">
-                    <span className="text-[8px] text-slate-500 block uppercase font-bold">Vadi King note</span>
-                    <span className="text-[#38BDF8] font-black block mt-0.5">Gandhar (G)</span>
-                  </div>
-                  <div className="bg-[#0F1115] p-3 rounded-xl border border-slate-850/40">
-                    <span className="text-[8px] text-slate-500 block uppercase font-bold">Samvadi Queen</span>
-                    <span className="text-[#FBBF24] font-black block mt-0.5">Nishad (N)</span>
-                  </div>
-                  <div className="bg-[#0F1115] p-3 rounded-xl border border-slate-850/40">
-                    <span className="text-[8px] text-slate-500 block uppercase font-bold">Traditional Prahar</span>
-                    <span className="text-purple-300 font-black block mt-0.5 truncate">Evening Twilight</span>
-                  </div>
-                </div>
-
-                {/* Aroha/Avaroha Swaralipi layout */}
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-                  <div className="bg-[#0f1115]/80 p-3 rounded-xl border border-slate-900 font-mono text-center">
-                    <span className="text-[8px] text-slate-500 block uppercase font-bold">Aroha (Ascension)</span>
-                    <span className="text-sm font-bold text-slate-300 block mt-1 tracking-wider">{currentPracticeDetails.aroha}</span>
-                  </div>
-                  <div className="bg-[#0f1115]/80 p-3 rounded-xl border border-slate-900 font-mono text-center">
-                    <span className="text-[8px] text-slate-500 block uppercase font-bold">Avaroha (Descension)</span>
-                    <span className="text-sm font-bold text-slate-300 block mt-1 tracking-wider">{currentPracticeDetails.avaroha}</span>
-                  </div>
-                  <div className="bg-[#0f1115]/80 p-3 rounded-xl border border-slate-900 font-mono text-center col-span-1 md:col-span-1">
-                    <span className="text-[8px] text-slate-500 block uppercase font-bold">Pakad (Catchphrase)</span>
-                    <span className="text-xs font-bold text-[#FBBF24] block mt-1 tracking-wider overflow-x-hidden truncate" title={currentPracticeDetails.pakad}>
-                      {currentPracticeDetails.pakad}
-                    </span>
-                  </div>
-                </div>
-
-                {/* Interactive Practice Goals list */}
-                <div className="bg-slate-950/20 border border-slate-850 p-4 rounded-xl space-y-2">
-                  <span className="text-[9px] font-mono text-slate-550 block uppercase font-bold">Disciplined Riyāz Focus Goals:</span>
-                  <ul className="space-y-1.5 text-xs text-slate-350 list-inside leading-relaxed list-disc">
-                    {currentPracticeDetails.goals.map((g, gi) => (
-                      <li key={gi} className="pl-1 text-slate-300">{g}</li>
-                    ))}
-                  </ul>
-                </div>
-              </div>
-
-              {/* Complete Bandish and Swaralipi sheet */}
-              <div className="bg-[#151A2E] p-6 rounded-2xl border border-slate-850 shadow-xl space-y-5">
-                <div className="border-b border-slate-850 pb-2">
-                  <h3 className="text-xs font-mono font-bold text-slate-400 uppercase tracking-widest flex items-center justify-between">
-                    <span>Full Classical Composition (Bandish)</span>
-                    <span className="text-[10px] text-emerald-400 font-black">{currentPracticeDetails.bandish.tal}</span>
-                  </h3>
-                </div>
-
-                <div className="space-y-1">
-                  <span className="text-base font-serif font-bold text-[#FBBF24] block">" {currentPracticeDetails.bandish.title} " ({currentPracticeDetails.bandish.laya})</span>
-                  <p className="text-xs text-slate-400 leading-relaxed font-sans">{currentPracticeDetails.bandish.description}</p>
-                </div>
-
-                {/* Sthayi (Part 1 Envelopes) */}
-                <div className="space-y-3.5 pt-1">
-                  <div className="flex items-center gap-2 border-l-2 border-[#7C3AED] pl-2 font-mono text-[10px] text-purple-400 uppercase font-black tracking-wider">
-                    Sthayi Section (First Verse)
-                  </div>
-                  
-                  {/* Lyrics row and Swaralipi aligned */}
-                  <div className="p-4 bg-[#0F1115] border border-slate-900 rounded-xl space-y-3 font-mono text-[11px] overflow-x-auto select-none leading-relaxed text-slate-350">
-                    {currentPracticeDetails.bandish.sthayiSwaralipi.map((line, idx) => (
-                      <div 
-                        key={idx} 
-                        className={`whitespace-pre border-b border-slate-900/40 pb-1 ${
-                          line.startsWith("Swar:") ? "text-[#38BDF8] font-bold" : 
-                          line.startsWith("Beats:") ? "text-slate-550 font-black" : "text-slate-300 font-sans"
-                        }`}
-                      >
-                        {line}
-                      </div>
-                    ))}
-                  </div>
-                </div>
-
-                {/* Antara (Part 2 Envelopes) */}
-                <div className="space-y-3.5 pt-1">
-                  <div className="flex items-center gap-2 border-l-2 border-amber-500 pl-2 font-mono text-[10px] text-amber-500 uppercase font-black tracking-wider">
-                    Antara Section (Second Verse Chorus)
-                  </div>
-                  
-                  <div className="p-4 bg-[#0F1115] border border-slate-900 rounded-xl space-y-3 font-mono text-[11px] overflow-x-auto select-none leading-relaxed text-slate-350">
-                    {currentPracticeDetails.bandish.antaraSwaralipi.map((line, idx) => (
-                      <div 
-                        key={idx} 
-                        className={`whitespace-pre border-b border-slate-900/40 pb-1 ${
-                          line.startsWith("Swar:") ? "text-[#38BDF8] font-bold" : 
-                          line.startsWith("Beats:") ? "text-slate-550 font-black" : "text-slate-300 font-sans"
-                        }`}
-                      >
-                        {line}
-                      </div>
-                    ))}
-                  </div>
-                </div>
-
-                {/* Sargam and Paltas Exercises tab */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-1">
-                  
-                  <div className="bg-[#0f1115]/70 border border-slate-900 p-4 rounded-xl space-y-2.5">
-                    <span className="text-[10px] font-mono text-purple-400 uppercase font-bold block">Example Sargam Phrasings</span>
-                    <div className="font-mono text-xs text-slate-400 space-y-1.5 leading-relaxed">
-                      {currentPracticeDetails.bandish.sargam.map((sline, si) => (
-                        <div key={si} className="border-b border-slate-900/80 pb-1 last:border-0">{sline}</div>
+              {(() => {
+                const r = RAAG_LIST.find(x => x.id === activePractice.raagId);
+                if (!r) return null;
+                const d = RAAG_DETAILS[r.id];
+                const SYM = ["S", "r", "R", "g", "G", "m", "M", "P", "d", "D", "n", "N"];
+                const paltas = generatePaltas(r).slice(0, 3);
+                return (
+                  <div className="bg-[#151A2E] p-6 rounded-2xl border border-slate-800 shadow-xl space-y-4">
+                    <h3 className="text-xs font-mono font-bold text-slate-400 uppercase tracking-widest border-b border-slate-800 pb-2">{r.name.replace(/^Raag\s+/i, "")}</h3>
+                    <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs font-mono">
+                      {[["Thaat", r.thaat], ["Vadi", SYM[r.vadi]], ["Samvadi", SYM[r.samvadi]], ["Time", r.time]].map(([k, v]) => (
+                        <div key={k} className="bg-[#0F1115] p-3 rounded-xl border border-slate-800">
+                          <span className="text-[8px] text-slate-500 block uppercase font-bold">{k}</span>
+                          <span className="text-slate-200 font-bold block mt-0.5">{v}</span>
+                        </div>
                       ))}
                     </div>
-                  </div>
-
-                  <div className="bg-[#0f1115]/70 border border-slate-900 p-4 rounded-xl space-y-2.5">
-                    <span className="text-[10px] font-mono text-purple-400 uppercase font-bold block">Recommended Riyāz Paltas (Scale Gymnastics)</span>
-                    <div className="font-mono text-xs text-slate-400 space-y-1.5 leading-relaxed">
-                      {currentPracticeDetails.paltas.map((pline, pi) => (
-                        <div key={pi} className="border-b border-slate-900/80 pb-1 last:border-0">{pline}</div>
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-3 font-mono text-center">
+                      {[["Aroh", r.aroha.join(" ")], ["Avaroh", r.avaroha.join(" ")], ["Pakad", d ? d.pakad : "Not written yet"]].map(([k, v]) => (
+                        <div key={k} className="bg-[#0F1115]/80 p-3 rounded-xl border border-slate-900">
+                          <span className="text-[8px] text-slate-500 block uppercase font-bold">{k}</span>
+                          <span className="text-sm font-bold text-slate-300 block mt-1">{v}</span>
+                        </div>
                       ))}
                     </div>
+                    <div className="space-y-2">
+                      <span className="text-[10px] font-mono text-purple-400 uppercase font-bold block">Paltas for this raag (score them in the Paltas tab)</span>
+                      {paltas.map(p => (
+                        <div key={p.id} className="font-mono text-xs text-slate-400 border-b border-slate-900 pb-1">
+                          <span className="text-slate-300 font-bold">{p.name}:</span> {p.notes.map(n => n.label).join(" ")}
+                        </div>
+                      ))}
+                    </div>
+                    <p className="text-[10px] text-slate-500">From the raag library (awaiting a guru's review).</p>
                   </div>
-
-                </div>
-
-              </div>
-
+                );
+              })()}
             </div>
 
           </div>
@@ -812,19 +456,17 @@ export const HomeTab: React.FC<HomeTabProps> = ({
               </h1>
               
               <p className="text-sm text-slate-300 leading-relaxed font-sans">
-                "Understand Your Music. Deepen Your Riyaz."<br />
-                Step onto your carpet, start your drone, and perfect the ancient microtonal aesthetics of Hindustani Classical Music.
+                Start the tanpura, sing, and see your swaras measured against your own Sa. Your plan for today is below.
               </p>
 
               <div className="pt-2 flex flex-wrap justify-center lg:justify-start gap-2 text-xs font-mono">
-                <span className="bg-[#0F1115] border border-slate-800 text-slate-400 px-3 py-1.5 rounded-lg font-bold">Base scale: C#</span>
-                <span className="bg-[#0F1115] border border-slate-800 text-slate-400 px-3 py-1.5 rounded-lg font-bold">Lineage: Hindustani Purist V2</span>
+                <span className="bg-[#0F1115] border border-slate-800 text-slate-400 px-3 py-1.5 rounded-lg font-bold">Your Sa: {baseTonicHz.toFixed(1)} Hz ({westernNote(baseTonicHz).name})</span>
               </div>
             </div>
 
             {/* Traditional Tanpura Neck design visual badge */}
             <div className="h-44 w-44 shrink-0 rounded-2xl bg-[#0F1115]/90 border border-slate-800 p-4 flex flex-col items-center justify-between relative shadow-inner">
-              <span className="text-[8px] font-mono text-slate-500 uppercase tracking-wider">Acoustic Anchor</span>
+              <span className="text-[8px] font-mono text-slate-500 uppercase tracking-wider">Naad AI</span>
               <div className="flex flex-col items-center flex-grow justify-center gap-1.5">
                 <div className="relative">
                   {/* Diya Oil Lamp symbol */}
@@ -833,10 +475,8 @@ export const HomeTab: React.FC<HomeTabProps> = ({
                     <div className="absolute -top-1.5 h-3 w-1.5 bg-orange-500 rounded-full blur-[0.5px] animate-pulse" />
                   </div>
                 </div>
-                <span className="text-xs text-slate-300 font-serif font-bold text-center">Riyāz Altar</span>
-                <span className="text-[8px] font-mono text-[#38BDF8] select-none uppercase tracking-widest font-bold">Acoustic standards ready</span>
+                <span className="text-xs text-slate-300 font-serif font-bold text-center">Riyaz</span>
               </div>
-              <span className="text-[8px] font-mono text-slate-650 block">S-P-S-S SYNTH</span>
             </div>
 
           </div>
@@ -849,8 +489,8 @@ export const HomeTab: React.FC<HomeTabProps> = ({
                 <Flame className="h-5 w-5 text-amber-500 fill-amber-500/20" />
               </div>
               <div>
-                <h3 className="text-sm font-mono font-bold text-slate-100 uppercase tracking-widest">Riyāz Altar Practice Mode</h3>
-                <span className="text-[10px] text-slate-450 block font-normal font-sans">Configure your real-time plucking standard, load classical sheets, and start your discipline.</span>
+                <h3 className="text-sm font-mono font-bold text-slate-100 uppercase tracking-widest">Timed riyaz with tanpura</h3>
+                <span className="text-[10px] text-slate-450 block font-normal font-sans">Choose a raag and a duration; the tanpura plays your Sa and the time is saved to your progress.</span>
               </div>
             </div>
 
@@ -891,10 +531,11 @@ export const HomeTab: React.FC<HomeTabProps> = ({
                     onChange={(e) => setSelectedPracticeScaleDuration(parseInt(e.target.value))}
                     className="w-full bg-[#0F1115] border border-slate-800 text-slate-300 font-bold p-3 rounded-xl appearance-none cursor-pointer hover:border-purple-500/50 focus:border-[#7C3AED] focus:outline-none"
                   >
-                    <option value="5">5 Minutes (Warmup)</option>
-                    <option value="15">15 Minutes (Standard alankar segment)</option>
-                    <option value="30">30 Minutes (Thorough Bandish session)</option>
-                    <option value="45">45 Minutes (Full Concert rehearsal)</option>
+                    <option value="5">5 minutes</option>
+                    <option value="15">15 minutes</option>
+                    <option value="30">30 minutes</option>
+                    <option value="45">45 minutes</option>
+                    <option value="60">60 minutes</option>
                   </select>
                   <ChevronRight className="h-4 w-4 text-slate-500 absolute top-4 right-3 transform rotate-45 pointer-events-none" />
                 </div>
@@ -909,7 +550,7 @@ export const HomeTab: React.FC<HomeTabProps> = ({
                 className="w-full py-4 rounded-xl bg-gradient-to-r from-[#7C3AED] to-[#38BDF8] hover:opacity-95 text-slate-950 font-mono text-xs font-black uppercase tracking-widest shadow-xl transform active:translate-y-0.5 transition duration-200 cursor-pointer flex justify-center items-center gap-2"
               >
                 <Play className="h-4 w-4 fill-slate-950" />
-                Start Live Practice Companion Mode
+                Start timed riyaz
               </button>
             </div>
 
@@ -930,7 +571,7 @@ export const HomeTab: React.FC<HomeTabProps> = ({
                   Find My Scale
                   <ArrowUpRight className="h-3 w-3 opacity-0 group-hover:opacity-100 transition-opacity" />
                 </h4>
-                <span className="text-[10px] text-slate-500 mt-0.5 block leading-normal font-sans">Tune and discover your ideal Sa frequency</span>
+                <span className="text-[10px] text-slate-500 mt-0.5 block leading-normal font-sans">Measure your natural Sa</span>
               </div>
             </button>
 
@@ -946,7 +587,7 @@ export const HomeTab: React.FC<HomeTabProps> = ({
                   Analyze Singing
                   <ArrowUpRight className="h-3 w-3 opacity-0 group-hover:opacity-100 transition-opacity" />
                 </h4>
-                <span className="text-[10px] text-slate-500 mt-0.5 block leading-normal font-sans">Evaluate performance types and raags</span>
+                <span className="text-[10px] text-slate-500 mt-0.5 block leading-normal font-sans">Record or upload, and see every swara measured</span>
               </div>
             </button>
 
@@ -962,7 +603,7 @@ export const HomeTab: React.FC<HomeTabProps> = ({
                   Start Tanpura
                   <ArrowUpRight className="h-3 w-3 opacity-0 group-hover:opacity-100 transition-opacity" />
                 </h4>
-                <span className="text-[10px] text-slate-500 mt-0.5 block leading-normal font-sans">Activate sequenced plucked string drone</span>
+                <span className="text-[10px] text-slate-500 mt-0.5 block leading-normal font-sans">Tanpura drone and taal</span>
               </div>
             </button>
 
@@ -978,139 +619,14 @@ export const HomeTab: React.FC<HomeTabProps> = ({
                   Explore Raags
                   <ArrowUpRight className="h-3 w-3 opacity-0 group-hover:opacity-100 transition-opacity" />
                 </h4>
-                <span className="text-[10px] text-slate-500 mt-0.5 block leading-normal font-sans">Search and review master scale blueprints</span>
+                <span className="text-[10px] text-slate-500 mt-0.5 block leading-normal font-sans">Aroh, avaroh, pakad and similar raags</span>
               </div>
             </button>
 
           </div>
 
-          {/* 4. Splitted Rows: Today's classical scale recommendations vs routines */}
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-5">
-            
-            {/* Today's Raga matching the Prahar */}
-            <div className="lg:col-span-4 bg-[#151A2E] p-5 rounded-2xl border border-slate-850 shadow-lg flex flex-col justify-between">
-              <div className="space-y-4">
-                <div className="flex items-center justify-between border-b border-slate-850 pb-2">
-                  <span className="text-[9px] font-mono text-slate-500 font-bold uppercase tracking-widest block">Today's Raga (Prahar Match)</span>
-                  <span className="text-[8px] font-mono text-[#FBBF24] uppercase border border-[#FBBF24]/20 px-2 py-0.5 bg-[#FBBF24]/5 rounded-full">Recommended</span>
-                </div>
-
-                <div className="space-y-1 pt-1 font-sans">
-                  <h3 className="text-xl font-serif font-black text-slate-100">{prahar.raagName}</h3>
-                  <p className="text-[10px] font-mono text-[#38BDF8] uppercase font-bold">{prahar.praharNum} • {prahar.timeStr}</p>
-                </div>
-
-                <div className="bg-[#0f1115]/50 p-3 rounded-lg border border-slate-900 font-mono text-[11px] text-slate-400 font-bold">
-                  <span className="text-[8px] text-slate-500 block uppercase mb-1">Scale path (Aroha)</span>
-                  <span>{prahar.scale}</span>
-                </div>
-              </div>
-
-              <div className="pt-6 shrink-0">
-                <button
-                  onClick={() => handleAction("library")}
-                  className="w-full text-center py-2.5 border border-slate-800 hover:border-[#7C3AED] bg-[#0F1115]/60 hover:bg-[#0F1115] text-[#38BDF8] text-xs font-mono font-bold rounded-xl transition-all cursor-pointer"
-                >
-                  Learn Raga Profile Details →
-                </button>
-              </div>
-            </div>
-
-            {/* Today's Riyaz Routine Checklist */}
-            <div className="lg:col-span-5 bg-[#151A2E] p-5 rounded-2xl border border-slate-850 shadow-lg space-y-4">
-              <div className="flex items-center justify-between border-b border-slate-850 pb-2">
-                <h3 className="text-xs font-mono font-bold text-slate-400 uppercase tracking-widest flex items-center gap-1.5">
-                  <BookOpen className="h-4 w-4" />
-                  Today's Riyāz Recommendations
-                </h3>
-                <span className="text-[9.5px] font-mono text-[#38BDF8] font-bold font-bold">4 Tasks</span>
-              </div>
-
-              <div className="space-y-2 text-xs">
-                
-                <div 
-                  onClick={() => toggleTodo("kharaj")}
-                  className={`p-3 rounded-xl border flex items-center justify-between gap-3 transition-colors cursor-pointer ${
-                    todayRiyazCompleted.kharaj ? 'bg-[#0f1115]/40 border-slate-900/60 opacity-60' : 'bg-[#0F1115] hover:bg-slate-900/35 border-slate-850'
-                  }`}
-                >
-                  <div className="space-y-0.5">
-                    <span className={`font-bold ${todayRiyazCompleted.kharaj ? 'line-through text-slate-500' : 'text-slate-300'}`}>1. Kharaj Riyāz (Bass standard meditation)</span>
-                    <span className="text-[9px] font-mono text-slate-500 block">15 minutes on sustained low-Sa drone string</span>
-                  </div>
-                  <CheckCircle2 className={`h-4.5 w-4.5 ${todayRiyazCompleted.kharaj ? 'text-emerald-500' : 'text-slate-700'}`} />
-                </div>
-
-                <div 
-                  onClick={() => toggleTodo("alankar")}
-                  className={`p-3 rounded-xl border flex items-center justify-between gap-3 transition-colors cursor-pointer ${
-                    todayRiyazCompleted.alankar ? 'bg-[#0f1115]/40 border-slate-900/60 opacity-60' : 'bg-[#0F1115] hover:bg-slate-900/35 border-slate-850'
-                  }`}
-                >
-                  <div className="space-y-0.5">
-                    <span className={`font-bold ${todayRiyazCompleted.alankar ? 'line-through text-slate-500' : 'text-slate-300'}`}>2. Audition Alankāras</span>
-                    <span className="text-[9px] font-mono text-slate-550 block font-bold">10 patterns of Sa-Re-Ga-Ma ascension templates</span>
-                  </div>
-                  <CheckCircle2 className={`h-4.5 w-4.5 ${todayRiyazCompleted.alankar ? 'text-emerald-500' : 'text-slate-700'}`} />
-                </div>
-
-                <div 
-                  onClick={() => toggleTodo("yaman_meend")}
-                  className={`p-3 rounded-xl border flex items-center justify-between gap-3 transition-colors cursor-pointer ${
-                    todayRiyazCompleted.yaman_meend ? 'bg-[#0f1115]/40 border-slate-900/60 opacity-60' : 'bg-[#0F1115] hover:bg-slate-900/35 border-slate-850'
-                  }`}
-                >
-                  <div className="space-y-0.5">
-                    <span className={`font-bold ${todayRiyazCompleted.yaman_meend ? 'line-through text-slate-500' : 'text-slate-300'}`}>3. Meend Stability Calibration</span>
-                    <span className="text-[9px] font-mono text-slate-500 block">Glide development between Nishad and Gandhar</span>
-                  </div>
-                  <CheckCircle2 className={`h-4.5 w-4.5 ${todayRiyazCompleted.yaman_meend ? 'text-emerald-500' : 'text-slate-700'}`} />
-                </div>
-
-                <div 
-                  onClick={() => toggleTodo("sargam")}
-                  className={`p-3 rounded-xl border flex items-center justify-between gap-3 transition-colors cursor-pointer ${
-                    todayRiyazCompleted.sargam ? 'bg-[#0f1115]/40 border-slate-900/60 opacity-60' : 'bg-[#0F1115] hover:bg-slate-900/35 border-slate-850'
-                  }`}
-                >
-                  <div className="space-y-0.5">
-                    <span className={`font-bold ${todayRiyazCompleted.sargam ? 'line-through text-slate-500' : 'text-slate-300'}`}>4. Sargam Geeta Speed Calibration</span>
-                    <span className="text-[9px] font-mono text-slate-500 block">Drut laya alignment with teentaal (16 beats)</span>
-                  </div>
-                  <CheckCircle2 className={`h-4.5 w-4.5 ${todayRiyazCompleted.sargam ? 'text-emerald-500' : 'text-slate-700'}`} />
-                </div>
-
-              </div>
-            </div>
-
-            {/* Practice Streak Lamp */}
-            <div className="lg:col-span-3 bg-[#151A2E] p-5 rounded-2xl border border-slate-850 shadow-lg justify-between flex flex-col min-h-[300px]">
-              <div className="space-y-1.5 border-b border-slate-850 pb-2">
-                <span className="text-[9px] font-mono text-slate-550 font-bold uppercase tracking-widest block">Practice Streak Panel</span>
-                <span className="text-xs text-slate-400 font-sans">Riyāz regularity rating indicator</span>
-              </div>
-
-              <div className="flex flex-col items-center justify-center py-4 relative">
-                <div className="relative">
-                  <div className="absolute -top-6 -left-6 h-28 w-28 rounded-full bg-orange-700/10 border border-orange-500/10 blur-xl animate-pulse" />
-                  <div className="h-16 w-16 bg-gradient-to-tr from-[#7c3aed] to-orange-700 rounded-b-full rounded-tr-full flex items-center justify-center relative shadow-lg transform rotate-45 border border-purple-800">
-                    <div className="h-7 w-3.5 bg-gradient-to-t from-[#FBBF24] to-red-500 rounded-full absolute -top-8 -left-1 text-center shadow-lg transform -rotate-45 animate-bounce" />
-                  </div>
-                </div>
-
-                <div className="text-center mt-6 z-10 font-sans">
-                  <span className="text-3xl font-black font-mono text-orange-400 block tracking-wider">14 Days</span>
-                  <span className="text-[9px] font-mono text-slate-400 uppercase leading-snug block font-bold">Consistent Riyāz dedication</span>
-                </div>
-              </div>
-
-              <div className="bg-[#0F1115] px-3 py-2.5 rounded-xl border border-slate-900 text-[10px] text-slate-400 leading-normal flex items-center gap-1.5 font-sans">
-                <Flame className="h-4 w-4 text-orange-400 min-w-4 shrink-0" />
-                <span>Guru says: "Fourteen continuous sunrises of melodic training clears the internal ear standard."</span>
-              </div>
-            </div>
-
-          </div>
+          {/* 4. Raags for now, today's plan from measurements, real streak */}
+          <TodayPanel onGo={g => handleAction(g.tab, g.mode)} />
 
         </div>
       )}
