@@ -1,65 +1,85 @@
 # Naad AI
 
 A riyaz (practice) companion for Hindustani classical vocalists. It listens
-while you sing and shows how closely you hold each swara, measured in cents
-against your own Sa. It also plays the tanpura and taal for you.
+while you sing and measures how you hold each swara against your own Sa,
+plays the tanpura and taal itself, and turns your measurements into practice:
+paltas across four layas, pakad practice, raag-grammar checks, ear training
+and a daily plan.
 
-You only need a laptop or phone microphone and earphones. Earphones keep the
-app's tanpura out of the microphone.
+You only need a laptop or phone microphone and earphones (earphones keep the
+app's tanpura out of the microphone).
+
+![Analysis of a recording](docs/screenshots/analysis.png)
 
 ## Principles
 
-- **Only real measurements.** Every number the app shows is measured from your
-  voice. If something can't be measured reliably, the app doesn't show it.
-- **Strict on raag rules, gentle on style.** A wrong swara for the raag is
-  flagged. A slower meend or a different ornament is your style, not a mistake.
-- **Accuracy is measured and published.** See [`eval/`](eval/).
+- **Only real measurements.** Every number is measured from your voice. If
+  something can't be measured reliably, the app doesn't show it. There is no
+  random or sample data anywhere in the app.
+- **Strict on raag rules, gentle on style.** A clearly held swara outside the
+  raag is flagged with its time. A slower meend or a different ornament is
+  your style: ornaments are measured, never judged.
+- **Accuracy is measured and published.** See [Accuracy](#accuracy).
 
-## Status
+## Features
 
-Work in progress. Being rebuilt in phases:
+| Feature | What it does |
+|---|---|
+| **Live tuner** | Current swara and cents from your Sa |
+| **Find my Sa** | Hold Sa for a few seconds; measures its pitch and wobble |
+| **Sa sadhana** | Longest steady hold, distance from Sa and wobble, tracked over time |
+| **Analyse singing** | Record or upload (analysed in the browser, never uploaded): held-note accuracy, per-swara position and wobble, range, breath per phrase, pitch curve on a sargam grid |
+| **Raag rule checker** | Clearly held swaras outside the raag, with timestamps; short touches ignored |
+| **Andolan and gamak** | Speed (Hz) and width (± cents) of each oscillation |
+| **Automatic Sa detection** | Pitch histogram matched to the raag's swaras; says "unsure" instead of guessing |
+| **Paltas with laya ladder** | Six paltas generated from each raag's aroh/avaroh; each note graded green/yellow/red for pitch and timing; thah → dugun → tigun → chaugun unlocks at 85 |
+| **Pakad practice** | Note-by-note scoring of the raag's pakad |
+| **Weak-swara paltas** | Built around the swaras your own measurements show are often off or unsteady |
+| **Ear training** | Name the swara, or name the raag from a phrase (similar raags as distractors) |
+| **Daily riyaz planner** | Aakar → Sa sadhana → kharaj → paltas → raag → taans → ear training; time adapts to your measurements and each step cites them |
+| **Raags for now** | From the time of day (prahar) |
+| **Tanpura and 10 taals** | Pa/Ma/Ni first string, fine tuning; Teentaal, Ektaal, Jhaptaal, Rupak, Dadra, Keherwa, Jhoomra, Tilwada, Chautaal, Deepchandi |
+| **Raag library** | 45 raags; 9 with pakad, chalan, nyas swaras and comparisons with similar raags |
+| **Profiles** | Several singers per device, no passwords, data stays in the browser; export/import |
+| **Written feedback (optional)** | An AI model comments only on the measured numbers, through gharana-style lenses; never invents numbers or quotes real musicians |
 
-| Phase | Work | Status |
+| | | |
 |---|---|---|
-| 1 | Real pitch tracking from recordings, automatic Sa detection, remove placeholder values | Done (real-voice accuracy test pending) |
-| 2 | Recorded tanpura and tabla sounds, 10 taals | Planned |
-| 3 | Verified raag library | Planned |
-| 4 | Sa sadhana, range and breath tracking | Planned |
-| 5 | Palta mode with laya ladder, pakad practice | Planned |
-| 6 | Raga rule checker, meend curve, gamak and andolan measurement | Planned |
-| 7 | Ear training, weak-swara practice, daily riyaz planner | Planned |
-| 8 | Accuracy report, per-user accounts, demo | Planned |
+| ![Home](docs/screenshots/home.png) | ![Paltas](docs/screenshots/palta.png) | ![Tanpura and taal](docs/screenshots/tanpura-taal.png) |
+| ![Sa sadhana](docs/screenshots/sa-sadhana.png) | ![Raag library](docs/screenshots/library.png) | ![Progress](docs/screenshots/progress.png) |
 
-### What works now
+## Accuracy
 
-- **Live tuner**: the swara you are singing and how many cents sharp or flat it is.
-- **Find my Sa**: hold Sa for a few seconds; the app measures its pitch and how much it wobbles.
-- **Analyse singing**: record or upload a recording (analysed in the browser, never uploaded).
-  You get the time on held notes, the share within ±20 cents of each swara, per-swara position
-  and wobble, the range, swaras outside the chosen raag, and the pitch curve on a sargam grid.
-- **Automatic Sa detection** from a recording, which says "not sure" instead of guessing.
-- **Progress and Profile** pages built only from your own saved practice (stored in your browser).
-- **Optional written feedback**: an AI model comments on the measured numbers only, through
-  gharana-style lenses. Without an API key the app shows the measurements alone.
-- Tanpura drone and taal metronome (synthesised for now; recorded samples come in Phase 2).
+All results are reproducible with one command each.
 
-### Accuracy so far (synthetic test audio only)
+| What | Result | Test data | Command |
+|---|---|---|---|
+| Pitch within ±20 cents | 100% of sung frames; 0% false pitch in silence | 20 synthetic clips (Sa sadhana, aroh, kharaj, taar, andolan, gamak, meend, noise) | `npm run eval:pitch` |
+| Sa detection within ±20 cents | 56 of 56 phrases (raag and voice type known) | 56 synthetic 20 s phrases, 4 raags × 14 Sa values | `npm run eval:sa` |
+| Real voices | *Collecting recordings* | see [eval/recordings](eval/recordings/README.md) | `npm run eval:real` |
 
-| What | Result | How to reproduce |
-|---|---|---|
-| Pitch within ±20 cents | 100% of sung frames, 0% false pitch in silence | `npm run eval:pitch` |
-| Sa within ±20 cents (raag and voice type known) | 56 of 56 test phrases | `npm run eval:sa` |
+Synthetic clips are much easier than real singing, so these numbers are an
+upper bound. The real-voice report is the one that counts; it uses
+recordings sung over the app's own tanpura, so the true Sa is known exactly.
 
-These numbers come from computer-generated voice-like test clips, which are much
-easier than real singing. Results on real recordings will be published once
-they are collected (see [`eval/README.md`](eval/README.md)).
+Pitch tracking uses the McLeod Pitch Method (implemented in
+`src/analysis/pitch/mpm.ts`), chosen over YIN and plain autocorrelation by
+the benchmark above.
 
-## Tech stack
+## How it works
 
-- React 19, TypeScript, Vite, Tailwind CSS
-- Express server (`server.ts`)
-- Pitch analysis in plain TypeScript (`src/analysis/`), shared by the browser and the tests
-- Optional written feedback from the Google Gemini API, based only on the measured numbers
+```
+microphone / uploaded file
+        │  (AudioWorklet: raw samples, browser voice processing off)
+        ▼
+src/analysis   pitch track (MPM, 100 readings/s) → held notes, Sa, swara stats,
+               phrases, rule flags, oscillations          ← pure TypeScript, tested in Node
+src/practice   paltas, note scoring, ear-training questions, weak swaras, planner
+src/audio      tanpura engine, tabla theka player (audio-clock scheduling)
+src/data       raag library, raag grammar, taals
+src/lib        per-singer profiles and practice history (browser storage)
+server.ts      serves the app; optional /api/feedback (numbers in, text out)
+```
 
 ## Run locally
 
@@ -71,11 +91,25 @@ cp .env.example .env   # optional: add a Gemini API key for written feedback
 npm run dev            # http://localhost:3000
 ```
 
-Other commands:
+| Command | |
+|---|---|
+| `npm test` | Unit tests (analysis, scoring, data consistency, profiles) |
+| `npm run lint` | Type check |
+| `npm run eval:pitch` / `eval:sa` / `eval:real` | Accuracy reports |
+| `npm run raag:review` | Writes `docs/raag-review.md`, a checklist for a guru to verify the raag data |
+| `npm run build` then `npm start` | Production build and server (uses `PORT` if set) |
 
-```bash
-npm test               # unit tests
-npm run eval:pitch     # pitch accuracy benchmark
-npm run eval:sa        # Sa detection benchmark
-npm run lint           # type check
-```
+## Deploy
+
+Any Node host works (for example Render or Railway): build command
+`npm install && npm run build`, start command `npm start`, and optionally the
+`GEMINI_API_KEY` environment variable for written feedback.
+
+## Status and what's still needed
+
+- **Real tanpura and tabla recordings.** The app currently plays synthesised
+  placeholders and says so on screen. See [docs/recording-guide.md](docs/recording-guide.md).
+- **Raag data review.** Every raag entry is marked as awaiting a guru's
+  review; see `docs/raag-review.md`.
+- **Real-voice accuracy report.** See [eval/recordings](eval/recordings/README.md).
+- **Real users.** Feedback from students at a music school.

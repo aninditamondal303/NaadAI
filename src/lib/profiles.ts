@@ -49,10 +49,19 @@ export function currentProfile(): SingerProfile | null {
   return loadProfiles().find(p => p.id === id) ?? null;
 }
 
+/** Unique id even if two profiles are created in the same millisecond. */
+function newProfileId(existing: SingerProfile[]): string {
+  const taken = new Set(existing.map(p => p.id));
+  const base = `p${Date.now().toString(36)}`;
+  let id = base, n = 1;
+  while (taken.has(id)) id = `${base}-${n++}`;
+  return id;
+}
+
 export function createProfile(name: string, saHz: number): SingerProfile {
   const list = loadProfiles();
   const p: SingerProfile = {
-    id: `p${Date.now().toString(36)}`,
+    id: newProfileId(list),
     name: name.trim().slice(0, 40) || "Singer",
     saHz,
     createdIso: new Date().toISOString(),
