@@ -31,31 +31,9 @@ export const JournalTab: React.FC = () => {
     try {
       const stored = localStorage.getItem("naadai_riyaz_journals");
       if (stored) {
-        setEntries(JSON.parse(stored));
-      } else {
-        // Seed default beautiful initial history for user visual engagement
-        const seedEntries: JournalEntry[] = [
-          {
-            id: "journal_1",
-            date: "2026-06-10",
-            raagId: "yaman",
-            raagName: "Raag Yaman",
-            durationMinutes: 40,
-            notes: "Focused heavily on avoiding the Pancham in the characteristic 'N' R G M D N' ascension. Stability on Gandhar felt extremely serene. Throat felt slightly dry but fine tuned after 15 minutes of Kharaj Riyāz.",
-            moodReflection: "Meditative & Calm"
-          },
-          {
-            id: "journal_2",
-            date: "2026-06-08",
-            raagId: "bhairav",
-            raagName: "Raag Bhairav",
-            durationMinutes: 30,
-            notes: "Practiced Komal Re andolan oscillations at dawn. Sur accuracy tracker was hovering around 89%. Felt absolute quiet resonance. Will continue perfecting the sub-hertz flat pitch stability.",
-            moodReflection: "Divine Sunrise Devotion"
-          }
-        ];
-        localStorage.setItem("naadai_riyaz_journals", JSON.stringify(seedEntries));
-        setEntries(seedEntries);
+        // Older versions pre-filled two sample entries; drop them so only the singer's own notes remain.
+        const own = (JSON.parse(stored) as JournalEntry[]).filter(e => e.id !== "journal_1" && e.id !== "journal_2");
+        setEntries(own);
       }
     } catch (e) {
       console.error("Failed to parse journal indexes:", e);
@@ -72,7 +50,7 @@ export const JournalTab: React.FC = () => {
       raagId: activeRaag.id,
       raagName: activeRaag.name,
       durationMinutes: duration,
-      notes: notesText.trim() || "Completed standard swara alignment drills.",
+      notes: notesText.trim(),
       moodReflection: moodText
     };
 
