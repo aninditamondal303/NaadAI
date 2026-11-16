@@ -1,9 +1,12 @@
 /**
- * The singer's practice history, kept in this browser (localStorage).
+ * The singer's practice history, kept in this browser (localStorage),
+ * separately for each singer profile.
  *
  * Only real measurements and real timings are stored here. Nothing is
  * pre-filled: a new user starts with an empty history.
  */
+
+import { currentProfileId, historyKeyFor, LEGACY_HISTORY_KEY } from "./profiles";
 
 export interface SwaraSnapshot {
   symbol: string;
@@ -86,12 +89,17 @@ export type PracticeRecord =
       minutes: number;
     };
 
-const KEY = "naad.practiceHistory.v1";
+
+/** History is stored per singer profile. */
+function key(): string {
+  const id = currentProfileId();
+  return id ? historyKeyFor(id) : LEGACY_HISTORY_KEY;
+}
 const EVENT = "naad-practice-history-changed";
 
 export function loadHistory(): PracticeRecord[] {
   try {
-    const raw = localStorage.getItem(KEY);
+    const raw = localStorage.getItem(key());
     const parsed = raw ? JSON.parse(raw) : [];
     return Array.isArray(parsed) ? parsed : [];
   } catch {
@@ -103,7 +111,7 @@ export function addRecord(record: PracticeRecord): void {
   try {
     const all = loadHistory();
     all.push(record);
-    localStorage.setItem(KEY, JSON.stringify(all.slice(-500)));
+    localStorage.setItem(key(), JSON.stringify(all.slice(-500)));
     window.dispatchEvent(new Event(EVENT));
   } catch {
     // Storage full or blocked: the measurement is still shown, just not saved.
@@ -112,7 +120,7 @@ export function addRecord(record: PracticeRecord): void {
 
 export function clearHistory(): void {
   try {
-    localStorage.removeItem(KEY);
+    localStorage.removeItem(key());
     window.dispatchEvent(new Event(EVENT));
   } catch { /* ignore */ }
 }

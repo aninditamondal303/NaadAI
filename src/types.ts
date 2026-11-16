@@ -42,14 +42,6 @@ export interface TooltipProps {
   label?: string;
 }
 
-/** The singer's saved settings. Only the Sa is stored for now. */
-export interface DigitalTwinState {
-  digitalTwinId: string;
-  vocalProfile: {
-    baseTonicHz: number;
-  };
-}
-
 export interface DiagnosticMetrics {
   timestamp: string;
   testedRaag: string;
