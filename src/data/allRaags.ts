@@ -9,8 +9,16 @@ export interface ComprehensiveRaag extends Raag {
   jati: string;
 }
 
-// Full database of Hindustani Classical Ragas totaling 84, structured under the 10 Traditional Thaats
-export const ALL_84_RAAGS: ComprehensiveRaag[] = [
+/**
+ * Raag library: basic facts for every raag in the app (thaat, swaras,
+ * aroh/avaroh, vadi/samvadi, time, jati). The swara lists drive the
+ * analysis ("swaras outside the raag") and the tanpura's first string.
+ *
+ * Fuller grammar (pakad, chalan, nyas, similar raags) lives in
+ * raagDetails.ts for the raags where it has been written. All entries are
+ * awaiting review by a guru; see docs/raag-review.md.
+ */
+export const RAAG_LIST: ComprehensiveRaag[] = [
   // --- KALYAN THAAT ---
   {
     id: "yaman",
@@ -85,7 +93,7 @@ export const ALL_84_RAAGS: ComprehensiveRaag[] = [
   {
     id: "hansasdhwani",
     name: "Raag Hansadhwani",
-    thaat: "Kalyan",
+    thaat: "Bilawal",
     allowedSwaras: [0, 2, 4, 7, 11],
     aroha: ["S", "R", "G", "P", "N", "S'"],
     avaroha: ["S'", "N", "P", "G", "R", "S"],
@@ -245,7 +253,7 @@ export const ALL_84_RAAGS: ComprehensiveRaag[] = [
     name: "Raag Bageshree",
     thaat: "Kafi",
     allowedSwaras: [0, 2, 3, 5, 7, 9, 10],
-    aroha: ["S", "G", "m", "D", "n", "S'"],
+    aroha: ["S", "g", "m", "D", "n", "S'"],
     avaroha: ["S'", "n", "D", "m", "P", "D", "m", "g", "R", "S"],
     vadi: 5,     // Ma
     samvadi: 0,  // Sa
@@ -337,20 +345,6 @@ export const ALL_84_RAAGS: ComprehensiveRaag[] = [
     mood: "Light, descriptive, pastoral romance",
     jati: "Mixed/Sankirna",
     description: "A semi-classical genius raga that allows almost all 12 semitones to express fluid beauty."
-  },
-  {
-    id: "brindabani",
-    name: "Raag Madhmad Sarang",
-    thaat: "Kafi",
-    allowedSwaras: [0, 2, 5, 7, 10],
-    aroha: ["S", "R", "m", "P", "n", "S'"],
-    avaroha: ["S'", "n", "P", "m", "R", "S"],
-    vadi: 2,
-    samvadi: 7,
-    time: "Midday (12 PM - 3 PM)",
-    mood: "Exquisite joy, playful spring breeze",
-    jati: "Audav-Audav",
-    description: "Similar to Vrindavani Sarang but drops Shuddha Nishad completely, using only Komal Ni."
   },
 
   // --- ASAVARI THAAT ---
@@ -564,7 +558,7 @@ export const ALL_84_RAAGS: ComprehensiveRaag[] = [
     aroha: ["S", "G", "m", "D", "n", "S'"],
     avaroha: ["S'", "n", "D", "m", "G", "R", "S"],
     vadi: 4,
-    samvadi: 11,
+    samvadi: 10, // komal Ni
     time: "Late Night (10 PM - 1 AM)",
     mood: "Intimate confession, deep romance",
     jati: "Audav-Shadav",
@@ -668,112 +662,10 @@ export const ALL_84_RAAGS: ComprehensiveRaag[] = [
     aroha: ["S", "r", "G", "M", "P", "d", "N", "S'"],
     avaroha: ["S'", "N", "d", "P", "M", "G", "r", "S"],
     vadi: 7,
-    samvadi: 4,
+    samvadi: 1, // Re
     time: "Evening (6 PM - 9 PM)",
     mood: "Profound romance, supreme prayerfulness",
     jati: "Sampurna-Sampurna",
     description: "An incredibly popular evening scale of deep sweetness, blending Kalyan and Bhairav notes."
   }
 ];
-
-// Helper to expand the compilation to represent all 84 traditional raga categories dynamically!
-// If the user searches beyond the highly curated list, we generate standard raga instances so that
-// the list contains a whopping 84 Classical catalog instances representing the complete Hindustani tradition!
-export function getExpanded84Raags(): ComprehensiveRaag[] {
-  const result = [...ALL_84_RAAGS];
-  const currentCount = result.length;
-  const targetCount = 84;
-
-  const standardRagaNames = [
-    { name: "Raag Gauri", thaat: "Bhairav", time: "Evening (6 PM - 9 PM)", mood: "Contemplative" },
-    { name: "Raag Bibhas", thaat: "Bhairav", time: "Morning (6 AM - 8 AM)", mood: "Solemn prayer" },
-    { name: "Raag Bhairav Bahar", thaat: "Bhairav", time: "Morning (4 AM - 6 AM)", mood: "Seasonal joy" },
-    { name: "Raag Lalit", thaat: "Bhairav", time: "Pre-dawn (3 AM - 6 AM)", mood: "Deep prayer and longing" },
-    { name: "Raag Basant", thaat: "Poorvi", time: "Spring / Night", mood: "Festive joy" },
-    { name: "Raag Paraj", thaat: "Poorvi", time: "Late Night (12 AM - 3 AM)", mood: "Playful devotions" },
-    { name: "Raag Bhatiyar", thaat: "Marwa", time: "Early Morning (3 AM - 6 AM)", mood: "Profound transition" },
-    { name: "Raag Sohini", thaat: "Marwa", time: "Late Night (12 AM - 3 AM)", mood: "Anxious romance" },
-    { name: "Raag Jait Kalyan", thaat: "Kalyan", time: "Evening (6 PM - 9 PM)", mood: "Joyful blessing" },
-    { name: "Raag Kedar Bahar", thaat: "Kalyan", time: "Midnight", mood: "Seasonal rain romance" },
-    { name: "Raag Shankara", thaat: "Bilawal", time: "Midnight (12 AM - 3 AM)", mood: "Ascetic power, Shiva's dance" },
-    { name: "Raag Bihag", thaat: "Bilawal", time: "Late Night (9 PM - 12 AM)", mood: "Deep romance, sweet longing" },
-    { name: "Raag Hameer", thaat: "Kalyan", time: "First Part of Night", mood: "Heroic grandeur" },
-    { name: "Raag Gaud Sarang", thaat: "Kalyan", time: "Midday (12 PM - 3 PM)", mood: "Intricate playfulness" },
-    { name: "Raag Gurjari Todi", thaat: "Todi", time: "Morning (9 AM - 12 PM)", mood: "Severe pathos and prayer" },
-    { name: "Raag Khat", thaat: "Asavari", time: "Morning", mood: "Intricate transition" },
-    { name: "Raag Gandhari", thaat: "Asavari", time: "Morning (9 AM - 11 AM)", mood: "Longing appeal" },
-    { name: "Raag Devgandhar", thaat: "Asavari", time: "Morning (9 AM - 11 AM)", mood: "Resignation" },
-    { name: "Raag Durga", thaat: "Bilawal", time: "Late Night (9 PM - 12 AM)", mood: "Bright innocence and purity" },
-    { name: "Raag Deshkar", thaat: "Bilawal", time: "Morning (6 AM - 9 AM)", mood: "Sunrise energy and joy" },
-    { name: "Raag Pahadi", thaat: "Bilawal", time: "Evening", mood: "Folk romance and joy" },
-    { name: "Raag Mand", thaat: "Bilawal", time: "Pastoral Night", mood: "Traditional desert romance" },
-    { name: "Raag Gaud Malhar", thaat: "Kafi", time: "Monsoon Season", mood: "Joy of rain storms" },
-    { name: "Raag Megh Malhar", thaat: "Kafi", time: "Monsoon Night", mood: "Thunderous power and rain" },
-    { name: "Raag Mian Ki Malhar", thaat: "Kafi", time: "Midnight Rain", mood: "Profound monsoon longing" },
-    { name: "Raag Sur Malhar", thaat: "Kafi", time: "Monsoon Afternoon", mood: "Exquisite cooling relief" },
-    { name: "Raag Des", thaat: "Khamaj", time: "Night (9 PM - 12 AM)", mood: "Deep romantic yearning" },
-    { name: "Raag Sorath", thaat: "Khamaj", time: "Night (9 PM - 12 AM)", mood: "Sweet rustic romance" },
-    { name: "Raag Tilang", thaat: "Khamaj", time: "Night (9 PM - 12 AM)", mood: "Thumri style devotion" },
-    { name: "Raag Gara", thaat: "Khamaj", time: "Late Night", mood: "Elegiac folk elements" },
-    { name: "Raag Bhinna Shadaj", thaat: "Kalyan", time: "Late Night", mood: "Ethereal purity" },
-    { name: "Raag Bhibhas Todi", thaat: "Todi", time: "Morning", mood: "Contemplation" },
-    { name: "Raag Basant Mukhari", thaat: "Bhairav", time: "Pre-dawn", mood: "Serene appeal" },
-    { name: "Raag Charukeshi", thaat: "Asavari", time: "Morning (6 AM - 9 AM)", mood: "Highly emotional, romantic appeal" },
-    { name: "Raag Vachaspati", thaat: "Kalyan", time: "Night", mood: "Majestic devotion" },
-    { name: "Raag Keeravani", thaat: "Kafi", time: "Midnight", mood: "Intense classical drama" },
-    { name: "Raag Simhendra Madhyam", thaat: "Poorvi", time: "Night", mood: "Spiritual gravity" },
-    { name: "Raag Malgunji", thaat: "Kafi", time: "Late Night", mood: "Intimate and delicate" },
-    { name: "Raag Kedar-Gaud", thaat: "Kalyan", time: "Night", mood: "Contemplative fusion" },
-    { name: "Raag Bahar", thaat: "Kafi", time: "Spring Midnight", mood: "Burst of floral cheer and joy" },
-    { name: "Raag Shahana", thaat: "Kafi", time: "Midnight", mood: "Solemn celebration" },
-    { name: "Raag Sindhura", thaat: "Kafi", time: "Afternoon", mood: "Pastoral romance" },
-    { name: "Raag Jog", thaat: "Kafi", time: "Late Night (12 AM - 3 AM)", mood: "Hypnotic contrast of flat/sharp keys" },
-    { name: "Raag Nand", thaat: "Kalyan", time: "Night (9 PM - 12 AM)", mood: "Extremely complex royal pathways" },
-    { name: "Raag Khem Kalyan", thaat: "Kalyan", time: "Night", mood: "Auspicious blessings" },
-    { name: "Raag Kamod", thaat: "Kalyan", time: "Night (9 PM - 12 AM)", mood: "Graceful elegance and surprise" },
-    { name: "Raag Maru Bihag", thaat: "Kalyan", time: "Night (9 PM - 12 AM)", mood: "Passionate romance and tension" },
-    { name: "Raag Yaman Kalyan", thaat: "Kalyan", time: "Evening (6 PM - 9 PM)", mood: "Devotional grace with weak flat Ma" },
-    { name: "Raag Shuddha Sarang", thaat: "Kalyan", time: "Midday (12 PM - 3 PM)", mood: "Sublime cool summer heat" },
-    { name: "Raag Saraswati", thaat: "Kalyan", time: "Night (9 PM - 12 AM)", mood: "Ethereal purity, wisdom and peace" },
-    { name: "Raag Jaijaivantee", thaat: "Khamaj", time: "Midnight (12 AM - 3 AM)", mood: "Highly majestic dramatic canvas" },
-    { name: "Raag Gauri Bhairav", thaat: "Bhairav", time: "Morning", mood: "Serenity" },
-    { name: "Raag Bhairavi Bahar", thaat: "Bhairavi", time: "Spring Dawn", mood: "Divine festival" },
-    { name: "Raag Dhani", thaat: "Kafi", time: "Afternoon", mood: "Exquisite natural simplicity" },
-    { name: "Raag Malhar", thaat: "Kafi", time: "Monsoon Night", mood: "Royal rain calling" }
-  ];
-
-  // Fill up to exactly 84 items
-  for (let i = 0; i < targetCount - currentCount; i++) {
-    const info = standardRagaNames[i % standardRagaNames.length];
-    const itemNumber = currentCount + i + 1;
-    const isEven = i % 2 === 0;
-
-    // Build realistic Swara keys depending on their designated Thāat
-    let swaraMap: number[] = [0, 2, 4, 7, 9, 11]; // default major
-    if (info.thaat === "Bhairav") swaraMap = [0, 1, 4, 5, 7, 8, 11];
-    else if (info.thaat === "Kafi") swaraMap = [0, 2, 3, 5, 7, 9, 10];
-    else if (info.thaat === "Asavari") swaraMap = [0, 2, 3, 5, 7, 8, 10];
-    else if (info.thaat === "Bhairavi") swaraMap = [0, 1, 3, 5, 7, 8, 10];
-    else if (info.thaat === "Todi") swaraMap = [0, 1, 3, 6, 7, 8, 11];
-    else if (info.thaat === "Marwa") swaraMap = [0, 1, 4, 6, 9, 11];
-    else if (info.thaat === "Poorvi") swaraMap = [0, 1, 4, 6, 7, 8, 11];
-    else if (info.thaat === "Khamaj") swaraMap = [0, 2, 4, 5, 7, 9, 10, 11];
-
-    result.push({
-      id: `${info.name.toLowerCase().replace(/\s+/g, '_')}_${itemNumber}`,
-      name: `${info.name} (Hindustani Catalog #${itemNumber})`,
-      thaat: info.thaat as any,
-      allowedSwaras: swaraMap,
-      aroha: isEven ? ["S", "R", "G", "M", "P", "D", "N", "S'"] : ["S", "g", "m", "P", "d", "n", "S'"],
-      avaroha: isEven ? ["S'", "N", "D", "P", "M", "G", "R", "S"] : ["S'", "n", "d", "P", "m", "g", "R", "S"],
-      vadi: isEven ? 4 : 7,
-      samvadi: isEven ? 11 : 0,
-      time: info.time,
-      mood: info.mood,
-      jati: isEven ? "Sampurna-Sampurna" : "Audav-Sampurna",
-      description: `A classic member of the Hindustani ${info.thaat} Thāat division. Characterized as being highly ${info.mood.toLowerCase()} and performed traditionally around the ${info.time.toLowerCase()} hours.`
-    });
-  }
-
-  return result;
-}

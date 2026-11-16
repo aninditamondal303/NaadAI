@@ -9,7 +9,7 @@ import {
   BookOpen, AlertCircle, ArrowUpRight, CheckCircle2, ChevronRight,
   Clock, Volume2, Sliders, Settings, Square, RotateCcw, Award
 } from 'lucide-react';
-import { ALL_84_RAAGS, ComprehensiveRaag } from '../data/allRaags';
+import { RAAG_LIST, ComprehensiveRaag } from '../data/allRaags';
 import { addRecord, newId } from '../lib/practiceHistory';
 import { firstStringForRaag, STRING_ORDER, TanpuraEngine, type FirstString } from '../audio/tanpura';
 import { westernNote } from '../analysis/music';
@@ -320,7 +320,7 @@ export const HomeTab: React.FC<HomeTabProps> = ({
 
   const handleStartPracticeSession = () => {
     // The drone uses the singer's own Sa; the first string follows the raag's swaras.
-    const raagData = ALL_84_RAAGS.find(r => r.id === selectedPracticeRaag);
+    const raagData = RAAG_LIST.find(r => r.id === selectedPracticeRaag);
     const optimalTuning: FirstString = raagData ? firstStringForRaag(raagData.allowedSwaras) : "Pa";
     const saHz = baseTonicHz ?? 130.81;
 
