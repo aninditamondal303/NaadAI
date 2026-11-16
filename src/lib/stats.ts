@@ -36,7 +36,7 @@ export function minutesPerDay(records: PracticeRecord[], n = 7, now = new Date()
     const i = index.get(localDay(new Date(r.dateIso)));
     if (i === undefined) continue;
     if (r.kind === "riyaz-timer") out[i].minutes += r.minutes;
-    else if (r.kind === "analysis") out[i].minutes += r.durationSec / 60;
+    else if (r.kind === "analysis" || r.kind === "sa-sadhana") out[i].minutes += r.durationSec / 60;
   }
   return out;
 }

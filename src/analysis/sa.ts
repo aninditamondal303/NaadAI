@@ -254,3 +254,54 @@ export function median(xs: number[]): number {
   const m = s.length >> 1;
   return s.length % 2 ? s[m] : (s[m - 1] + s[m]) / 2;
 }
+
+// ---------------------------------------------------------------- Sa sadhana
+
+export interface SaSadhanaResult {
+  /** Longest continuous hold within ±50 cents of Sa (s). */
+  longestHoldSec: number;
+  /** Total time spent within ±50 cents of Sa (s). */
+  totalOnSaSec: number;
+  /** Median distance from Sa during the longest hold (cents, + = sharp). */
+  medianOffsetCents: number;
+  /** Median |distance from the hold's own centre| (cents): how much the note wavered. */
+  wobbleCents: number;
+}
+
+/**
+ * Sa sadhana: how long and how steadily Sa was held against the given Sa.
+ * Any octave of Sa counts (mandra, madhya or taar). Gaps of up to 50 ms are
+ * bridged. Returns null if Sa was never held for 0.5 s.
+ */
+export function measureSaSadhana(track: PitchTrack, saHz: number): SaSadhanaResult | null {
+  const offs = track.frames.map(f => {
+    if (f.hz === null) return null;
+    const c = centsBetween(f.hz, saHz);
+    const o = c - 1200 * Math.round(c / 1200);
+    return Math.abs(o) <= 50 ? o : null;
+  });
+  const maxGap = Math.round(0.05 / track.hopSec);
+  let best: number[] = [];
+  let cur: number[] = [];
+  let gap = 0;
+  let total = 0;
+  for (const o of offs) {
+    if (o === null) {
+      if (cur.length && ++gap > maxGap) { if (cur.length > best.length) best = cur; cur = []; gap = 0; }
+      continue;
+    }
+    total++;
+    gap = 0;
+    cur.push(o);
+  }
+  if (cur.length > best.length) best = cur;
+  const longestHoldSec = best.length * track.hopSec;
+  if (longestHoldSec < 0.5) return null;
+  const med = median(best);
+  return {
+    longestHoldSec,
+    totalOnSaSec: total * track.hopSec,
+    medianOffsetCents: med,
+    wobbleCents: median(best.map(o => Math.abs(o - med))),
+  };
+}

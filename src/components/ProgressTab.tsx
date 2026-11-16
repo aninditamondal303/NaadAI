@@ -48,6 +48,16 @@ export const ProgressTab: React.FC = () => {
     medianCents: a.medianAbsDeviationCents === null ? null : Number(a.medianAbsDeviationCents.toFixed(1)),
   }));
 
+  const sadhana = history
+    .filter((r): r is Extract<PracticeRecord, { kind: "sa-sadhana" }> => r.kind === "sa-sadhana")
+    .slice(-20)
+    .map(r => ({ date: shortDate(r.dateIso), hold: Number(r.longestHoldSec.toFixed(1)), wobble: Number(r.wobbleCents.toFixed(1)) }));
+
+  const breath = analyses
+    .filter(a => typeof a.longestPhraseSec === "number")
+    .slice(-20)
+    .map(a => ({ date: shortDate(a.dateIso), longest: Number(a.longestPhraseSec!.toFixed(1)), typical: a.medianPhraseSec == null ? null : Number(a.medianPhraseSec.toFixed(1)) }));
+
   // Range in cents relative to each session's Sa, so different Sa values compare fairly.
   const range = analyses.filter(a => a.lowest && a.highest).slice(-20).map((a, i) => ({
     n: `#${i + 1}`,
@@ -68,7 +78,7 @@ export const ProgressTab: React.FC = () => {
       </div>
 
       <p className="text-[11px] text-slate-500 px-1">
-        Built from what you have saved in this browser: recordings analysed in the Analyzer, Sa checks and timed riyaz sessions.
+        Built from what you have saved in this browser: recordings analysed in the Analyzer, Sa checks, Sa sadhana and timed riyaz sessions.
       </p>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
@@ -109,6 +119,49 @@ export const ProgressTab: React.FC = () => {
                   <Tooltip contentStyle={tooltipStyle} />
                   <Bar name="Minutes" dataKey="minutes" fill="#38BDF8" radius={[4, 4, 0, 0]} maxBarSize={30} />
                 </BarChart>
+              </ResponsiveContainer>
+            )}
+          </div>
+        </div>
+
+        <div className="bg-[#151A2E] p-5 rounded-2xl border border-slate-800 shadow-xl space-y-4">
+          <div>
+            <h4 className="text-sm font-bold text-slate-200">Sa sadhana</h4>
+            <span className="text-[10px] font-mono text-slate-500">Longest steady hold of Sa (s) and its wobble (cents), last 20 sessions</span>
+          </div>
+          <div className="h-56">
+            {sadhana.length === 0 ? <Empty>Use "Sa sadhana" in the Analyzer to track how long and how steadily you hold Sa.</Empty> : (
+              <ResponsiveContainer width="100%" height="100%">
+                <LineChart data={sadhana} margin={{ left: -20, right: 10, top: 10, bottom: 0 }}>
+                  <CartesianGrid strokeDasharray="3 3" stroke="#1e293b" />
+                  <XAxis dataKey="date" tick={{ fill: '#64748b', fontSize: 9 }} />
+                  <YAxis yAxisId="s" tick={{ fill: '#64748b', fontSize: 9 }} />
+                  <YAxis yAxisId="c" orientation="right" tick={{ fill: '#64748b', fontSize: 9 }} />
+                  <Tooltip contentStyle={tooltipStyle} />
+                  <Line yAxisId="s" name="Longest hold (s)" dataKey="hold" stroke="#FBBF24" strokeWidth={2} dot />
+                  <Line yAxisId="c" name="Wobble (cents)" dataKey="wobble" stroke="#38BDF8" strokeWidth={1.5} dot />
+                </LineChart>
+              </ResponsiveContainer>
+            )}
+          </div>
+        </div>
+
+        <div className="bg-[#151A2E] p-5 rounded-2xl border border-slate-800 shadow-xl space-y-4">
+          <div>
+            <h4 className="text-sm font-bold text-slate-200">Breath per phrase</h4>
+            <span className="text-[10px] font-mono text-slate-500">Longest and typical phrase between breaths (s), per analysed recording</span>
+          </div>
+          <div className="h-56">
+            {breath.length === 0 ? <Empty>Analyse a recording to see how long your phrases are between breaths.</Empty> : (
+              <ResponsiveContainer width="100%" height="100%">
+                <LineChart data={breath} margin={{ left: -20, right: 10, top: 10, bottom: 0 }}>
+                  <CartesianGrid strokeDasharray="3 3" stroke="#1e293b" />
+                  <XAxis dataKey="date" tick={{ fill: '#64748b', fontSize: 9 }} />
+                  <YAxis tick={{ fill: '#64748b', fontSize: 9 }} />
+                  <Tooltip contentStyle={tooltipStyle} />
+                  <Line name="Longest phrase (s)" dataKey="longest" stroke="#7C3AED" strokeWidth={2} dot />
+                  <Line name="Typical phrase (s)" dataKey="typical" stroke="#38BDF8" strokeWidth={1.5} dot connectNulls={false} />
+                </LineChart>
               </ResponsiveContainer>
             )}
           </div>

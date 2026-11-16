@@ -4,7 +4,8 @@
  *
  *  - Live tuner:      which swara you are singing right now, and how many cents off
  *  - Find my Sa:      hold Sa for a few seconds; we measure it
- *  - Analyse singing: record or upload; per-swara measurements and pitch curve
+ *  - Sa sadhana:      hold Sa against the tanpura; length, offset and wobble
+ *  - Analyse singing: record or upload; per-swara measurements, breath and pitch curve
  */
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { Activity, Headphones, Mic, Square, Upload } from 'lucide-react';
@@ -15,12 +16,13 @@ import { noteLabel, summariseTake, type TakeMeasurements } from '../analysis/sum
 import { rmsOf, trackPitch, VOICING, windowSizeFor } from '../analysis/track';
 import { DEFAULT_PITCH_SETTINGS, type PitchTrack } from '../analysis/types';
 import { decodeAudioFile } from '../audio/decode';
-import { MicSession } from '../audio/mic';
 import { RAAG_LIST } from '../data/allRaags';
 import { addRecord, newId } from '../lib/practiceHistory';
 import { TakeReport } from './analysis/TakeReport';
+import { LevelMeter, useMic } from './analysis/micHooks';
+import { SaSadhana } from './analysis/SaSadhana';
 
-export type AnalyzerMode = "tuner" | "scale" | "singing";
+export type AnalyzerMode = "tuner" | "scale" | "sadhana" | "singing";
 
 interface AnalyzerTabProps {
   baseTonicHz: number;
@@ -40,43 +42,6 @@ const silenceRms = Math.pow(10, DEFAULT_PITCH_SETTINGS.silenceDb / 20);
 const card = "bg-[#151A2E] p-6 rounded-3xl border border-slate-800 shadow-xl";
 const primaryBtn = "px-5 py-3 rounded-xl bg-gradient-to-r from-[#7C3AED] to-[#38BDF8] text-slate-950 font-mono text-xs font-black uppercase tracking-wider flex items-center gap-2 cursor-pointer disabled:opacity-50";
 const stopBtn = "px-5 py-3 rounded-xl bg-rose-600 hover:bg-rose-500 text-white font-mono text-xs font-bold uppercase tracking-wider flex items-center gap-2 cursor-pointer";
-
-/** Hook: one microphone session shared by the three modes. */
-function useMic() {
-  const ref = useRef<MicSession | null>(null);
-  const [error, setError] = useState<string | null>(null);
-  const open = async () => {
-    setError(null);
-    if (ref.current) return ref.current;
-    try {
-      ref.current = await MicSession.open();
-      return ref.current;
-    } catch (e: any) {
-      setError(e?.name === "NotAllowedError"
-        ? "Microphone permission was denied. Please allow microphone access in your browser and try again."
-        : `Couldn't open the microphone: ${e?.message || e}`);
-      return null;
-    }
-  };
-  const close = async () => {
-    const m = ref.current;
-    ref.current = null;
-    if (m) await m.close();
-  };
-  useEffect(() => () => { void close(); }, []);
-  return { open, close, error, session: ref };
-}
-
-const LevelMeter: React.FC<{ level: number }> = ({ level }) => {
-  // dBFS from -60 to 0 mapped to 0..100%
-  const db = level > 0 ? 20 * Math.log10(level) : -100;
-  const pct = Math.max(0, Math.min(100, ((db + 60) / 60) * 100));
-  return (
-    <div className="w-full max-w-md h-2 rounded-full bg-slate-900 overflow-hidden" title={`${db.toFixed(0)} dB`}>
-      <div className="h-full bg-gradient-to-r from-emerald-500 via-amber-400 to-rose-500 transition-[width] duration-75" style={{ width: `${pct}%` }} />
-    </div>
-  );
-};
 
 // ------------------------------------------------------------------ live tuner
 
@@ -349,6 +314,9 @@ const AnalyseSinging: React.FC<{ saHz: number }> = ({ saHz }) => {
             medianWobbleCents: s.medianWobbleCents,
             totalHeldSec: s.totalHeldSec,
           })),
+          longestPhraseSec: m.longestPhraseSec,
+          medianPhraseSec: m.medianPhraseSec,
+          phraseCount: m.phrases.length,
         });
         void source;
       } catch (e: any) {
@@ -476,7 +444,7 @@ export const AnalyzerTab: React.FC<AnalyzerTabProps> = ({ baseTonicHz, onTonicCh
   const [mode, setMode] = useState<AnalyzerMode>(initialMode);
   useEffect(() => setMode(initialMode), [initialMode]);
 
-  const modes: [AnalyzerMode, string][] = [["tuner", "Live tuner"], ["scale", "Find my Sa"], ["singing", "Analyse singing"]];
+  const modes: [AnalyzerMode, string][] = [["tuner", "Live tuner"], ["scale", "Find my Sa"], ["sadhana", "Sa sadhana"], ["singing", "Analyse singing"]];
 
   return (
     <div className="space-y-6">
@@ -511,6 +479,7 @@ export const AnalyzerTab: React.FC<AnalyzerTabProps> = ({ baseTonicHz, onTonicCh
 
       {mode === "tuner" && <LiveTuner saHz={baseTonicHz} />}
       {mode === "scale" && <FindSa saHz={baseTonicHz} onTonicChange={onTonicChange} />}
+      {mode === "sadhana" && <SaSadhana saHz={baseTonicHz} />}
       {mode === "singing" && <AnalyseSinging saHz={baseTonicHz} />}
     </div>
   );
