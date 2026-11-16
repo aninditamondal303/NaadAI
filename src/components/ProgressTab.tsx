@@ -188,7 +188,7 @@ export const ProgressTab: React.FC = () => {
             <span className="text-[10px] font-mono text-slate-500">Highest speed sung cleanly (score 85+) for each palta and pakad</span>
           </div>
           {ladder.length === 0 ? <p className="text-xs text-slate-500">Practise a palta in the Paltas tab to start your laya ladder.</p> : (
-            <table className="w-full text-xs font-mono">
+            <div className="overflow-x-auto"><table className="w-full text-xs font-mono whitespace-nowrap">
               <thead><tr className="text-[9px] uppercase tracking-widest text-slate-500 text-left"><th className="py-1.5">Raag</th><th>Exercise</th><th>Highest clean speed</th><th>Reached</th><th>Attempts</th></tr></thead>
               <tbody>
                 {ladder.map(l => (
@@ -197,7 +197,7 @@ export const ProgressTab: React.FC = () => {
                   </tr>
                 ))}
               </tbody>
-            </table>
+            </table></div>
           )}
         </div>
 

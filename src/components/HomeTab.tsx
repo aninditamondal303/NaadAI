@@ -465,7 +465,7 @@ export const HomeTab: React.FC<HomeTabProps> = ({
             </div>
 
             {/* Traditional Tanpura Neck design visual badge */}
-            <div className="h-44 w-44 shrink-0 rounded-2xl bg-[#0F1115]/90 border border-slate-800 p-4 flex flex-col items-center justify-between relative shadow-inner">
+            <div className="hidden lg:flex h-44 w-44 shrink-0 rounded-2xl bg-[#0F1115]/90 border border-slate-800 p-4 flex-col items-center justify-between relative shadow-inner">
               <span className="text-[8px] font-mono text-slate-500 uppercase tracking-wider">Naad AI</span>
               <div className="flex flex-col items-center flex-grow justify-center gap-1.5">
                 <div className="relative">

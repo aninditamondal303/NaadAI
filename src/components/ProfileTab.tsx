@@ -114,7 +114,7 @@ export const ProfileTab: React.FC<ProfileTabProps> = ({ baseTonicHz, vocalistNam
           </p>
         ) : (
           <div className="overflow-x-auto">
-            <table className="w-full text-xs font-mono">
+            <table className="w-full text-xs font-mono whitespace-nowrap">
               <thead>
                 <tr className="text-[9px] uppercase tracking-widest text-slate-500 text-left">
                   <th className="py-2 pr-3">Swara</th>
