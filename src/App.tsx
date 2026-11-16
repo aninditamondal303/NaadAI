@@ -151,7 +151,6 @@ export default function App() {
   const [password, setPassword] = useState<string>("");
   const [confirmPassword, setConfirmPassword] = useState<string>("");
   const [isPasswordVisible, setIsPasswordVisible] = useState<boolean>(false);
-  const [selectedAvatar, setSelectedAvatar] = useState<string>("Tansen");
   const [authStage, setAuthStage] = useState<"form" | "loading" | "complete">("form");
   const [authStepMessage, setAuthStepMessage] = useState<string>("");
   const [authError, setAuthError] = useState<string>("");
@@ -163,7 +162,7 @@ export default function App() {
     // Check Email
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!email.trim() || !emailRegex.test(email)) {
-      setAuthError("Please provide a valid, authentic email address (e.g., shishya@naadai.com).");
+      setAuthError("Please enter a valid email address.");
       return false;
     }
 
@@ -175,14 +174,14 @@ export default function App() {
 
     const hasSpecialOrDigit = /[0-9!@#$%^&*()_+={}\[\]|\\:;"'<>,.?/~`]/.test(password);
     if (!hasSpecialOrDigit) {
-      setAuthError("Passcode Strength Requirement: Password must contain at least one number (0-9) or special character (!@#$ etc.) to ensure digital twin authenticity.");
+      setAuthError("Password must contain at least one number or special character.");
       return false;
     }
 
     // Checking Registration credentials
     if (isRegistering) {
       if (!vocalistName.trim()) {
-        setAuthError("Registration Error: Please provide an authentic Shishya Practitioner Name.");
+        setAuthError("Please enter your name.");
         return false;
       }
       if (password !== confirmPassword) {
@@ -201,11 +200,7 @@ export default function App() {
     setAuthError("");
 
     const steps = [
-      "Verifying credentials against Shāstra Registry...",
-      "Calibrating microtonal register boundaries...",
-      "Attuning digital voice-print resonance curves...",
-      "Synchronizing offline-fallback telemetry caches...",
-      "Alignment Successful: Ready - Launching Riyāz Desk..."
+      "Opening your riyaz desk..."
     ];
 
     let currentStep = 0;
@@ -262,8 +257,7 @@ export default function App() {
               </div>
               <div>
                 <h1 className="text-lg font-extrabold tracking-tight text-white flex items-center gap-0.5">
-                  NaadAI 
-                  <span className="text-[9px] font-mono tracking-widest font-extrabold text-teal-400 bg-teal-950/60 border border-teal-800/40 px-1.5 py-0.5 rounded-full uppercase ml-1.5">Twin</span>
+                  Naad AI
                 </h1>
               </div>
             </div>
@@ -324,16 +318,16 @@ export default function App() {
               <div className="text-center max-w-3xl mx-auto space-y-6 pt-6">
                 <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-teal-900 bg-teal-950/40 text-teal-450 text-xs font-mono tracking-wider font-extrabold uppercase animate-pulse">
                   <Sparkles className="h-3 w-3" />
-                  India's Premier Acoustic Digital Twin Engine
+                  Riyaz companion for Hindustani vocalists
                 </div>
                 <h2 className="text-4xl md:text-5xl font-extrabold tracking-tight leading-tight font-serif text-white">
-                  Attune Your Vocal Soul. <br />
-                  <span className="text-transparent bg-clip-text bg-gradient-to-r from-teal-455 via-sky-305 to-emerald-405">
-                    Perfect Your Swar Sādhanā.
+                  Sing. See every swara. <br />
+                  <span className="text-transparent bg-clip-text bg-gradient-to-r from-teal-400 via-sky-300 to-emerald-400">
+                    Improve your sur.
                   </span>
                 </h2>
                 <p className="text-slate-300 md:text-sm leading-relaxed max-w-2xl mx-auto font-sans">
-                  NaadAI is a foolproof, real-time vocalist feedback console that maps your acoustic singing timber into a persistent digital twin profile, enabling microtonal pitch training across the ragas.
+                  Naad AI listens while you practise and shows how closely you hold each swara, measured in cents against your own Sa. It plays the tanpura and taal for you, so you only need a microphone and earphones.
                 </p>
                 <div className="flex flex-wrap justify-center gap-4 pt-4">
                   <button
@@ -341,14 +335,14 @@ export default function App() {
                     onClick={() => { setActivePage("signup"); setAuthError(""); }}
                     className="px-6 py-3 rounded-xl bg-gradient-to-r from-teal-500 to-emerald-600 text-slate-950 text-sm font-mono font-bold uppercase tracking-wider hover:opacity-90 shadow-xl transition-all hover:-translate-y-0.5 duration-300 cursor-pointer"
                   >
-                    Initialize Free Shishya Account
+                    Create free account
                   </button>
                   <button
                     type="button"
                     onClick={() => { setActivePage("login"); setAuthError(""); }}
                     className="px-6 py-3 rounded-xl border border-teal-900 bg-teal-950/30 text-teal-300 text-sm font-mono font-bold uppercase tracking-wider hover:bg-teal-950/70 transition-all cursor-pointer"
                   >
-                    Access Riyāz Desk (Log In)
+                    Log in
                   </button>
                 </div>
               </div>
@@ -361,7 +355,7 @@ export default function App() {
                   </div>
                   <h3 className="text-lg font-bold font-serif text-white">Interactive Swara Pitch Tuner</h3>
                   <p className="text-xs text-slate-400 leading-relaxed font-sans">
-                    Instantly capture singing pitch with microtonal accuracy down to absolute cents of a semitone (Shruti deviation). Tracks complex pitch ornaments like sliding Meend transitions.
+                    Shows the pitch you are singing, live, as a swara and how many cents sharp or flat it is from your Sa.
                   </p>
                 </div>
 
@@ -369,9 +363,9 @@ export default function App() {
                   <div className="h-10 w-10 rounded-xl bg-cyan-500/15 border border-cyan-500 text-cyan-400 flex items-center justify-center">
                     <Database className="h-5 w-5" />
                   </div>
-                  <h3 className="text-lg font-bold font-serif text-white">Persistent Digital-Twin Profiler</h3>
+                  <h3 className="text-lg font-bold font-serif text-white">Practice Profile</h3>
                   <p className="text-xs text-slate-400 leading-relaxed font-sans">
-                    Builds your personalized acoustic profile from timbral stability logs, habitual flat tendencies, breath-holding seconds, and registers, synchronizing with our Express backend.
+                    Keeps your Sa and your practice history, so you can see how your swaras change over weeks of riyaz.
                   </p>
                 </div>
 
@@ -379,9 +373,9 @@ export default function App() {
                   <div className="h-10 w-10 rounded-xl bg-emerald-500/15 border border-emerald-500 text-emerald-400 flex items-center justify-center">
                     <Award className="h-5 w-5" />
                   </div>
-                  <h3 className="text-lg font-bold font-serif text-white">Conservatory Curriculum Pathway</h3>
+                  <h3 className="text-lg font-bold font-serif text-white">Practice Journal</h3>
                   <p className="text-xs text-slate-400 leading-relaxed font-sans">
-                    Track your daily hours practice, mark musical checkpoints complete across level guidelines (Prārāmbhī to Vishārad Masters), and accumulate authentic medals.
+                    Log your daily riyaz and mark off the lessons you have completed.
                   </p>
                 </div>
               </div>
@@ -391,55 +385,28 @@ export default function App() {
                 <div className="text-center space-y-2">
                   <h3 className="text-2xl font-bold font-serif text-white">The 10 Parent Scales (Thaats)</h3>
                   <p className="text-slate-400 text-xs max-w-lg mx-auto font-sans">
-                    The fundamental Parent Scales from which all 84 Raags originate, exquisitely mapped inside our digital tuning system.
+                    Bhatkhande's ten parent scales, used to group raags by their swaras.
                   </p>
                 </div>
                 <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-3.5 text-center">
                   {[
-                    { name: "Bilawal", notes: "All Shuddh notes", vibe: "Pure Joy, Daylight Sunshine" },
-                    { name: "Kalyan", notes: "Teevra Madhyam (Ma#)", vibe: "Auspicious, Evening Peace" },
-                    { name: "Khamaj", notes: "Komal Nishad (Ni_)", vibe: "Lyrical, Playful, Devotional" },
-                    { name: "Kafi", notes: "Komal Ga & Komal Ni", vibe: "Expressive Folk, Midnight" },
-                    { name: "Asavari", notes: "Komal Ga, Dha, Ni", vibe: "Melancholic, Pre-noon Dusk" },
-                    { name: "Bhairav", notes: "Komal Re & Komal Dha", vibe: "Shattering Dawn Meditative" },
-                    { name: "Bhairavi", notes: "All Komal Swaras", vibe: "Deep Pathos, Eternal Finale" },
-                    { name: "Todi", notes: "Komal Re, Ga, Dha & Teevra Ma", vibe: "Sorrow, Spiritual Yearning" },
-                    { name: "Poorvi", notes: "Komal Re, Dha & Teevra Ma", vibe: "Solemn Sunset Twilight" },
-                    { name: "Marwa", notes: "Komal Re & Teevra Ma", vibe: "Anxious, Piercing Dawn-dusk" }
+                    { name: "Bilawal", notes: "All Shuddh notes" },
+                    { name: "Kalyan", notes: "Teevra Madhyam (Ma#)" },
+                    { name: "Khamaj", notes: "Komal Nishad (Ni_)" },
+                    { name: "Kafi", notes: "Komal Ga & Komal Ni" },
+                    { name: "Asavari", notes: "Komal Ga, Dha, Ni" },
+                    { name: "Bhairav", notes: "Komal Re & Komal Dha" },
+                    { name: "Bhairavi", notes: "All Komal Swaras" },
+                    { name: "Todi", notes: "Komal Re, Ga, Dha & Teevra Ma" },
+                    { name: "Poorvi", notes: "Komal Re, Dha & Teevra Ma" },
+                    { name: "Marwa", notes: "Komal Re & Teevra Ma" }
                   ].map((titem, ind) => (
                     <div key={titem.name} className="p-3.5 rounded-xl border border-teal-950/50 bg-[#08181f]/40 space-y-1">
                       <span className="text-[10px] uppercase font-mono font-extrabold text-teal-400">Thaat {ind + 1}</span>
                       <h4 className="font-serif font-bold text-slate-100 text-sm leading-tight">{titem.name}</h4>
                       <p className="text-[9px] text-slate-400 tracking-tight leading-normal font-mono">{titem.notes}</p>
-                      <p className="text-[8px] text-slate-500 italic block pt-0.5">{titem.vibe}</p>
                     </div>
                   ))}
-                </div>
-              </div>
-
-              {/* 4. Academy Testimonials / Classical Lineages */}
-              <div className="space-y-6">
-                <h3 className="text-2xl font-bold font-serif text-white text-center">Student Spotlight & Guru Endorsements</h3>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <div className="bg-teal-950/10 border border-teal-950/60 p-5 rounded-xl space-y-3">
-                    <p className="text-xs text-slate-300 italic font-sans leading-relaxed">
-                      "As a classical vocalist shishya, perfect pitch stability has always been checked under strict supervision. Under NaadAI's microtonal tuning logs, I can practice in Dawn's quiet hours and perfect my Komal Re oscillation down to absolute single cent thresholds. Magnificent architecture!"
-                    </p>
-                    <div className="flex justify-between items-center text-[10px] font-mono">
-                      <span className="text-teal-400 font-bold">— Priyadarshani Sen, Scholar</span>
-                      <span className="text-emerald-500">✔ VERIFIED SHISHYA</span>
-                    </div>
-                  </div>
-
-                  <div className="bg-teal-950/10 border border-teal-950/60 p-5 rounded-xl space-y-3">
-                    <p className="text-xs text-slate-300 italic font-sans leading-relaxed">
-                      "Traditional training is sacred, yet the precision is mathematical. The Voice Twin feedback mechanism accurately graphs the difference between a natural Sa pitch hold and a slurred, flat interval. It's a robust addition to live physical guru training."
-                    </p>
-                    <div className="flex justify-between items-center text-[10px] font-mono">
-                      <span className="text-teal-400 font-bold">— Pandit R. Devendra, Gwalior Shāstri</span>
-                      <span className="text-emerald-500">✔ SENIOR GURU CO-SIGN</span>
-                    </div>
-                  </div>
                 </div>
               </div>
 
@@ -448,20 +415,20 @@ export default function App() {
                 <h3 className="text-2xl font-bold font-serif text-white text-center">Frequently Asked Questions</h3>
                 {[
                   {
-                    q: "What is an Acoustic Vocalist Digital Twin?",
-                    a: "An Acoustic Digital Twin is a structured profile tracking your baseline vocal standard Sa pitch, larynx frequency ranges, breath-holding seconds capabilities, note stability records, and timbral tendencies (like habitual flat or sharp spikes). It persistently updates via the Express API backend server."
+                    q: "Do I need any special equipment?",
+                    a: "No. A laptop or phone microphone is enough. Please use earphones, so the app's tanpura does not leak into the microphone and confuse the pitch reading."
                   },
                   {
                     q: "Is standard C3 (Male) and G3 (Female) supported?",
-                    a: "Absolutely. During sign-up, or inside the live telemetry console, you can select 'Male Sa (C3)', 'Female Sa (G3)', or tune your exact custom standard Sa down to fine Hertz values using our range tuning slider."
+                    a: "Yes. You can pick a common Sa such as C3 (male) or G3 (female), or set your exact Sa in Hertz with the slider."
                   },
                   {
                     q: "How does the pitch tuner detect microtones?",
-                    a: "By mapping the fundamental pitch of the microphone input against active raga intervals. Within ragas like Bhairavi, it measures if you are hit flat (Komal) swaras and highlights cent deviations, providing immediate Gāndhār / Nishād coaching flags."
+                    a: "It measures the pitch of your voice many times a second and compares it with your Sa. The difference is shown in cents (100 cents = one semitone), so you can see whether a swara is sharp or flat."
                   },
                   {
-                    q: "Do I need real credentials?",
-                    a: "Yes! There are no pre-filled credentials. You can set up your custom passcode. The website authenticates the structure dynamically ensuring strong passwords containing digits or special chars."
+                    q: "Is my account stored securely?",
+                    a: "Not yet. Sign-in is currently only a local placeholder: the password is not checked by a server. Proper per-user accounts are planned. Please don't reuse a real password here."
                   }
                 ].map((faq, index) => (
                   <div key={index} className="border-b border-teal-950/40 pb-3">
@@ -487,12 +454,12 @@ export default function App() {
                 {/* Visual Header of portal */}
                 <div className="text-center space-y-2 mb-6">
                   <h3 className="text-2xl font-bold font-serif text-white">
-                    {activePage === "login" ? "Welcome back, Shishya" : "Register Shishya Profile"}
+                    {activePage === "login" ? "Welcome back" : "Create your account"}
                   </h3>
                   <p className="text-xs text-slate-400 font-mono">
                     {activePage === "login" 
                       ? "Attune credentials to enter the virtual riyāz deck" 
-                      : "Create your persistent vocal twin coordinate node"}
+                      : "Create your practice profile"}
                   </p>
                 </div>
 
@@ -501,7 +468,7 @@ export default function App() {
                   <div className="bg-red-950/60 border border-red-500/50 p-3 rounded-lg text-xs text-red-200 font-medium space-y-1 mb-4">
                     <div className="flex items-center gap-1.5 font-bold uppercase text-red-400 text-[10px]">
                       <AlertTriangle className="h-3.5 w-3.5" />
-                      Authenticity Safety Warning
+                      Please check
                     </div>
                     <p className="leading-normal">{authError}</p>
                   </div>
@@ -516,7 +483,7 @@ export default function App() {
                     </div>
                     <div className="space-y-1.5 text-center">
                       <p className="text-xs font-mono font-bold text-teal-400 animate-pulse">{authStepMessage}</p>
-                      <p className="text-[10px] text-slate-400 font-sans font-medium">Constructing active digital twin profile nodes...</p>
+                      <p className="text-[10px] text-slate-400 font-sans font-medium">Setting up your profile...</p>
                     </div>
                   </div>
                 )}
@@ -529,7 +496,7 @@ export default function App() {
                     {activePage === "signup" && (
                       <div className="space-y-1">
                         <label className="font-mono uppercase tracking-wider text-[9px] font-bold text-slate-400 block">
-                          Practitioner Shishya Name
+                          Your name
                         </label>
                         <div className="relative">
                           <input 
@@ -548,7 +515,7 @@ export default function App() {
                     {/* Email Input */}
                     <div className="space-y-1">
                       <label className="font-mono uppercase tracking-wider text-[9px] font-bold text-slate-400 block">
-                        Academic Email Address
+                        Email
                       </label>
                       <div className="relative">
                         <input 
@@ -566,7 +533,7 @@ export default function App() {
                     {/* Passcode lock */}
                     <div className="space-y-1">
                       <label className="font-mono uppercase tracking-wider text-[9px] font-bold text-slate-400 block">
-                        Access Passcode
+                        Password
                       </label>
                       <div className="relative">
                         <input 
@@ -593,7 +560,7 @@ export default function App() {
                     {activePage === "signup" && (
                       <div className="space-y-1">
                         <label className="font-mono uppercase tracking-wider text-[9px] font-bold text-slate-400 block">
-                          Confirm Passcode
+                          Confirm password
                         </label>
                         <div className="relative">
                           <input 
@@ -613,7 +580,7 @@ export default function App() {
                     {activePage === "signup" && (
                       <div className="space-y-2 pt-1 font-sans">
                         <label className="font-mono uppercase tracking-wider text-[9px] font-bold text-slate-400 block">
-                          Vocal Registration Standard (Sa)
+                          Your Sa
                         </label>
                         <div className="grid grid-cols-3 gap-2">
                           {[
@@ -642,43 +609,13 @@ export default function App() {
                       </div>
                     )}
 
-                    {/* Choice of Gharana Avatar on signup */}
-                    {activePage === "signup" && (
-                      <div className="space-y-2">
-                        <label className="font-mono uppercase tracking-wider text-[9px] font-bold text-slate-400 block">
-                          Study Lineage Avatar
-                        </label>
-                        <div className="grid grid-cols-3 gap-2">
-                          {[
-                            { id: "Tansen", label: "Tansen Dynasty", desc: "Pure Acoustic" },
-                            { id: "Khayal", label: "Khayāl Master", desc: "Colouratura" },
-                            { id: "Dhrupad", label: "Dhrupad Elder", desc: "Meditative" }
-                          ].map((av) => (
-                            <button
-                              key={av.id}
-                              type="button"
-                              onClick={() => setSelectedAvatar(av.id)}
-                              className={`p-1.5 rounded-lg border text-left transition-all cursor-pointer ${
-                                selectedAvatar === av.id
-                                  ? "bg-teal-500/20 border-teal-500 text-teal-300 font-bold"
-                                  : "bg-slate-900 border-teal-950/40 text-slate-500 hover:text-slate-300"
-                              }`}
-                            >
-                              <span className="block text-[9px] font-bold">{av.label}</span>
-                              <span className="text-[7px] opacity-70 block leading-tight">{av.desc}</span>
-                            </button>
-                          ))}
-                        </div>
-                      </div>
-                    )}
-
                     {/* Action buttons */}
                     <button
                       type="submit"
                       className="w-full py-2.5 rounded-xl bg-gradient-to-r from-teal-500 to-emerald-600 text-slate-950 font-mono text-xs font-bold uppercase tracking-wider hover:opacity-95 shadow-lg hover:-translate-y-0.5 duration-300 cursor-pointer flex items-center justify-center gap-1.5"
                     >
                       <LogIn className="h-4 w-4" />
-                      {activePage === "login" ? "Verify Credentials" : "Establish Profile Node"}
+                      {activePage === "login" ? "Log in" : "Create account"}
                     </button>
 
                   </form>
@@ -688,7 +625,7 @@ export default function App() {
                 {authStage === "form" && (
                   <div className="mt-6 pt-4 border-t border-teal-950/40 text-center">
                     <p className="text-xs text-slate-400 font-mono">
-                      {activePage === "login" ? "New shishya scholar?" : "Already registered custom node?"}
+                      {activePage === "login" ? "New here?" : "Already have an account?"}
                       &nbsp;
                       <button
                         type="button"
@@ -698,7 +635,7 @@ export default function App() {
                         }}
                         className="text-teal-400 font-bold hover:underline cursor-pointer"
                       >
-                        {activePage === "login" ? "Generate Account" : "Access Credentials Portal"}
+                        {activePage === "login" ? "Create an account" : "Log in"}
                       </button>
                     </p>
                   </div>
@@ -712,8 +649,8 @@ export default function App() {
         {/* Public Landing Area Footer */}
         <footer className="relative z-20 border-t border-teal-950/40 py-4 text-center text-[10px] font-mono tracking-wider bg-slate-950/40">
           <div className="max-w-7xl mx-auto px-4 flex flex-col md:flex-row justify-between items-center gap-2">
-            <span>ॐ नादब्रह्मणे नमः — "Ancient melody meeting computational science"</span>
-            <span>© 12026 NAADAI CONCEPTS, LTD. ALL RIGHTS RESERVED.</span>
+            <span>ॐ नादब्रह्मणे नमः</span>
+            <span>Naad AI · student project · © 2026</span>
           </div>
         </footer>
 
@@ -822,8 +759,8 @@ export default function App() {
       {/* Aesthetic classical credits footer */}
       <footer className="relative z-20 border-t border-[#7C3AED]/20 py-4 text-center text-[10px] font-mono tracking-wider bg-[#0F1115]">
         <div className="max-w-7xl mx-auto px-6 flex flex-col md:flex-row justify-between items-center gap-2 text-slate-500">
-          <span>ॐ नादब्रह्मणे नमः — "Ancient melody meeting computational science"</span>
-          <span>© 12026 NAADAI CONCEPTS, LTD. ALL RIGHTS RESERVED.</span>
+          <span>ॐ नादब्रह्मणे नमः</span>
+          <span>Naad AI · student project · © 2026</span>
         </div>
       </footer>
 

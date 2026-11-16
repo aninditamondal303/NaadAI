@@ -176,14 +176,10 @@ export const AnalyzerTab: React.FC<AnalyzerTabProps> = ({
   const waveIntervalRef = useRef<number | null>(null);
 
   // Simulation pipeline steps
+  // NOTE: this report is still an example, not a measurement of the recording.
+  // It will be replaced by real pitch analysis (src/analysis) in Phase 1.
   const PipelineSteps = [
-    "DSP: Auditing analog recording buffers...",
-    "DSP: Extracting vocal saptak range bounds...",
-    "ML model: Extracting F0 contours via CREPE inference...",
-    "DSP: Running pitch-histogram structural mapping...",
-    "Grammar Parser: Checking Tivra Madhyam frequency weights...",
-    "AI matching: Computing cross-correlation index over 84 ragas database...",
-    "Guru Panel: Consolidating classical musicological logs..."
+    "Preparing example report..."
   ];
 
   // Handle Recording Timer
@@ -457,6 +453,11 @@ export const AnalyzerTab: React.FC<AnalyzerTabProps> = ({
       {activeSubMode === "singing" && showReport && !isRecording && (
         <div className="space-y-6 animate-in fade-in duration-500">
           
+          <div className="p-3 rounded-xl border border-amber-500/40 bg-amber-500/10 text-amber-200 text-xs font-sans">
+            Example report: these values are placeholders and were not measured from your recording.
+            Real analysis is being built.
+          </div>
+
           {/* TOP THREE DETECTED MELODIC RAGAS CANDIDATES */}
           <div className="bg-[#151A2E] p-6 rounded-3xl border border-slate-800 shadow-2xl space-y-5">
             <div className="border-b border-slate-850 pb-3 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
@@ -660,44 +661,6 @@ export const AnalyzerTab: React.FC<AnalyzerTabProps> = ({
 
             </div>
           )}
-
-          {/* GURU EVALUATION FORUMS PANEL */}
-          <div className="bg-[#151A2E] p-6 rounded-3xl border border-slate-800 shadow-xl space-y-4 font-sans">
-            <h3 className="text-xs font-mono font-bold text-[#FBBF24] uppercase tracking-widest pl-1">
-              Feedback from Classical Vocal Gurus Panel
-            </h3>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-              <div className="bg-[#11131E]/60 p-4 rounded-xl border border-slate-850 flex flex-col justify-between hover:border-[#7C3AED]/35 transition-colors">
-                <div>
-                  <h4 className="text-xs font-mono font-black text-purple-400">Pandit Bhimsen Joshi</h4>
-                  <p className="text-[11px] text-slate-450 italic leading-relaxed mt-2">
-                    "Consistent stability on Gandhar is impressive. Perfecting the vigor in the Drut phrasing is vital. Excellent breath support!"
-                  </p>
-                </div>
-                <span className="text-[7.5px] font-mono text-slate-550 uppercase tracking-widest block mt-4 text-right">Kirana Gharana</span>
-              </div>
-
-              <div className="bg-[#11131E]/60 p-4 rounded-xl border border-slate-850 flex flex-col justify-between hover:border-[#7C3AED]/35 transition-colors">
-                <div>
-                  <h4 className="text-xs font-mono font-black text-purple-400">Kishori Amonkar</h4>
-                  <p className="text-[11px] text-slate-450 italic leading-relaxed mt-2">
-                    "The Meend glides are loaded with deep inner Bhava (emotion). Guard the microtonal shade on Madhyam; let it slide slower."
-                  </p>
-                </div>
-                <span className="text-[7.5px] font-mono text-slate-550 uppercase tracking-widest block mt-4 text-right">Jaipur-Atrauli Gharana</span>
-              </div>
-
-              <div className="bg-[#11131E]/60 p-4 rounded-xl border border-slate-850 flex flex-col justify-between hover:border-[#7C3AED]/35 transition-colors">
-                <div>
-                  <h4 className="text-xs font-mono font-black text-purple-400">Pandit Jasraj</h4>
-                  <p className="text-[11px] text-slate-450 italic leading-relaxed mt-2">
-                    "Resonant swaras. The voice projection carries spiritual purity. Work on holding the Komal Rishabh with deep meditative quietness."
-                  </p>
-                </div>
-                <span className="text-[7.5px] font-mono text-slate-550 uppercase tracking-widest block mt-4 text-right">Mewati Gharana</span>
-              </div>
-            </div>
-          </div>
 
           {/* MISTAKE LOCALIZATION TIMELINE (MICROTONAL AUDIO TIMELINE scrubber) */}
           <div className="bg-[#151A2E] p-6 rounded-2xl border border-slate-850 shadow-lg space-y-4 font-mono text-xs">

@@ -1086,7 +1086,7 @@ export const HomeTab: React.FC<HomeTabProps> = ({
               </div>
               <div>
                 <h4 className="text-xs font-bold text-slate-200 font-mono uppercase tracking-wide flex items-center gap-1">
-                  Explore 84+ Raags
+                  Explore Raags
                   <ArrowUpRight className="h-3 w-3 opacity-0 group-hover:opacity-100 transition-opacity" />
                 </h4>
                 <span className="text-[10px] text-slate-500 mt-0.5 block leading-normal font-sans">Search and review master scale blueprints</span>
