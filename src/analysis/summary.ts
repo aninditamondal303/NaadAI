@@ -53,6 +53,11 @@ export interface SwaraStats {
   medianWobbleCents: number;
 }
 
+export interface Phrase {
+  startSec: number;
+  durSec: number;
+}
+
 export interface TakeMeasurements {
   pitchMethod: string;
   durationSec: number;
@@ -71,9 +76,37 @@ export interface TakeMeasurements {
   highestNote: { label: string; hz: number } | null;
   swaras: SwaraStats[];
   heldNotes: HeldNote[];
+  /** Sung phrases: singing separated by silences of at least BREATH_GAP_SEC. */
+  phrases: Phrase[];
+  longestPhraseSec: number | null;
+  medianPhraseSec: number | null;
 }
 
 export const MIN_HELD_SEC = 0.25;
+/** A silence at least this long counts as a breath between phrases. Shorter gaps are articulation. */
+export const BREATH_GAP_SEC = 0.3;
+/** Phrases shorter than this are ignored (coughs, clicks, single short syllables). */
+export const MIN_PHRASE_SEC = 0.3;
+
+/** Split the singing into phrases separated by breaths (silences of at least BREATH_GAP_SEC). */
+export function findPhrases(track: PitchTrack): Phrase[] {
+  const f = track.frames;
+  const gapFrames = Math.ceil(BREATH_GAP_SEC / track.hopSec);
+  const phrases: Phrase[] = [];
+  let start = -1, lastVoiced = -1;
+  for (let i = 0; i <= f.length; i++) {
+    const voiced = i < f.length && f[i].hz !== null;
+    if (voiced) {
+      if (start < 0) start = i;
+      lastVoiced = i;
+    } else if (start >= 0 && (i === f.length || i - lastVoiced >= gapFrames)) {
+      const durSec = (lastVoiced - start + 1) * track.hopSec;
+      if (durSec >= MIN_PHRASE_SEC) phrases.push({ startSec: f[start].timeSec, durSec });
+      start = -1;
+    }
+  }
+  return phrases;
+}
 const MAX_GAP_FRAMES = 3;
 
 /** Split the pitch track into held notes (runs on one swara lasting at least MIN_HELD_SEC). */
@@ -138,7 +171,11 @@ export function summariseTake(track: PitchTrack, opts: SummariseOptions = {}): T
     ? track.frames[track.frames.length - 1].timeSec + track.windowSize / 2 / track.sampleRate
     : 0;
 
+  const phrases = findPhrases(track);
   const base = {
+    phrases,
+    longestPhraseSec: phrases.length ? Math.max(...phrases.map(p => p.durSec)) : null,
+    medianPhraseSec: phrases.length ? median(phrases.map(p => p.durSec)) : null,
     pitchMethod: track.method,
     durationSec,
     voicedSec: voicedFrames * track.hopSec,

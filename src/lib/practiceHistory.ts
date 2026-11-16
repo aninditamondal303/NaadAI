@@ -27,6 +27,21 @@ export type PracticeRecord =
       lowest: { label: string; hz: number } | null;
       highest: { label: string; hz: number } | null;
       swaras: SwaraSnapshot[];
+      /** Breath per phrase (added in v2 records; may be missing in older ones). */
+      longestPhraseSec?: number | null;
+      medianPhraseSec?: number | null;
+      phraseCount?: number;
+    }
+  | {
+      kind: "sa-sadhana";
+      id: string;
+      dateIso: string;
+      saHz: number;
+      durationSec: number;
+      longestHoldSec: number;
+      totalOnSaSec: number;
+      medianOffsetCents: number;
+      wobbleCents: number;
     }
   | {
       kind: "sa-check";

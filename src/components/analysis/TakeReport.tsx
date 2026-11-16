@@ -60,6 +60,11 @@ export const TakeReport: React.FC<TakeReportProps> = ({ m, track, raagName, allo
             note="100 cents = one semitone"
           />
           <Stat
+            label="Breath: longest phrase"
+            value={m.longestPhraseSec === null ? "–" : `${m.longestPhraseSec.toFixed(1)} s`}
+            note={m.medianPhraseSec === null ? undefined : `${m.phrases.length} ${m.phrases.length === 1 ? "phrase" : "phrases"} · typical ${m.medianPhraseSec.toFixed(1)} s (a silence of 0.3 s or more counts as a breath)`}
+          />
+          <Stat
             label="Range (held notes)"
             value={m.lowestNote && m.highestNote ? `${m.lowestNote.label} – ${m.highestNote.label}` : "–"}
             note={m.lowestNote && m.highestNote ? `${m.lowestNote.hz.toFixed(0)} – ${m.highestNote.hz.toFixed(0)} Hz` : undefined}
