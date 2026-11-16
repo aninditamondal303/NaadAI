@@ -3,14 +3,14 @@
  * src/analysis; anything that couldn't be measured is shown as "–".
  */
 import React from 'react';
-import { westernNote } from '../../analysis/music';
+import { signedCents, westernNote } from '../../analysis/music';
 import type { TakeMeasurements } from '../../analysis/summary';
 import type { PitchTrack } from '../../analysis/types';
 import { PitchContour } from './PitchContour';
 import { FeedbackPanel } from './FeedbackPanel';
 
 const fmtSec = (s: number) => (s >= 60 ? `${Math.floor(s / 60)}m ${Math.round(s % 60)}s` : `${s.toFixed(1)} s`);
-const fmtCents = (c: number) => `${c > 0 ? "+" : ""}${c.toFixed(0)}`;
+const fmtCents = signedCents;
 
 const Stat: React.FC<{ label: string; value: string; note?: string }> = ({ label, value, note }) => (
   <div className="bg-[#0F1115]/60 p-4 rounded-xl border border-slate-800 space-y-1">

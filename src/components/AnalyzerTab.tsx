@@ -8,7 +8,7 @@
  */
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { Activity, Headphones, Mic, Square, Upload } from 'lucide-react';
-import { centsBetween, westernNote } from '../analysis/music';
+import { centsBetween, signedCents, westernNote } from '../analysis/music';
 import { makeMpmDetector } from '../analysis/pitch/mpm';
 import { measureHeldSa, type HeldSaResult } from '../analysis/sa';
 import { noteLabel, summariseTake, type TakeMeasurements } from '../analysis/summary';
@@ -139,7 +139,7 @@ const LiveTuner: React.FC<{ saHz: number }> = ({ saHz }) => {
       <div className="flex flex-col items-center gap-3 py-4">
         <span className={`text-6xl font-black font-mono ${colour}`}>{label}</span>
         <span className="text-sm font-mono text-slate-400">
-          {reading ? `${off > 0 ? "+" : ""}${off.toFixed(0)} cents · ${reading.hz.toFixed(1)} Hz` : running ? "Listening..." : "Not listening"}
+          {reading ? `${signedCents(off)} cents · ${reading.hz.toFixed(1)} Hz` : running ? "Listening..." : "Not listening"}
         </span>
         <div className="relative w-full max-w-md h-6 rounded-full bg-slate-900 border border-slate-800">
           <div className="absolute left-1/2 top-0 bottom-0 w-px bg-[#FBBF24]" />
@@ -247,7 +247,7 @@ const FindSa: React.FC<{ saHz: number; onTonicChange?: (hz: number) => void }> =
             <div className="bg-[#0F1115]/60 p-4 rounded-xl border border-slate-800">
               <span className="text-[9px] text-slate-500 uppercase block font-bold">Sa</span>
               <span className="text-2xl font-black text-slate-100 block">{r.saHz.toFixed(1)} Hz</span>
-              <span className="text-[10px] text-slate-400">{wn.name} {wn.cents >= 0 ? "+" : ""}{wn.cents.toFixed(0)} cents</span>
+              <span className="text-[10px] text-slate-400">{wn.name} {signedCents(wn.cents)} cents</span>
             </div>
             <div className="bg-[#0F1115]/60 p-4 rounded-xl border border-slate-800">
               <span className="text-[9px] text-slate-500 uppercase block font-bold">Held steadily for</span>

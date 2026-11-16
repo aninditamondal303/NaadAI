@@ -634,7 +634,7 @@ export default function App() {
               <span className="font-serif text-lg font-bold text-slate-950 leading-none">ॐ</span>
             </div>
             <div>
-              <h1 className="text-xl font-serif font-black text-slate-100 tracking-wide">NaadAI</h1>
+              <h1 className="text-xl font-serif font-black text-slate-100 tracking-wide">Naad AI</h1>
               <p className="text-[10px] font-mono text-[#38BDF8] uppercase tracking-widest font-bold">Classical Riyaz Companion</p>
             </div>
           </div>
