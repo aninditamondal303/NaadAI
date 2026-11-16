@@ -21,7 +21,7 @@ Work in progress. Being rebuilt in phases:
 
 | Phase | Work | Status |
 |---|---|---|
-| 1 | Real pitch tracking from recordings, automatic Sa detection, remove placeholder values | In progress |
+| 1 | Real pitch tracking from recordings, automatic Sa detection, remove placeholder values | Done (real-voice accuracy test pending) |
 | 2 | Recorded tanpura and tabla sounds, 10 taals | Planned |
 | 3 | Verified raag library | Planned |
 | 4 | Sa sadhana, range and breath tracking | Planned |
@@ -30,9 +30,29 @@ Work in progress. Being rebuilt in phases:
 | 7 | Ear training, weak-swara practice, daily riyaz planner | Planned |
 | 8 | Accuracy report, per-user accounts, demo | Planned |
 
-Working now: the live swara tuner, the tanpura drone and the taal metronome.
-Some analysis screens still show example values while their real measurements
-are being built; these are labelled in the app.
+### What works now
+
+- **Live tuner**: the swara you are singing and how many cents sharp or flat it is.
+- **Find my Sa**: hold Sa for a few seconds; the app measures its pitch and how much it wobbles.
+- **Analyse singing**: record or upload a recording (analysed in the browser, never uploaded).
+  You get the time on held notes, the share within ±20 cents of each swara, per-swara position
+  and wobble, the range, swaras outside the chosen raag, and the pitch curve on a sargam grid.
+- **Automatic Sa detection** from a recording, which says "not sure" instead of guessing.
+- **Progress and Profile** pages built only from your own saved practice (stored in your browser).
+- **Optional written feedback**: an AI model comments on the measured numbers only, through
+  gharana-style lenses. Without an API key the app shows the measurements alone.
+- Tanpura drone and taal metronome (synthesised for now; recorded samples come in Phase 2).
+
+### Accuracy so far (synthetic test audio only)
+
+| What | Result | How to reproduce |
+|---|---|---|
+| Pitch within ±20 cents | 100% of sung frames, 0% false pitch in silence | `npm run eval:pitch` |
+| Sa within ±20 cents (raag and voice type known) | 56 of 56 test phrases | `npm run eval:sa` |
+
+These numbers come from computer-generated voice-like test clips, which are much
+easier than real singing. Results on real recordings will be published once
+they are collected (see [`eval/README.md`](eval/README.md)).
 
 ## Tech stack
 
@@ -56,5 +76,6 @@ Other commands:
 ```bash
 npm test               # unit tests
 npm run eval:pitch     # pitch accuracy benchmark
+npm run eval:sa        # Sa detection benchmark
 npm run lint           # type check
 ```

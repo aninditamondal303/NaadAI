@@ -49,7 +49,7 @@ export const PitchContour: React.FC<{ track: PitchTrack; saHz: number; allowedSw
               label={{ value: g.label, position: "left", fill: "#94a3b8", fontSize: 10 }}
             />
           ))}
-          <XAxis dataKey="t" type="number" domain={["dataMin", "dataMax"]} tick={{ fill: "#64748b", fontSize: 10 }} unit="s" />
+          <XAxis dataKey="t" type="number" domain={["dataMin", "dataMax"]} tick={{ fill: "#64748b", fontSize: 10 }} tickFormatter={(v: number) => `${Math.round(v)} s`} />
           <YAxis domain={[lo, hi]} tick={false} width={36} />
           <Tooltip
             contentStyle={{ background: "#0F1115", border: "1px solid #334155", fontSize: 11 }}

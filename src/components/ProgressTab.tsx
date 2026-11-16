@@ -61,7 +61,7 @@ export const ProgressTab: React.FC = () => {
   return (
     <div className="space-y-6">
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
-        <Stat icon={<Hourglass className="h-5 w-5" />} label="Practice time" value={totalMinutes >= 60 ? `${(totalMinutes / 60).toFixed(1)} h` : `${Math.round(totalMinutes)} min`} />
+        <Stat icon={<Hourglass className="h-5 w-5" />} label="Practice time" value={totalMinutes >= 60 ? `${(totalMinutes / 60).toFixed(1)} h` : totalMinutes >= 1 ? `${Math.round(totalMinutes)} min` : `${Math.round(totalMinutes * 60)} s`} />
         <Stat icon={<Flame className="h-5 w-5" />} label="Practice streak" value={`${streak} ${streak === 1 ? "day" : "days"}`} />
         <Stat icon={<Bookmark className="h-5 w-5" />} label="Analysed recordings" value={String(analyses.length)} />
         <Stat icon={<Compass className="h-5 w-5" />} label="Raags analysed" value={String(raags)} />

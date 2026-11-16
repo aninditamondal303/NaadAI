@@ -5,7 +5,7 @@
  */
 import React, { useEffect, useMemo, useState } from 'react';
 import { User } from 'lucide-react';
-import { centsBetween, westernNote } from '../analysis/music';
+import { centsBetween, signedCents, westernNote } from '../analysis/music';
 import { SWARA_NAMES, SWARA_SYMBOLS } from '../analysis/summary';
 import { clearHistory, loadHistory, onHistoryChange, type PracticeRecord } from '../lib/practiceHistory';
 
@@ -81,7 +81,7 @@ export const ProfileTab: React.FC<ProfileTabProps> = ({ baseTonicHz, vocalistNam
         <div className="bg-[#151A2E] p-5 rounded-2xl border border-slate-800 space-y-1">
           <span className="text-[9px] font-mono text-slate-500 uppercase tracking-widest block font-bold">Your Sa</span>
           <span className="text-2xl font-black font-mono text-slate-100 block">{baseTonicHz.toFixed(1)} Hz</span>
-          <span className="text-[11px] text-slate-400">{sa.name} {sa.cents >= 0 ? "+" : ""}{sa.cents.toFixed(0)} cents</span>
+          <span className="text-[11px] text-slate-400">{sa.name} {signedCents(sa.cents)} cents</span>
         </div>
         <div className="bg-[#151A2E] p-5 rounded-2xl border border-slate-800 space-y-1">
           <span className="text-[9px] font-mono text-slate-500 uppercase tracking-widest block font-bold">Latest Sa check</span>
@@ -125,7 +125,7 @@ export const ProfileTab: React.FC<ProfileTabProps> = ({ baseTonicHz, vocalistNam
                   <tr key={s.symbol} className="border-t border-slate-800 text-slate-200">
                     <td className="py-2 pr-3 font-bold">{s.symbol} <span className="font-sans font-normal text-slate-400">{s.name}</span></td>
                     <td className="py-2 pr-3">{s.sec.toFixed(0)} s</td>
-                    <td className={`py-2 pr-3 ${Math.abs(s.dev) > 15 ? "text-amber-300" : ""}`}>{s.dev > 0 ? "+" : ""}{s.dev.toFixed(0)} cents</td>
+                    <td className={`py-2 pr-3 ${Math.abs(s.dev) > 15 ? "text-amber-300" : ""}`}>{signedCents(s.dev)} cents</td>
                     <td className="py-2 pr-3">±{s.wob.toFixed(1)} cents</td>
                   </tr>
                 ))}

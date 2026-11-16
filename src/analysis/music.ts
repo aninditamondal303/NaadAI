@@ -24,3 +24,9 @@ export function westernNote(hz: number): { name: string; cents: number } {
   const name = WESTERN[((nearest % 12) + 12) % 12] + (Math.floor(nearest / 12) - 1);
   return { name, cents: (midi - nearest) * 100 };
 }
+
+/** "+12", "-8" or "0" (never "-0"). */
+export function signedCents(c: number): string {
+  const r = Math.round(c);
+  return r > 0 ? `+${r}` : r < 0 ? `${r}` : "0";
+}
