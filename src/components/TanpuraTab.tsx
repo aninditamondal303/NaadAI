@@ -46,6 +46,7 @@ export const TanpuraTab: React.FC<TanpuraTabProps> = ({ baseTonicHz, onTonicChan
   const [tPlaying, setTPlaying] = useState(false);
   const [lit, setLit] = useState<StringId | null>(null);
   const [tSource, setTSource] = useState<string>("");
+  const [droneMode, setDroneMode] = useState(false);
   const tanpura = useRef<TanpuraEngine | null>(null);
 
   // Sa: nearest equal-tempered note + fine tuning in cents
@@ -57,22 +58,33 @@ export const TanpuraTab: React.FC<TanpuraTabProps> = ({ baseTonicHz, onTonicChan
   }, [baseTonicHz]);
   const [octave, setOctave] = useState<2 | 3>(nearest.octave <= 2 ? 2 : 3);
 
-  const ensureTanpura = async () => {
-    if (!tanpura.current) {
+  const tanpuraLoading = useRef<Promise<TanpuraEngine> | null>(null);
+  const ensureTanpura = async (): Promise<TanpuraEngine> => {
+    if (tanpura.current) return tanpura.current;
+    if (tanpuraLoading.current) return tanpuraLoading.current;
+    tanpuraLoading.current = (async () => {
       const ctx = getCtx();
       const eng = new TanpuraEngine(ctx, ctx.destination, { saHz: baseTonicHz, firstString: first, cycleSec, volume: tVolume });
       eng.onPluck = s => { setLit(s); window.setTimeout(() => setLit(cur => (cur === s ? null : cur)), 350); };
       await eng.loadSamples();
-      setTSource(eng.source === "samples"
-        ? `Recorded tanpura samples${eng.sourceCredit ? ` (${eng.sourceCredit})` : ""}`
-        : "Synthesised tanpura (placeholder until real recordings are added)");
       tanpura.current = eng;
-    }
-    return tanpura.current;
+      setTSource(eng.describeSource());
+      setDroneMode(eng.usesRecordedDrone());
+      return eng;
+    })();
+    return tanpuraLoading.current;
   };
 
-  useEffect(() => { tanpura.current?.setOptions({ saHz: baseTonicHz }); }, [baseTonicHz]);
-  useEffect(() => { tanpura.current?.setOptions({ firstString: first, cycleSec, volume: tVolume }); }, [first, cycleSec, tVolume]);
+  useEffect(() => {
+    const eng = tanpura.current;
+    if (!eng) return;
+    eng.setOptions({ saHz: baseTonicHz, firstString: first, cycleSec, volume: tVolume });
+    setTSource(eng.describeSource());
+    setDroneMode(eng.usesRecordedDrone());
+  }, [baseTonicHz, first, cycleSec, tVolume]);
+
+  // Load the sounds once when the tab opens, so the source line is accurate before playing
+  useEffect(() => { void ensureTanpura(); }, []);
   useEffect(() => () => { tanpura.current?.disconnect(); }, []);
 
   const toggleTanpura = async () => {
@@ -95,23 +107,28 @@ export const TanpuraTab: React.FC<TanpuraTabProps> = ({ baseTonicHz, onTonicChan
   const player = useRef<TaalPlayer | null>(null);
   const taal = TAALS.find(t => t.id === taalId)!;
 
-  const ensurePlayer = async () => {
-    if (!player.current) {
+  const playerLoading = useRef<Promise<TaalPlayer> | null>(null);
+  const ensurePlayer = async (): Promise<TaalPlayer> => {
+    if (player.current) return player.current;
+    if (playerLoading.current) return playerLoading.current;
+    playerLoading.current = (async () => {
       const ctx = getCtx();
       const p = new TaalPlayer(ctx, ctx.destination, { taal, bpm, saHz: baseTonicHz, volume: bVolume });
       p.onMatra = m => setMatra(m);
       await p.loadSamples();
       setBSource(p.source === "samples"
-        ? `Recorded tabla samples${p.sourceCredit ? ` (${p.sourceCredit})` : ""}`
-        : "Synthesised tabla (placeholder until real recordings are added)");
+        ? `Real tabla recordings, retuned so the dayan sits on your Sa${p.sourceCredit ? ` (${p.sourceCredit})` : ""}`
+        : "Synthesised tabla (placeholder: real recordings couldn't be loaded)");
       player.current = p;
-    }
-    return player.current;
+      return p;
+    })();
+    return playerLoading.current;
   };
 
   useEffect(() => { player.current?.setOptions({ taal, bpm }); }, [taalId, bpm]);
   useEffect(() => { player.current?.setOptions({ volume: bVolume, saHz: baseTonicHz }); }, [bVolume, baseTonicHz]);
   useEffect(() => () => { player.current?.disconnect(); }, []);
+  useEffect(() => { void ensurePlayer(); }, []);
 
   const toggleTaal = async () => {
     const p = await ensurePlayer();
@@ -147,7 +164,7 @@ export const TanpuraTab: React.FC<TanpuraTabProps> = ({ baseTonicHz, onTonicChan
             const hz = stringHz(s, baseTonicHz, first);
             const name = s === "first" ? `${first},` : s === "kharaj" ? "S,," : "S";
             return (
-              <button key={s} type="button" onClick={async () => (await ensureTanpura()).pluckNow(s)}
+              <button key={s} type="button" disabled={droneMode} onClick={async () => (await ensureTanpura()).pluckNow(s)}
                 className={`p-3 rounded-xl border text-center cursor-pointer transition-colors ${lit === s ? "border-[#FBBF24] bg-[#FBBF24]/10" : "border-slate-800 bg-[#0F1115]/60 hover:border-slate-600"}`}>
                 <span className="block text-[9px] font-mono text-slate-500 uppercase">{STRING_LABEL[s]} string</span>
                 <span className="block text-lg font-black font-mono text-slate-100">{name}</span>
@@ -156,7 +173,11 @@ export const TanpuraTab: React.FC<TanpuraTabProps> = ({ baseTonicHz, onTonicChan
             );
           })}
         </div>
-        <p className="text-[10px] text-slate-500 -mt-2">Tap a string to pluck it. Strings are tuned by just intonation, like a real tanpura.</p>
+        <p className="text-[10px] text-slate-500 -mt-2">
+          {droneMode
+            ? "Playing a real tanpura recording, so strings can't be plucked one at a time and the cycle speed is the player's own."
+            : "Tap a string to pluck it. Strings are tuned by just intonation, like a real tanpura."}
+        </p>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
           <div className="space-y-2">
@@ -198,10 +219,12 @@ export const TanpuraTab: React.FC<TanpuraTabProps> = ({ baseTonicHz, onTonicChan
               </div>
               <p className="text-[10px] text-slate-500">Pa for most raags, Ma for raags without Pa (e.g. Malkauns), Ni for raags like Marwa.</p>
             </div>
-            <label className="block space-y-1">
-              <span className={label}>Cycle: {cycleSec.toFixed(1)} s per four plucks</span>
-              <input type="range" min={3} max={8} step={0.1} value={cycleSec} onChange={e => setCycleSec(Number(e.target.value))} className="w-full accent-[#7C3AED]" />
-            </label>
+            {!droneMode && (
+              <label className="block space-y-1">
+                <span className={label}>Cycle: {cycleSec.toFixed(1)} s per four plucks</span>
+                <input type="range" min={3} max={8} step={0.1} value={cycleSec} onChange={e => setCycleSec(Number(e.target.value))} className="w-full accent-[#7C3AED]" />
+              </label>
+            )}
             <label className="block space-y-1">
               <span className={label}>Volume</span>
               <input type="range" min={0} max={1} step={0.01} value={tVolume} onChange={e => setTVolume(Number(e.target.value))} className="w-full accent-[#7C3AED]" />

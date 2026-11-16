@@ -38,7 +38,7 @@ app's tanpura out of the microphone).
 | **Ear training** | Name the swara, or name the raag from a phrase (similar raags as distractors) |
 | **Daily riyaz planner** | Aakar → Sa sadhana → kharaj → paltas → raag → taans → ear training; time adapts to your measurements and each step cites them |
 | **Raags for now** | From the time of day (prahar) |
-| **Tanpura and 10 taals** | Pa/Ma/Ni first string, fine tuning; Teentaal, Ektaal, Jhaptaal, Rupak, Dadra, Keherwa, Jhoomra, Tilwada, Chautaal, Deepchandi |
+| **Tanpura and 10 taals** | Real tanpura and tabla recordings retuned to your Sa; Pa/Ma/Ni first string, fine tuning; Teentaal, Ektaal, Jhaptaal, Rupak, Dadra, Keherwa, Jhoomra, Tilwada, Chautaal, Deepchandi |
 | **Raag library** | 45 raags; 9 with pakad, chalan, nyas swaras and comparisons with similar raags |
 | **Profiles** | Several singers per device, no passwords, data stays in the browser; export/import |
 | **Written feedback (optional)** | An AI model comments only on the measured numbers, through gharana-style lenses; never invents numbers or quotes real musicians |
@@ -99,6 +99,11 @@ npm run dev            # http://localhost:3000
 | `npm run raag:review` | Writes `docs/raag-review.md`, a checklist for a guru to verify the raag data |
 | `npm run build` then `npm start` | Production build and server (uses `PORT` if set) |
 
+## Credits
+
+Tabla and tanpura recordings: [Naad](https://github.com/oormicreations/naad)
+by Oormi Creations, MIT licence (see `public/samples/*/LICENSE`).
+
 ## Deploy
 
 Any Node host works (for example Render or Railway): build command
@@ -107,8 +112,10 @@ Any Node host works (for example Render or Railway): build command
 
 ## Status and what's still needed
 
-- **Real tanpura and tabla recordings.** The app currently plays synthesised
-  placeholders and says so on screen. See [docs/recording-guide.md](docs/recording-guide.md).
+- **More tanpura recordings.** The app ships real tanpura and tabla
+  recordings from the MIT-licensed [Naad](https://github.com/oormicreations/naad)
+  project, but only one tanpura key (Sa–Pa, Sa = C). Ma/Ni tuning still uses a
+  synthesised tanpura. See [docs/recording-guide.md](docs/recording-guide.md).
 - **Raag data review.** Every raag entry is marked as awaiting a guru's
   review; see `docs/raag-review.md`.
 - **Real-voice accuracy report.** See [eval/recordings](eval/recordings/README.md).
