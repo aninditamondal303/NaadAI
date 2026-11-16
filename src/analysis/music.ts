@@ -14,3 +14,13 @@ export function hzFromCents(refHz: number, cents: number): number {
 export function foldToOctave(cents: number): number {
   return ((cents % 1200) + 1200) % 1200;
 }
+
+const WESTERN = ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"];
+
+/** Nearest Western note name (e.g. "C#3") and how many cents away, for reference. */
+export function westernNote(hz: number): { name: string; cents: number } {
+  const midi = 69 + 12 * Math.log2(hz / 440);
+  const nearest = Math.round(midi);
+  const name = WESTERN[((nearest % 12) + 12) % 12] + (Math.floor(nearest / 12) - 1);
+  return { name, cents: (midi - nearest) * 100 };
+}

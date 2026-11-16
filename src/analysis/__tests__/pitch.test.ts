@@ -50,3 +50,12 @@ describe.each<PitchMethodName>(["mpm", "yin"])("%s pitch tracking", method => {
     expect(b).toEqual(a);
   });
 });
+
+import { westernNote } from "../music";
+describe("westernNote", () => {
+  it("names notes", () => {
+    expect(westernNote(138.59).name).toBe("C#3");
+    expect(westernNote(440).name).toBe("A4");
+    expect(Math.abs(westernNote(130.81).cents)).toBeLessThan(1);
+  });
+});

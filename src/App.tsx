@@ -748,6 +748,7 @@ export default function App() {
           <AnalyzerTab 
             baseTonicHz={baseTonicHz} 
             onTonicChange={handleTonicChange} 
+            initialMode={analyzerMode}
           />
         )}
         {activeTab === "journal" && <JournalTab />}
