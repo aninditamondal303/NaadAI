@@ -6,3 +6,6 @@ coverage/
 *.log
 .env*
 !.env.example
+
+# Local practice data written by the dev server
+data-vocal-twin.json
