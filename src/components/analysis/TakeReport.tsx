@@ -11,6 +11,7 @@ import { PitchContour } from './PitchContour';
 import { FeedbackPanel } from './FeedbackPanel';
 import { downloadTakeImage } from '../../lib/takeImage';
 import { useLang } from '../../i18n/lang';
+import { ListenBack } from './ListenBack';
 
 const fmtSec = (s: number) => (s >= 60 ? `${Math.floor(s / 60)}m ${Math.round(s % 60)}s` : `${s.toFixed(1)} s`);
 const fmtCents = signedCents;
@@ -24,6 +25,8 @@ const Stat: React.FC<{ label: string; value: string; note?: string }> = ({ label
 );
 
 export interface TakeReportProps {
+  /** The recording itself, for listening back (kept only in memory). */
+  audio?: { samples: Float32Array; sampleRate: number };
   m: TakeMeasurements;
   track: PitchTrack;
   raagName: string;
@@ -32,7 +35,7 @@ export interface TakeReportProps {
   saNotes: string[];
 }
 
-export const TakeReport: React.FC<TakeReportProps> = ({ m, track, raagName, allowedSwaras, saNotes }) => {
+export const TakeReport: React.FC<TakeReportProps> = ({ audio, m, track, raagName, allowedSwaras, saNotes }) => {
   const sa = westernNote(m.saHz);
   const { t } = useLang();
   const outside = m.swaras.filter(s => s.inRaag === false);
@@ -42,6 +45,8 @@ export const TakeReport: React.FC<TakeReportProps> = ({ m, track, raagName, allo
       {saNotes.map((n, i) => (
         <div key={i} className="p-3 rounded-xl border border-amber-500/40 bg-amber-500/10 text-amber-200 text-xs">{n}</div>
       ))}
+
+      {audio && <ListenBack audio={audio} track={track} saHz={m.saHz} allowedSwaras={allowedSwaras ?? [0, 2, 4, 5, 7, 9, 11]} />}
 
       <div className="bg-[#1A2150] p-5 rounded-2xl border border-slate-800 space-y-4">
         <div className="flex flex-wrap items-baseline justify-between gap-3">
