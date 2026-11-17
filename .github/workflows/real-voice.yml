@@ -26,6 +26,8 @@ jobs:
           find eval/datasets/vocadito -maxdepth 3 | head -20
       - name: Evaluate
         run: npm run eval:f0 -- eval/datasets/vocadito --name "vocadito (Bittner et al. 2021, CC BY 4.0)"
+      - name: Show results
+        run: cat eval/results/real-voice-pitch.md
       - uses: actions/upload-artifact@v4
         with:
           name: real-voice-pitch
