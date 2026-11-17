@@ -255,6 +255,7 @@ const FindSa: React.FC<{ saHz: number; onTonicChange?: (hz: number) => void }> =
 // ------------------------------------------------------------------ analyse singing
 
 interface AnalysisResult {
+  audio?: { samples: Float32Array; sampleRate: number };
   m: TakeMeasurements;
   track: PitchTrack;
   raagName: string;
@@ -292,6 +293,9 @@ const AnalyseSinging: React.FC<{ saHz: number; autoDemo?: boolean }> = ({ saHz, 
   };
 
   const analyse = async (samples: Float32Array, sampleRate: number, demo = false) => {
+    // The analysis worker takes ownership of the samples, so keep a copy for listening back
+    // (up to 5 minutes, to keep memory use reasonable).
+    const keep = samples.length <= sampleRate * 300 ? samples.slice() : null;
     setBusy("Measuring pitch...");
     setError(null);
     try {
@@ -302,7 +306,7 @@ const AnalyseSinging: React.FC<{ saHz: number; autoDemo?: boolean }> = ({ saHz, 
       if (demo) {
         notes.unshift(`Demo: a computer-generated Raag Yaman phrase (Sa ${DEMO_SA_HZ} Hz), not a real singer. It includes an andolan on Ga, a meend, a slightly flat Re and a held shuddha Ma, so you can see what the analysis finds. Demo results are not saved.`);
       }
-      setResult({ m, track, raagName: r.name, allowedSwaras: r.allowedSwaras, saNotes: notes });
+      setResult({ audio: keep ? { samples: keep, sampleRate } : undefined, m, track, raagName: r.name, allowedSwaras: r.allowedSwaras, saNotes: notes });
       if (demo) return;
       addRecord({
         kind: "analysis",
@@ -468,7 +472,7 @@ const AnalyseSinging: React.FC<{ saHz: number; autoDemo?: boolean }> = ({ saHz, 
         </div>
       </div>
 
-      {result && <TakeReport m={result.m} track={result.track} raagName={result.raagName} allowedSwaras={result.allowedSwaras} saNotes={result.saNotes} />}
+      {result && <TakeReport audio={result.audio} m={result.m} track={result.track} raagName={result.raagName} allowedSwaras={result.allowedSwaras} saNotes={result.saNotes} />}
     </div>
   );
 };
