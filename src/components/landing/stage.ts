@@ -8,7 +8,7 @@ import type { Sky } from "./sky";
 export interface TracePoint { t: number; c: number | null }
 
 /** Lines for Raag Yaman's swaras, mandra Pa to taar Sa (cents from Sa). */
-export const GRID: { c: number; label: string; kind: "sa" | "swara" | "outside" }[] = [
+export const GRID: GridLine[] = [
   { c: -500, label: "प़", kind: "swara" },
   { c: -300, label: "ध़", kind: "swara" },
   { c: -100, label: "ऩि", kind: "swara" },
@@ -22,16 +22,35 @@ export const GRID: { c: number; label: string; kind: "sa" | "swara" | "outside" 
   { c: 1100, label: "नि", kind: "swara" },
   { c: 1200, label: "सां", kind: "sa" },
 ];
+export type GridLine = { c: number; label: string; kind: "sa" | "swara" | "outside" };
+
+const DEVA12 = ["सा", "रे॒", "रे", "ग॒", "ग", "म", "म॑", "प", "ध॒", "ध", "नि॒", "नि"];
+
+/**
+ * Lines for any raag: its swaras from mandra Pa up to taar Sa (cents from Sa).
+ * `allowed` holds semitones 0..11 that belong to the raag.
+ */
+export function gridFor(allowed: number[]): GridLine[] {
+  const out: GridLine[] = [];
+  for (let c = -500; c <= 1200; c += 100) {
+    const semi = ((c / 100) % 12 + 12) % 12;
+    if (!allowed.includes(semi)) continue;
+    const base = DEVA12[semi];
+    const label = c < 0 ? base[0] + "\u093C" + base.slice(1) : c === 1200 ? "सां" : base;
+    out.push({ c, label, kind: semi === 0 ? "sa" : "swara" });
+  }
+  return out;
+}
+
 export const C_MIN = -600;
 export const C_MAX = 1300;
 
-/** Grid labels in Bengali (akarmatrik) notation: tivra Ma is হ্মা, taar Sa র্সা. */
-const GRID_BN: Record<number, string> = {
-  [-500]: "পা", [-300]: "ধা", [-100]: "নি", 0: "সা", 200: "রে", 400: "গা", 500: "মা", 600: "হ্মা",
-  700: "পা", 900: "ধা", 1100: "নি", 1200: "র্সা",
-};
-
 export type Script = "deva" | "beng";
+
+function bengLabel(c: number): string {
+  if (c === 1200) return "র্সা";
+  return TWELVE.beng[(((Math.round(c / 100)) % 12) + 12) % 12];
+}
 
 /** All twelve swaras, for naming the nearest one to a sung pitch. */
 const TWELVE: Record<Script, string[]> = {
@@ -68,7 +87,7 @@ export function layout(w: number) {
   return { gutter, right, top: 28, bottom: 28 };
 }
 
-export function drawStage(ctx: CanvasRenderingContext2D, w: number, h: number, sky: Sky, view: View | null, script: Script = "deva") {
+export function drawStage(ctx: CanvasRenderingContext2D, w: number, h: number, sky: Sky, view: View | null, script: Script = "deva", grid: GridLine[] = GRID) {
   const { gutter, right, top, bottom } = layout(w);
   ctx.clearRect(0, 0, w, h);
   const y = (c: number) => top + ((C_MAX - c) / (C_MAX - C_MIN)) * (h - top - bottom);
@@ -77,7 +96,7 @@ export function drawStage(ctx: CanvasRenderingContext2D, w: number, h: number, s
   // Swara lines
   ctx.textAlign = "right";
   ctx.textBaseline = "middle";
-  for (const g of GRID) {
+  for (const g of grid) {
     const yy = Math.round(y(g.c)) + 0.5;
     ctx.strokeStyle = g.kind === "sa" ? sky.lineStrong : sky.line;
     ctx.lineWidth = g.kind === "sa" ? 1.25 : 1;
@@ -92,7 +111,7 @@ export function drawStage(ctx: CanvasRenderingContext2D, w: number, h: number, s
     const per100 = ((h - top - bottom) / (C_MAX - C_MIN)) * 100;
     const size = Math.max(11, Math.min(g.kind === "sa" ? (small ? 19 : 26) : (small ? 15 : 20), per100 * 1.5));
     ctx.font = script === "beng" ? `${size}px "Tiro Bangla", serif` : `${size}px "Tiro Devanagari Hindi", serif`;
-    ctx.fillText(script === "beng" ? GRID_BN[g.c] : g.label, gutter - (small ? 10 : 22), yy + 1);
+    ctx.fillText(script === "beng" ? bengLabel(g.c) : g.label, gutter - (small ? 10 : 22), yy + 1);
   }
   if (!view || view.points.length === 0) return;
 

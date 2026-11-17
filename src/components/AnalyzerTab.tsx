@@ -19,6 +19,10 @@ import { runAnalysis } from '../analysis/runAnalysis';
 import { decodeAudioFile } from '../audio/decode';
 import { RAAG_LIST } from '../data/allRaags';
 import { addRecord, newId } from '../lib/practiceHistory';
+import { SwaraCanvas } from './shared/SwaraCanvas';
+import { gridFor, type View } from './landing/stage';
+import { createLiveTracker } from '../analysis/live';
+import { useLang } from '../i18n/lang';
 import { TakeReport } from './analysis/TakeReport';
 import { LevelMeter, useMic } from './analysis/micHooks';
 import { SaSadhana } from './analysis/SaSadhana';
@@ -262,6 +266,7 @@ const DEMO_SA_HZ = 130.81;
 
 const AnalyseSinging: React.FC<{ saHz: number; autoDemo?: boolean }> = ({ saHz, autoDemo = false }) => {
   const mic = useMic();
+  const A = useLang().t.analyzer;
   const [raagId, setRaagId] = useState("yaman");
   const [saChoice, setSaChoice] = useState<"mine" | "detect">("mine");
   const [recording, setRecording] = useState(false);
@@ -274,6 +279,17 @@ const AnalyseSinging: React.FC<{ saHz: number; autoDemo?: boolean }> = ({ saHz, 
   const fileInput = useRef<HTMLInputElement | null>(null);
 
   const raag = useMemo(() => RAAG_OPTIONS.find(r => r.id === raagId) ?? RAAG_OPTIONS[0], [raagId]);
+  const grid = useMemo(() => gridFor(raag.allowedSwaras), [raag]);
+  // Live drawing while recording (the saved analysis is computed separately from the full recording)
+  const tracker = useRef<ReturnType<typeof createLiveTracker> | null>(null);
+  const liveView = (): View | null => {
+    const m = mic.session.current;
+    const tr = tracker.current;
+    if (!m || !tr) return null;
+    const now = m.context.currentTime;
+    tr.step(now);
+    return { kind: "live", points: tr.points, duration: 0, reveal: 0, ghostRest: false, now };
+  };
 
   const analyse = async (samples: Float32Array, sampleRate: number, demo = false) => {
     setBusy("Measuring pitch...");
@@ -335,6 +351,7 @@ const AnalyseSinging: React.FC<{ saHz: number; autoDemo?: boolean }> = ({ saHz, 
     setResult(null);
     const m = await mic.open();
     if (!m) return;
+    tracker.current = createLiveTracker(m, saHz);
     m.startRecording();
     setRecording(true);
     setElapsed(0);
@@ -386,7 +403,7 @@ const AnalyseSinging: React.FC<{ saHz: number; autoDemo?: boolean }> = ({ saHz, 
       <div className={`${card} space-y-5`}>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <label className="space-y-1 block">
-            <span className="text-[9px] font-mono text-slate-500 uppercase tracking-widest font-bold block">Raag</span>
+            <span className="text-[9px] font-mono text-slate-500 uppercase tracking-widest font-bold block">{A.raag}</span>
             <select
               value={raagId}
               onChange={e => setRaagId(e.target.value)}
@@ -397,9 +414,9 @@ const AnalyseSinging: React.FC<{ saHz: number; autoDemo?: boolean }> = ({ saHz, 
             </select>
           </label>
           <div className="space-y-1">
-            <span className="text-[9px] font-mono text-slate-500 uppercase tracking-widest font-bold block">Measure against</span>
+            <span className="text-[9px] font-mono text-slate-500 uppercase tracking-widest font-bold block">{A.measureAgainst}</span>
             <div className="flex gap-2 text-xs font-mono">
-              {([["mine", `My Sa (${saHz.toFixed(1)} Hz)`], ["detect", "Detect from recording"]] as const).map(([v, l]) => (
+              {([["mine", A.mySa(saHz.toFixed(1))], ["detect", A.detect]] as const).map(([v, l]) => (
                 <button
                   key={v}
                   type="button"
@@ -417,14 +434,17 @@ const AnalyseSinging: React.FC<{ saHz: number; autoDemo?: boolean }> = ({ saHz, 
         <div className="flex flex-col items-center gap-3">
           {recording && (
             <>
-              <span className="text-xs font-mono text-[#F4C56A]">Recording {Math.floor(elapsed / 60)}:{String(Math.floor(elapsed % 60)).padStart(2, "0")}</span>
+              <SwaraCanvas className="rz-live" grid={grid} getView={liveView} running={recording}
+                label={`Your voice drawn on the swaras of ${raag.name} while recording`} />
+              <span className="text-xs text-slate-400">{A.liveNote}</span>
+              <span className="text-xs font-mono text-[#F4C56A]">{A.recording} {Math.floor(elapsed / 60)}:{String(Math.floor(elapsed % 60)).padStart(2, "0")}</span>
               <LevelMeter level={level} />
             </>
           )}
           <div className="flex flex-wrap justify-center gap-3">
             {!recording
-              ? <button type="button" className={primaryBtn} onClick={startRecording} disabled={!!busy}><Mic className="h-4 w-4" /> Record</button>
-              : <button type="button" className={stopBtn} onClick={() => void stopRecording()}><Square className="h-4 w-4 fill-white" /> Stop & analyse</button>}
+              ? <button type="button" className={primaryBtn} onClick={startRecording} disabled={!!busy}><Mic className="h-4 w-4" /> {A.record}</button>
+              : <button type="button" className={stopBtn} onClick={() => void stopRecording()}><Square className="h-4 w-4 fill-white" /> {A.stop}</button>}
             {!recording && (
               <button
                 type="button"
@@ -432,13 +452,13 @@ const AnalyseSinging: React.FC<{ saHz: number; autoDemo?: boolean }> = ({ saHz, 
                 onClick={() => fileInput.current?.click()}
                 className="px-5 py-3 rounded-xl border border-slate-700 text-slate-200 hover:bg-slate-800 font-mono text-xs font-bold uppercase tracking-wider flex items-center gap-2 cursor-pointer disabled:opacity-50"
               >
-                <Upload className="h-4 w-4" /> Upload recording
+                <Upload className="h-4 w-4" /> {A.upload}
               </button>
             )}
             {!recording && (
               <button type="button" disabled={!!busy} onClick={runDemo}
                 className="px-5 py-3 rounded-xl border border-dashed border-slate-700 text-slate-300 hover:bg-slate-800 font-mono text-xs font-bold uppercase tracking-wider cursor-pointer disabled:opacity-50">
-                Try a demo recording
+                {A.demo}
               </button>
             )}
             <input ref={fileInput} type="file" accept="audio/*,.wav,.mp3,.m4a,.webm,.ogg" className="hidden" onChange={onFile} data-testid="audio-upload" />
@@ -458,34 +478,25 @@ const AnalyseSinging: React.FC<{ saHz: number; autoDemo?: boolean }> = ({ saHz, 
 export const AnalyzerTab: React.FC<AnalyzerTabProps> = ({ baseTonicHz, onTonicChange, initialMode = "singing", autoDemo = false }) => {
   const [mode, setMode] = useState<AnalyzerMode>(initialMode);
   useEffect(() => setMode(initialMode), [initialMode]);
-
-  const modes: [AnalyzerMode, string][] = [["tuner", "Live tuner"], ["scale", "Find my Sa"], ["sadhana", "Sa sadhana"], ["singing", "Analyse singing"]];
+  const { t } = useLang();
+  const A = t.analyzer;
+  const modes: AnalyzerMode[] = ["tuner", "scale", "sadhana", "singing"];
 
   return (
     <div className="space-y-6">
-      <div className={`${card} flex flex-col md:flex-row justify-between items-start md:items-center gap-4`}>
+      <header className="az-head">
         <div>
-          <h2 className="text-xl font-bold text-slate-100 flex items-center gap-2">
-            <Activity className="h-5 w-5 text-[#F4C56A]" />
-            Analyzer
-          </h2>
-          <p className="text-xs text-slate-400 mt-1 max-w-xl leading-relaxed">
-            Everything shown here is measured from your voice. Recordings are analysed in your browser and are not uploaded.
-          </p>
+          <h1 className="az-title">{A.title}</h1>
+          <p className="az-intro">{A.intro}</p>
         </div>
-        <div className="flex font-mono text-[10px] p-1 bg-[#0D1230] border border-slate-800 rounded-xl shrink-0">
-          {modes.map(([id, label]) => (
-            <button
-              key={id}
-              type="button"
-              onClick={() => setMode(id)}
-              className={`px-3 py-1.5 rounded-lg font-bold uppercase transition-all cursor-pointer ${mode === id ? "bg-[#E0A458] text-white" : "text-slate-400 hover:text-slate-200"}`}
-            >
-              {label}
+        <nav className="az-modes" aria-label={A.title}>
+          {modes.map(id => (
+            <button key={id} type="button" aria-current={mode === id ? "true" : undefined} onClick={() => setMode(id)}>
+              {A.modes[id]}
             </button>
           ))}
-        </div>
-      </div>
+        </nav>
+      </header>
 
       <div className="flex items-center gap-2 text-[11px] text-slate-400 px-1">
         <Headphones className="h-4 w-4 text-[#9FB3E6]" />
