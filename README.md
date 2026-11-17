@@ -149,7 +149,7 @@ Requires Node.js 20 or later.
 
 ```bash
 npm install
-cp .env.example .env   # optional: add a Gemini API key for written feedback
+cp .env.example .env   # optional: add an API key for written feedback
 npm run dev            # http://localhost:3000
 ```
 
@@ -175,7 +175,7 @@ static site, so the optional written feedback is switched off there.
 
 To run with the server (and written feedback), any Node host works (for example Render or Railway): build command
 `npm install && npm run build`, start command `npm start`, and optionally the
-`GEMINI_API_KEY` environment variable for written feedback.
+`FEEDBACK_API_KEY` environment variable for written feedback.
 
 ## Status and what's still needed
 

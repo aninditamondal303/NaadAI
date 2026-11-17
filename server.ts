@@ -34,7 +34,7 @@ app.post("/api/feedback", async (req, res) => {
     return res.status(400).json({ error: "Missing or invalid measurements." });
   }
 
-  const apiKey = process.env.GEMINI_API_KEY?.trim();
+  const apiKey = process.env.FEEDBACK_API_KEY?.trim();
   if (!apiKey) {
     return res.json({ unavailable: true, reason: "no API key configured" });
   }
@@ -42,7 +42,7 @@ app.post("/api/feedback", async (req, res) => {
   try {
     const ai = new GoogleGenAI({ apiKey });
     const response = await ai.models.generateContent({
-      model: process.env.GEMINI_MODEL || "gemini-3.5-flash",
+      model: process.env.FEEDBACK_MODEL || "gemini-3.5-flash",
       contents: buildFeedbackPrompt(measurements),
       config: { systemInstruction: FEEDBACK_SYSTEM_PROMPT, temperature: 0.4 },
     });
