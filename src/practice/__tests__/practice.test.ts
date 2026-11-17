@@ -97,3 +97,24 @@ describe("note scoring", () => {
     expect(notesOnly(parseSargam("S | R")).length).toBe(2);
   });
 });
+
+describe("basic paltas on shuddha swaras", () => {
+  it("covers the standard alankars", async () => {
+    const { SHUDDHA_SWARAS } = await import("../paltas");
+    const ps = generatePaltas(SHUDDHA_SWARAS);
+    const byId = (id: string) => ps.find(p => p.id === id)!.notes.map(n => n.label);
+    expect(byId("doubled").slice(0, 4)).toEqual(["S", "S", "R", "R"]);
+    expect(byId("threes").slice(0, 6)).toEqual(["S", "R", "G", "R", "G", "M"]);
+    expect(byId("one-three-two").slice(0, 3)).toEqual(["S", "G", "R"]);
+    expect(byId("sa-leaps").slice(0, 6)).toEqual(["S", "R", "S", "S", "G", "S"]);
+    // descending half mirrors the pattern from taar Sa
+    const threes = byId("threes");
+    expect(threes.slice(threes.length / 2, threes.length / 2 + 3)).toEqual(["S'", "N", "D"]);
+  });
+
+  it("leaps from Sa in Yaman use tivra Ma and skip nothing of the aroh", () => {
+    const yaman = generatePaltas(raag("yaman")).find(p => p.id === "sa-leaps")!.notes.map(n => n.label);
+    expect(yaman.slice(0, 6)).toEqual(["S", "R", "S", "S", "G", "S"]);
+    expect(yaman).toContain("M");
+  });
+});
