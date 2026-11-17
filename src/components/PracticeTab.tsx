@@ -195,15 +195,15 @@ export const PracticeTab: React.FC<Props> = ({ baseTonicHz, initialMode = "palta
     return "bg-[#0D1230]/60 border-slate-800 text-slate-300";
   };
 
-  const card = "bg-[#1A2150] p-6 rounded-2xl border border-slate-800 shadow-xl space-y-4";
-  const label = "text-[9px] font-mono text-slate-500 uppercase tracking-widest font-bold block";
+  const card = "pr-panel space-y-4";
+  const label = "pr-label";
 
   return (
     <div className="space-y-6">
       <div className={card}>
         <div>
-          <h2 className="text-xl font-bold font-serif text-slate-100">Palta & pakad practice</h2>
-          <p className="text-xs text-slate-400 mt-1">
+          <h1 className="pg-title">Riyaz</h1>
+          <p className="pr-intro">
             Sing each swara on its beat. Every note is graded for pitch and timing: green (within 25 cents, on time), yellow (within 50 cents, or late), red (further off or missed).
             Score {UNLOCK_SCORE} or more to unlock the next speed. Please use earphones.
           </p>
@@ -225,7 +225,7 @@ export const PracticeTab: React.FC<Props> = ({ baseTonicHz, initialMode = "palta
             <div className="flex gap-2">
               {(["palta", "pakad", "ear", "match"] as const).map(k => (
                 <button key={k} type="button" disabled={running || (k === "pakad" && !details)} onClick={() => setKind(k)}
-                  className={`px-3 py-2 rounded-lg border text-xs font-mono font-bold cursor-pointer disabled:opacity-40 ${kind === k ? "bg-[#E0A458] border-[#E0A458] text-white" : "border-slate-800 text-slate-300"}`}>
+                  aria-current={kind === k ? "true" : undefined} className="pr-kind">
                   {k === "palta" ? "Paltas" : k === "pakad" ? "Pakad" : k === "ear" ? "Ear training" : "Sur milao"}
                 </button>
               ))}
@@ -244,13 +244,13 @@ export const PracticeTab: React.FC<Props> = ({ baseTonicHz, initialMode = "palta
       </div>
 
       {kind === "palta" && (
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+        <div className="pr-exlist">
           {exercises.map(e => (
             <button key={e.id} type="button" disabled={running} onClick={() => setExerciseId(e.id)}
-              className={`text-left p-4 rounded-xl border cursor-pointer ${exercise?.id === e.id ? "border-[#E0A458] bg-[#E0A458]/10" : "border-slate-800 bg-[#1A2150] hover:border-slate-600"}`}>
-              <span className="font-bold text-slate-100 block">{e.name}</span>
-              <span className="text-[11px] font-mono text-slate-400 block truncate">{e.description}</span>
-              <span className="text-[10px] text-slate-500 block mt-1">
+              aria-current={exercise?.id === e.id ? "true" : undefined} className="pr-ex">
+              <span className="pr-ex-name">{e.name}</span>
+              <span className="pr-ex-notes">{e.description}</span>
+              <span className="pr-ex-best">
                 Best clean speed: {best[e.id] ? LAYAS[best[e.id] - 1].name : "none yet"}
               </span>
             </button>

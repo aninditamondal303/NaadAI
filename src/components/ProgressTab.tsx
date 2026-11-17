@@ -4,6 +4,7 @@
  * charts with an explanation, never sample data.
  */
 import React, { useEffect, useMemo, useState } from 'react';
+import { SwaraRing, RiyazThread } from './progress/SwaraRing';
 import {
   Bar, BarChart, CartesianGrid, Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis,
 } from 'recharts';
@@ -85,7 +86,20 @@ export const ProgressTab: React.FC = () => {
 
   return (
     <div className="space-y-6">
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+      <header className="pg-head">
+        <h1 className="pg-title">Progress</h1>
+        <p className="pg-figures">
+          <span><b>{totalMinutes >= 60 ? `${(totalMinutes / 60).toFixed(1)} h` : `${Math.round(totalMinutes)} min`}</b> of riyaz</span>
+          <span><b>{streak}</b> {streak === 1 ? "day" : "days"} in a row</span>
+          <span><b>{analyses.length}</b> recordings analysed</span>
+          <span><b>{raags}</b> {raags === 1 ? "raag" : "raags"}</span>
+        </p>
+      </header>
+      <section className="pg-hero">
+        <SwaraRing analyses={analyses} />
+        <RiyazThread days={minutesPerDay(history, 56)} />
+      </section>
+      <div className="hidden">
         <Stat icon={<Hourglass className="h-5 w-5" />} label="Practice time" value={totalMinutes >= 60 ? `${(totalMinutes / 60).toFixed(1)} h` : totalMinutes >= 1 ? `${Math.round(totalMinutes)} min` : `${Math.round(totalMinutes * 60)} s`} />
         <Stat icon={<Flame className="h-5 w-5" />} label="Practice streak" value={`${streak} ${streak === 1 ? "day" : "days"}`} />
         <Stat icon={<Bookmark className="h-5 w-5" />} label="Analysed recordings" value={String(analyses.length)} />

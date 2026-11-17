@@ -8,6 +8,7 @@ import { ArrowLeft, Search, ShieldAlert } from 'lucide-react';
 import { RAAG_LIST, type ComprehensiveRaag } from '../data/allRaags';
 import { RAAG_DETAILS } from '../data/raagDetails';
 import { RaagStudy } from './study/RaagStudy';
+import { SamayChakra } from './library/SamayChakra';
 
 const SYM = ["S", "r", "R", "g", "G", "m", "M", "P", "d", "D", "n", "N"];
 const NAMES = ["Sa", "komal Re", "Re", "komal Ga", "Ga", "Ma", "tivra Ma", "Pa", "komal Dha", "Dha", "komal Ni", "Ni"];
@@ -18,9 +19,9 @@ const shortName = (r: ComprehensiveRaag) => r.name.replace(/^Raag\s+/i, "");
 const varjitOf = (r: ComprehensiveRaag) => FAMILIES.filter(([, idx]) => idx.every(i => !r.allowedSwaras.includes(i))).map(([n]) => n);
 
 const Row: React.FC<{ label: string; children: React.ReactNode }> = ({ label, children }) => (
-  <div className="grid grid-cols-1 sm:grid-cols-[160px_1fr] gap-1 sm:gap-4 py-2 border-t border-slate-800">
-    <span className="text-[10px] font-mono text-slate-500 uppercase tracking-widest font-bold">{label}</span>
-    <span className="text-sm text-slate-200">{children}</span>
+  <div className="lib-row">
+    <span className="lib-row-k">{label}</span>
+    <span className="lib-row-v">{children}</span>
   </div>
 );
 
@@ -43,20 +44,17 @@ export const LibraryTab: React.FC<{ saHz?: number }> = ({ saHz = 130.81 }) => {
     const d = RAAG_DETAILS[r.id];
     const varjit = varjitOf(r);
     return (
-      <div className="space-y-5">
-        <button type="button" onClick={() => setViewing(null)} className="flex items-center gap-1.5 text-xs font-mono text-slate-400 hover:text-slate-200 cursor-pointer">
-          <ArrowLeft className="h-4 w-4" /> All raags
-        </button>
-        <div className="bg-[#1A2150] p-6 rounded-2xl border border-slate-800 space-y-1">
-          <h2 className="text-2xl font-bold font-serif text-slate-100">{shortName(r)}</h2>
-          <p className="text-xs text-slate-400">{r.thaat} thaat · {r.jati} · {r.time}</p>
-          <p className="text-[11px] text-amber-300/80 pt-2 flex items-center gap-1.5">
-            <ShieldAlert className="h-3.5 w-3.5" />
+      <div className="lib">
+        <button type="button" onClick={() => setViewing(null)} className="lib-back">All raags</button>
+        <header className="lib-raag-head">
+          <h1 className="lib-title">{shortName(r)}</h1>
+          <p className="lib-intro">{r.thaat} thaat, {r.jati.toLowerCase()}, {r.time.toLowerCase()}. {r.description}</p>
+          <p className="lib-review">
             {d?.review.status === "reviewed" ? `Reviewed by ${d.review.reviewer}` : "Awaiting a guru's review. Please check details with your teacher."}
           </p>
-        </div>
+        </header>
 
-        <div className="bg-[#1A2150] p-6 rounded-2xl border border-slate-800">
+        <div className="lib-rows">
           <Row label="Swaras">{r.allowedSwaras.map(i => `${SYM[i]} (${NAMES[i]})`).join(", ")}</Row>
           <Row label="Varjit">{varjit.length ? varjit.join(", ") : "None (all seven swaras are used)"}</Row>
           <Row label="Aroh"><span className="font-mono">{r.aroha.join(" ")}</span></Row>
@@ -97,48 +95,55 @@ export const LibraryTab: React.FC<{ saHz?: number }> = ({ saHz = 130.81 }) => {
     );
   }
 
+  const byThaat = THAATS.slice(1).map(t => [t, list.filter(r => r.thaat === t)] as const).filter(([, rs]) => rs.length > 0);
+
   return (
-    <div className="space-y-5">
-      <div className="bg-[#1A2150] p-6 rounded-2xl border border-slate-800 space-y-4">
+    <div className="lib">
+      <header className="lib-head">
         <div>
-          <h2 className="text-xl font-bold font-serif text-slate-100">Raag library</h2>
-          <p className="text-xs text-slate-400 mt-1">
-            {RAAG_LIST.length} raags with their swaras, aroh, avaroh, vadi and samvadi. {fullCount} also have pakad, chalan, nyas swaras and comparisons with similar raags.
-            All entries are awaiting a guru's review.
+          <h1 className="lib-title">Raag library</h1>
+          <p className="lib-intro">
+            {RAAG_LIST.length} raags with their swaras, aroh, avaroh, vadi and samvadi. {fullCount} also have pakad, chalan,
+            alaap, a sargam geet and a bandish to study. All entries await a guru's review.
           </p>
         </div>
-        <div className="flex flex-col md:flex-row gap-3">
-          <label className="flex-1 flex items-center gap-2 bg-[#0D1230] border border-slate-800 rounded-lg px-3">
-            <Search className="h-4 w-4 text-slate-500" />
-            <input value={query} onChange={e => setQuery(e.target.value)} placeholder="Search raags by name, thaat, mood or time..."
-              className="flex-1 bg-transparent py-2 text-sm text-slate-200 outline-none" />
+        <div className="lib-filters">
+          <label className="lib-search">
+            <span className="lib-vh">Search raags</span>
+            <input value={query} onChange={e => setQuery(e.target.value)} placeholder="Search by name, thaat, mood or time" />
           </label>
-          <select value={thaat} onChange={e => setThaat(e.target.value)} className="bg-[#0D1230] border border-slate-800 rounded-lg px-3 py-2 text-sm text-slate-200">
+          <select value={thaat} onChange={e => setThaat(e.target.value)} aria-label="Thaat">
             {THAATS.map(t => <option key={t} value={t}>{t === "All" ? "All thaats" : `${t} thaat`}</option>)}
           </select>
-          <label className="flex items-center gap-2 text-xs text-slate-300">
-            <input type="checkbox" checked={fullOnly} onChange={e => setFullOnly(e.target.checked)} className="accent-[#E0A458]" />
-            Full details only
+          <label className="lib-check">
+            <input type="checkbox" checked={fullOnly} onChange={e => setFullOnly(e.target.checked)} />
+            With study material
           </label>
         </div>
-      </div>
+      </header>
+
+      <SamayChakra raags={list} onOpen={setViewing} />
 
       {list.length === 0 ? (
-        <p className="text-sm text-slate-400 px-1">No raags match your search. Try another word.</p>
+        <p className="lib-intro">No raags match your search. Try another word.</p>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
-          {list.map(r => (
-            <button key={r.id} type="button" onClick={() => setViewing(r)}
-              className="text-left bg-[#1A2150] p-4 rounded-xl border border-slate-800 hover:border-[#E0A458]/60 cursor-pointer space-y-1.5">
-              <div className="flex items-center justify-between gap-2">
-                <span className="font-bold font-serif text-slate-100">{shortName(r)}</span>
-                {RAAG_DETAILS[r.id] && <span className="text-[8px] font-mono uppercase text-emerald-300 border border-emerald-700/50 rounded px-1.5 py-0.5">Full details</span>}
-              </div>
-              <span className="block text-[10px] font-mono text-slate-500">{r.thaat} · {r.time}</span>
-              <span className="block text-xs font-mono text-slate-300">{r.aroha.join(" ")}</span>
-            </button>
+        <section className="lib-index" aria-label="All raags by thaat">
+          {byThaat.map(([t, rs]) => (
+            <div key={t} className="lib-thaat">
+              <h2>{t}</h2>
+              <ul>
+                {rs.map(r => (
+                  <li key={r.id}>
+                    <button type="button" onClick={() => setViewing(r)}>
+                      <span className="lib-name">{shortName(r).replace(/\s*\(.*\)/, "")}{RAAG_DETAILS[r.id] && <span className="lib-study" title="Has alaap, sargam geet and bandish"> ✦</span>}</span>
+                      <span className="lib-aroh">{r.aroha.join(" ")}</span>
+                    </button>
+                  </li>
+                ))}
+              </ul>
+            </div>
           ))}
-        </div>
+        </section>
       )}
     </div>
   );
