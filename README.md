@@ -39,7 +39,15 @@ follow each raag's rules (tests check every swara); they are not traditional
 bandishes and await a guru's review. "Give me more" generates further sargam
 and alaap phrases for any raag from its aroh and avaroh.
 
-Practice also has basic paltas on the shuddha swaras (12 alankars), the same
+After each recording the report also guesses **which raag it sounds like**
+(from the swaras held and how the singer moved between them, with raags that
+share swaras named together), shows a **shruti view** of where each swara sat
+between the keyboard position and the natural just-intonation position, and
+can make a **share link for a guru**: the measurements and pitch line are
+packed into the link itself, with no recording and no server.
+
+Practice also has **Guru-shishya** (the app sings a phrase, you sing it back,
+each swara is marked), basic paltas on the shuddha swaras (12 alankars), the same
 patterns for every raag, and Sur milao: hear a swara, sing it, and see how
 close you were. The app can be installed and works offline after the first
 visit.

@@ -12,6 +12,9 @@ import { FeedbackPanel } from './FeedbackPanel';
 import { downloadTakeImage } from '../../lib/takeImage';
 import { useLang } from '../../i18n/lang';
 import { ListenBack } from './ListenBack';
+import { RaagGuessPanel } from './RaagGuessPanel';
+import { ShrutiView } from './ShrutiView';
+import { ShareTake } from './ShareTake';
 
 const fmtSec = (s: number) => (s >= 60 ? `${Math.floor(s / 60)}m ${Math.round(s % 60)}s` : `${s.toFixed(1)} s`);
 const fmtCents = signedCents;
@@ -45,6 +48,10 @@ export const TakeReport: React.FC<TakeReportProps> = ({ audio, m, track, raagNam
       {saNotes.map((n, i) => (
         <div key={i} className="p-3 rounded-xl border border-amber-500/40 bg-amber-500/10 text-amber-200 text-xs">{n}</div>
       ))}
+
+      <RaagGuessPanel heldNotes={m.heldNotes} chosenRaag={raagName} />
+      <ShrutiView swaras={m.swaras} />
+      <ShareTake m={m} track={track} raagName={raagName} allowedSwaras={allowedSwaras ?? [0, 2, 4, 5, 7, 9, 11]} />
 
       {audio && <ListenBack audio={audio} track={track} saHz={m.saHz} allowedSwaras={allowedSwaras ?? [0, 2, 4, 5, 7, 9, 11]} />}
 

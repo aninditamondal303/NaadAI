@@ -19,10 +19,11 @@ import { generatePaltas, LAYAS, SHUDDHA_SWARAS, UNLOCK_SCORE } from '../practice
 import { expectedHz, scoreNote, totalScore, type NoteScore } from '../practice/scoring';
 import { useMic } from './analysis/micHooks';
 import { SurMilao } from './practice/SurMilao';
+import { GuruShishya } from './practice/GuruShishya';
 import { EarTraining } from './practice/EarTraining';
 import { weakSwaraPalta, weakSwaras } from '../practice/weakSwaras';
 
-interface Props { baseTonicHz: number; initialMode?: "palta" | "pakad" | "ear" | "match" }
+interface Props { baseTonicHz: number; initialMode?: "palta" | "pakad" | "ear" | "match" | "guru" }
 
 type Exercise = { id: string; name: string; description: string; tokens: SargamToken[] };
 type PracticeRec = Extract<PracticeRecord, { kind: "palta" | "pakad" }>;
@@ -59,7 +60,7 @@ function click(ctx: AudioContext, when: number, accent: boolean) {
 export const PracticeTab: React.FC<Props> = ({ baseTonicHz, initialMode = "palta" }) => {
   const mic = useMic();
   const [raagId, setRaagId] = useState("shuddha");
-  const [kind, setKind] = useState<"palta" | "pakad" | "ear" | "match">(initialMode);
+  const [kind, setKind] = useState<"palta" | "pakad" | "ear" | "match" | "guru">(initialMode);
   useEffect(() => setKind(initialMode), [initialMode]);
   const [exerciseId, setExerciseId] = useState("aroh-avaroh");
   const [bpm, setBpm] = useState(60);
@@ -208,7 +209,7 @@ export const PracticeTab: React.FC<Props> = ({ baseTonicHz, initialMode = "palta
             Score {UNLOCK_SCORE} or more to unlock the next speed. Please use earphones.
           </p>
         </div>
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+        <div className="pr-controls">
           <label className="space-y-1 block">
             <span className={label}>Raag</span>
             <select value={raagId} disabled={running} onChange={e => setRaagId(e.target.value)} className="w-full bg-[#062327] border border-slate-800 rounded-lg px-3 py-2 text-sm text-slate-200">
@@ -223,16 +224,17 @@ export const PracticeTab: React.FC<Props> = ({ baseTonicHz, initialMode = "palta
           <div className="space-y-1">
             <span className={label}>Exercise type</span>
             <div className="flex gap-2">
-              {(["palta", "pakad", "ear", "match"] as const).map(k => (
+              {(["palta", "pakad", "guru", "match", "ear"] as const).map(k => (
                 <button key={k} type="button" disabled={running || (k === "pakad" && !details)} onClick={() => setKind(k)}
                   aria-current={kind === k ? "true" : undefined} className="pr-kind">
-                  {k === "palta" ? "Paltas" : k === "pakad" ? "Pakad" : k === "ear" ? "Ear training" : "Sur milao"}
+                  {k === "palta" ? "Paltas" : k === "pakad" ? "Pakad" : k === "ear" ? "Ear training" : k === "guru" ? "Guru-shishya" : "Sur milao"}
                 </button>
               ))}
             </div>
             {!details && <span className="text-[10px] text-slate-500">Pakad not written yet for this raag.</span>}
           </div>
-          <label className="space-y-1 block">
+          {(kind === "palta" || kind === "pakad") && <>
+          <label className="space-y-1 block pr-beat">
             <span className={label}>Beat: {bpm} per minute</span>
             <input type="range" min={40} max={120} value={bpm} disabled={running} onChange={e => setBpm(Number(e.target.value))} className="w-full accent-[#C9A227]" />
           </label>
@@ -240,6 +242,7 @@ export const PracticeTab: React.FC<Props> = ({ baseTonicHz, initialMode = "palta
             <input type="checkbox" checked={withTanpura} disabled={running} onChange={e => setWithTanpura(e.target.checked)} className="accent-[#C9A227]" />
             Tanpura on (Sa {baseTonicHz.toFixed(1)} Hz)
           </label>
+          </>}
         </div>
       </div>
 
@@ -260,8 +263,9 @@ export const PracticeTab: React.FC<Props> = ({ baseTonicHz, initialMode = "palta
 
       {kind === "ear" && <EarTraining raag={raag} saHz={baseTonicHz} />}
       {kind === "match" && <SurMilao raag={raag} saHz={baseTonicHz} />}
+      {kind === "guru" && <GuruShishya raag={raag} saHz={baseTonicHz} />}
 
-      {kind !== "ear" && kind !== "match" && exercise && (
+      {kind !== "ear" && kind !== "match" && kind !== "guru" && exercise && (
         <div className={card}>
           <div className="flex flex-wrap items-center justify-between gap-3">
             <div className="flex gap-2">

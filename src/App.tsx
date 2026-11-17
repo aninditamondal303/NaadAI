@@ -7,6 +7,7 @@ import React, { useState, useEffect } from 'react';
 import { Music, Award, Sparkles, RefreshCw, Compass, AlertTriangle, FileText, Settings, User, Search, Filter, Check, ChevronDown, X, Sun, Moon, Sunrise, Lock, ShieldCheck, Mail, LogIn, Database, Home, BookOpen, BarChart2, Activity } from 'lucide-react';
 import { createProfile, currentProfile, loadProfiles, setCurrentProfile, updateProfile, type SingerProfile } from './lib/profiles';
 import { Landing } from './components/landing/Landing';
+import { SharedTakeView } from './components/SharedTakeView';
 import { useLang } from './i18n/lang';
 import { LangPicker } from './i18n/LangPicker';
 import './app-shell.css';
@@ -44,7 +45,7 @@ export default function App() {
   // Seven active menu tabs for classical musicians
   const [activeTab, setActiveTab] = useState<AppTab>("home");
   const [analyzerMode, setAnalyzerMode] = useState<AnalyzerMode>("singing");
-  const [practiceMode, setPracticeMode] = useState<"palta" | "pakad" | "ear" | "match">("palta");
+  const [practiceMode, setPracticeMode] = useState<"palta" | "pakad" | "ear" | "match" | "guru">("palta");
 
   // Custom raga selection and filter states
   const [searchQuery, setSearchQuery] = useState("");
@@ -65,6 +66,8 @@ export default function App() {
 
   // The last singer on this device, offered on the welcome page
   const returning = isAuthenticated ? null : currentProfile();
+  // A take shared as a link (#take=...) opens in a read-only view
+  const [sharedCode, setSharedCode] = useState<string | null>(() => (window.location.hash.startsWith("#take=") ? window.location.hash.slice(6) : null));
   // Opened from "See the full analysis" on the welcome page
   const [autoDemo, setAutoDemo] = useState(false);
   useEffect(() => { if (activeTab !== "analyzer") setAutoDemo(false); }, [activeTab]);
@@ -86,6 +89,10 @@ export default function App() {
   const handleTaalStatsChange = (stats: { layaAccuracy: number; driftMs: number } | any) => {
     // If the metronome has a high-quality run, feed stats into active attempt
   };
+
+  if (sharedCode) {
+    return <SharedTakeView code={sharedCode} onOpenApp={() => { window.history.replaceState(null, "", window.location.pathname); setSharedCode(null); }} />;
+  }
 
   if (!isAuthenticated) {
     if (activePage === "welcome") {
