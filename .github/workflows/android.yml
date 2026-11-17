@@ -6,6 +6,11 @@ name: Android app
 
 on:
   workflow_dispatch:
+    inputs:
+      release_tag:
+        description: "Publish the APK as a release with this tag (for example v1.0.0); leave empty for a test build"
+        required: false
+        default: ""
   push:
     tags: ["v*"]
 
@@ -43,9 +48,13 @@ jobs:
           name: naad-ai-apk
           path: naad-ai.apk
       - name: Attach to release
-        if: startsWith(github.ref, 'refs/tags/v')
+        if: startsWith(github.ref, 'refs/tags/v') || inputs.release_tag != ''
         uses: softprops/action-gh-release@v2
         with:
+          tag_name: ${{ inputs.release_tag || github.ref_name }}
+          name: Naad AI ${{ inputs.release_tag || github.ref_name }}
+          target_commitish: ${{ github.sha }}
+          make_latest: true
           files: naad-ai.apk
           body: |
             Naad AI for Android. Download naad-ai.apk on your phone and open it to install
