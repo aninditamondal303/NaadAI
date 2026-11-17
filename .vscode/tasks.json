@@ -1,0 +1,20 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    { "label": "Run the app (dev server)", "type": "npm", "script": "dev", "isBackground": true, "problemMatcher": [] },
+    { "label": "Type check", "type": "npm", "script": "lint", "problemMatcher": ["$tsc"] },
+    { "label": "Run all tests", "type": "npm", "script": "test", "group": { "kind": "test", "isDefault": true }, "problemMatcher": [] },
+    { "label": "Pitch benchmark (synthetic voices)", "type": "npm", "script": "eval:pitch", "problemMatcher": [] },
+    { "label": "Sa detection benchmark", "type": "npm", "script": "eval:sa", "problemMatcher": [] },
+    { "label": "Accuracy on your own recordings", "type": "npm", "script": "eval:real", "problemMatcher": [] },
+    {
+      "label": "Pitch accuracy on a dataset with reference f0",
+      "type": "shell",
+      "command": "npm run eval:f0 -- \"${input:datasetFolder}\"",
+      "problemMatcher": []
+    }
+  ],
+  "inputs": [
+    { "id": "datasetFolder", "type": "promptString", "description": "Folder with WAV files and reference f0 files", "default": "eval/datasets/vocadito" }
+  ]
+}

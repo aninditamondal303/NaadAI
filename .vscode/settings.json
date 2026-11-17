@@ -1,0 +1,7 @@
+{
+  "typescript.tsdk": "node_modules/typescript/lib",
+  "files.exclude": { "dist": true },
+  "search.exclude": { "dist": true, "eval/datasets": true, "package-lock.json": true },
+  "files.associations": { "*.css": "tailwindcss" },
+  "editor.tabSize": 2
+}

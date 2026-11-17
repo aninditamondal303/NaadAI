@@ -1,0 +1,7 @@
+{
+  "recommendations": [
+    "vitest.explorer",
+    "bradlc.vscode-tailwindcss",
+    "github.vscode-github-actions"
+  ]
+}
