@@ -1,5 +1,15 @@
 @import "tailwindcss";
 
+/* One type family for the whole app: Mukta (Latin and Devanagari) or Hind Siliguri
+   for Bengali, with Tiro for headings and swara names. */
+@theme {
+  --font-sans: "Mukta", "Hind Siliguri", system-ui, sans-serif;
+  --font-serif: "Tiro Devanagari Hindi", "Tiro Bangla", Georgia, serif;
+  --font-mono: "Mukta", "Hind Siliguri", system-ui, sans-serif;
+}
+:lang(bn) { --font-sans: "Hind Siliguri", "Mukta", system-ui, sans-serif; --font-serif: "Tiro Bangla", "Tiro Devanagari Hindi", Georgia, serif; --font-mono: "Hind Siliguri", system-ui, sans-serif; }
+body { background: #0D1230; }
+
 @keyframes float-pattern {
   0% { transform: translateY(0px) rotate(0deg); opacity: 0.1; }
   50% { transform: translateY(-20px) rotate(180deg); opacity: 0.35; }

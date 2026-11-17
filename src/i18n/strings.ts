@@ -1,0 +1,307 @@
+/**
+ * Words for the welcome page, the singer picker and the app's main menu,
+ * in English, Hindi and Bengali. The Hindi and Bengali were written for
+ * this project and are awaiting review by native speakers.
+ */
+export type Lang = "en" | "hi" | "bn";
+
+export const LANGS: { id: Lang; name: string }[] = [
+  { id: "en", name: "English" },
+  { id: "hi", name: "हिन्दी" },
+  { id: "bn", name: "বাংলা" },
+];
+
+export interface Strings {
+  langLabel: string;
+  nav: { listens: string; accuracy: string; source: string; open: string; continueAs: (n: string) => string };
+  stageLabel: string;
+  read: { onNote: string; sharp: (n: number) => string; flat: (n: number) => string; mandra: string; taar: string };
+  title: string;
+  intro: string;
+  sing: string;
+  saLegend: string;
+  saLow: string;
+  saHigh: string;
+  saLowHint: string;
+  saHighHint: string;
+  demo: string;
+  stop: string;
+  status: { listening: string; demo: string; loading: string; idle: string; seeAnalysis: string };
+  err: { demoMissing: string; micBlocked: string; micFailed: (m: string) => string };
+  hour: (prahar: number, ofNight: boolean, raags: string[]) => string;
+  listens: { h: string; lede: string; items: [string, string][] };
+  accuracy: {
+    h: string; lede: string;
+    rows: [string, string, string][];
+    tablesPre: string; pitch: string; and: string; sa: string; helpPre: string; guide: string; helpPost: string;
+  };
+  practise: { h: string; items: [string, string][] };
+  privacy: { h: string; lede: string };
+  credit: string; creditLink: string; creditPost: string; review: string; sourceCode: string;
+  gate: {
+    back: string; who: string; newSinger: string; savedHere: string; add: string; name: string; enterName: string;
+    yourSa: string; start: string; backToProfiles: string; import: string; importFailed: string;
+    presets: [string, string, string, string];
+  };
+  tabs: Record<"home" | "tanpura" | "analyzer" | "practice" | "journal" | "progress" | "library" | "profile", string>;
+  streak: (n: number) => string;
+  switchSinger: string;
+  englishOnlyNote: string;
+}
+
+const listOf = (names: string[], and: string) =>
+  names.length <= 1 ? names.join("") : `${names.slice(0, -1).join(", ")} ${and} ${names[names.length - 1]}`;
+
+const en: Strings = {
+  langLabel: "Language",
+  nav: { listens: "How it listens", accuracy: "Accuracy", source: "Source", open: "Open the app", continueAs: n => `Continue as ${n}` },
+  stageLabel: "Pitch drawn on the swara lines of Raag Yaman",
+  read: { onNote: "on the note", sharp: n => `${n} cents sharp`, flat: n => `${n} cents flat`, mandra: "mandra", taar: "taar" },
+  title: "Your riyaz, drawn while you sing.",
+  intro: "Naad AI listens to your voice against a recorded tanpura and shows where every note lands: how far from the swara, how steady, and which notes wander outside the raag.",
+  sing: "Sing with the tanpura",
+  saLegend: "Your Sa",
+  saLow: "Sa C", saHigh: "Sa G", saLowHint: "Typical for most men", saHighHint: "Typical for most women",
+  demo: "Play the demo phrase",
+  stop: "Stop",
+  status: {
+    listening: "Listening. Wear earphones so the tanpura stays out of the microphone.",
+    demo: "A computer-generated Yaman phrase with one shuddha Ma that doesn't belong.",
+    loading: "Tuning the tanpura...",
+    idle: "Nothing is recorded or uploaded. Your voice is measured in this tab and then forgotten.",
+    seeAnalysis: "See the full analysis of this phrase",
+  },
+  err: {
+    demoMissing: "The demo recording didn't load. Check your connection and reload the page.",
+    micBlocked: "Microphone access was blocked. Allow it for this site in your browser's address bar, then press Sing again.",
+    micFailed: m => `The microphone didn't open: ${m}`,
+  },
+  hour: (p, night, raags) => {
+    const ord = ["1st", "2nd", "3rd", "4th"][p - 1];
+    const base = `It's the ${ord} prahar of the ${night ? "night" : "day"} where you are.`;
+    return raags.length ? `${base} Raags for this hour include ${listOf(raags, "and")}.` : base;
+  },
+  listens: {
+    h: "How it listens",
+    lede: "A hundred times a second it measures the pitch of your voice and compares it with your Sa. When you stop, it turns those readings into things a teacher would point out.",
+    items: [
+      ["Your Sa", "It uses the Sa you set, or finds the one you were singing to from the notes of the raag."],
+      ["Each held note", "How many cents sharp or flat it sat, and how much it wavered."],
+      ["Phrases and breaths", "Where each phrase starts and ends, split wherever you breathe for a third of a second or more."],
+      ["Notes outside the raag", "Held notes that don't belong to the raag you chose, with the moment they happened."],
+      ["Andolan and gamak", "Oscillations between half a swing and twelve swings a second, with how wide they were."],
+    ],
+  },
+  accuracy: {
+    h: "How well it measures",
+    lede: "Every number below comes from the test scripts in the repository, run on computer-generated voices whose pitch is known exactly. Real voices are harder. Those results will be published once enough recordings with a reference have been collected.",
+    rows: [
+      ["Pitch readings within 20 cents", "100%", "20 clips, 98 seconds, male and female voices, with gamak, meend and background noise"],
+      ["Pitch heard in silence", "0%", "Readings wrongly reported during breaths and pauses"],
+      ["Sa found, raag and voice known", "56 / 56", "Yaman, Bhairav, Bhupali and Malkauns, Sa from 110 to 233 Hz"],
+      ["Sa found, raag known", "91%", "The same 56 phrases, without being told the voice type"],
+    ],
+    tablesPre: "Full tables:", pitch: "pitch", and: "and", sa: "Sa detection",
+    helpPre: "To help test it on real singing, see the", guide: "recording guide", helpPost: ".",
+  },
+  practise: {
+    h: "What you can practise",
+    items: [
+      ["Tanpura and taal", "A recorded tanpura tuned to your Sa, and ten taals played with recorded tabla bols."],
+      ["Paltas", "Exercises built from each raag's aroh and avaroh, scored note by note, with a faster laya unlocked at 85."],
+      ["Sa sadhana", "Hold Sa as long and as steadily as you can; it keeps your best."],
+      ["Ear training", "After a Sa, hear a swara and name it; later, hear a phrase and name the raag."],
+      ["Journal and progress", "Every take is kept, so you can see which swaras are getting steadier."],
+    ],
+  },
+  privacy: {
+    h: "Where your voice goes",
+    lede: "Nowhere. Recordings are analysed inside your browser, and profiles and practice history stay on this device. There are no accounts or passwords. You can export a profile to move it to another device.",
+  },
+  credit: "Tanpura and tabla recordings from", creditLink: "Naad by Oormi Creations", creditPost: "(MIT licence).",
+  review: "Raag notes are awaiting review by a guru.",
+  sourceCode: "Source code on GitHub",
+  gate: {
+    back: "Back to the welcome page", who: "Who is practising?", newSinger: "New singer",
+    savedHere: "Profiles are saved only in this browser. No account or password is needed.",
+    add: "Add a singer", name: "Name", enterName: "Please enter a name.",
+    yourSa: "Your Sa. You can measure it exactly later with Find my Sa.",
+    start: "Start practising", backToProfiles: "Back to profiles", import: "Import a profile from another device",
+    importFailed: "This file couldn't be imported.",
+    presets: ["Lower male voice", "Higher male voice", "Lower female voice", "Higher female voice"],
+  },
+  tabs: { home: "Home", tanpura: "Tanpura & taal", analyzer: "Analyzer", practice: "Paltas", journal: "Journal", progress: "Progress", library: "Library", profile: "Profile" },
+  streak: n => `${n}-day streak`,
+  switchSinger: "Switch singer",
+  englishOnlyNote: "",
+};
+
+const hi: Strings = {
+  langLabel: "भाषा",
+  nav: { listens: "यह कैसे सुनता है", accuracy: "सटीकता", source: "सोर्स कोड", open: "ऐप खोलें", continueAs: n => `${n} के रूप में जारी रखें` },
+  stageLabel: "राग यमन की स्वर-रेखाओं पर आपकी आवाज़ का सुर",
+  read: { onNote: "ठीक सुर पर", sharp: n => `${n} सेंट ऊँचा`, flat: n => `${n} सेंट नीचा`, mandra: "मंद्र", taar: "तार" },
+  title: "गाते-गाते देखिए अपना रियाज़।",
+  intro: "नाद AI रिकॉर्ड किए गए तानपुरे के साथ आपकी आवाज़ सुनता है और दिखाता है कि हर स्वर कहाँ लगा: स्वर से कितना दूर, कितना स्थिर, और कौन-से स्वर राग से बाहर चले गए।",
+  sing: "तानपुरे के साथ गाइए",
+  saLegend: "आपका सा",
+  saLow: "सा C", saHigh: "सा G", saLowHint: "अधिकतर पुरुषों के लिए", saHighHint: "अधिकतर महिलाओं के लिए",
+  demo: "डेमो आलाप सुनिए",
+  stop: "रोकें",
+  status: {
+    listening: "सुन रहा है। इयरफ़ोन लगाइए, ताकि तानपुरे की आवाज़ माइक्रोफ़ोन में न जाए।",
+    demo: "कंप्यूटर से बना यमन का एक आलाप, जिसमें एक शुद्ध म राग से बाहर है।",
+    loading: "तानपुरा मिलाया जा रहा है...",
+    idle: "कुछ भी रिकॉर्ड या अपलोड नहीं होता। आपकी आवाज़ इसी टैब में मापी जाती है और फिर भुला दी जाती है।",
+    seeAnalysis: "इस आलाप का पूरा विश्लेषण देखिए",
+  },
+  err: {
+    demoMissing: "डेमो रिकॉर्डिंग लोड नहीं हुई। इंटरनेट जाँचकर पेज फिर से खोलिए।",
+    micBlocked: "माइक्रोफ़ोन की अनुमति नहीं मिली। ब्राउज़र के एड्रेस बार में इस साइट को अनुमति दीजिए, फिर दोबारा गाइए दबाइए।",
+    micFailed: m => `माइक्रोफ़ोन नहीं खुला: ${m}`,
+  },
+  hour: (p, night, raags) => {
+    const ord = ["पहला", "दूसरा", "तीसरा", "चौथा"][p - 1];
+    const base = `आपके यहाँ अभी ${night ? "रात" : "दिन"} का ${ord} प्रहर है।`;
+    return raags.length ? `${base} इस समय के कुछ राग: ${listOf(raags, "और")}।` : base;
+  },
+  listens: {
+    h: "यह कैसे सुनता है",
+    lede: "हर सेकंड सौ बार यह आपकी आवाज़ का सुर मापता है और उसे आपके सा से मिलाता है। गाना रोकने पर यह उन मापों को वैसी बातों में बदलता है जो एक गुरु बताते।",
+    items: [
+      ["आपका सा", "यह आपका चुना हुआ सा लेता है, या राग के स्वरों से पहचान लेता है कि आप किस सा पर गा रहे थे।"],
+      ["हर ठहरा हुआ स्वर", "वह कितने सेंट ऊँचा या नीचा लगा, और कितना डगमगाया।"],
+      ["आलाप और साँस", "हर वाक्य कहाँ शुरू और कहाँ खत्म हुआ; एक तिहाई सेकंड या उससे लंबी साँस पर उसे बाँटा जाता है।"],
+      ["राग से बाहर के स्वर", "ठहरे हुए ऐसे स्वर जो चुने हुए राग में नहीं हैं, और वे कब लगे।"],
+      ["आंदोलन और गमक", "आधे से बारह झूलों प्रति सेकंड तक के कंपन, और वे कितने चौड़े थे।"],
+    ],
+  },
+  accuracy: {
+    h: "यह कितना सही मापता है",
+    lede: "नीचे का हर अंक रिपॉज़िटरी की टेस्ट स्क्रिप्ट से आया है, जो कंप्यूटर से बनी ऐसी आवाज़ों पर चलती हैं जिनका सुर ठीक-ठीक पता है। असली आवाज़ें ज़्यादा कठिन होती हैं। संदर्भ के साथ पर्याप्त रिकॉर्डिंग मिलने पर उनके नतीजे भी प्रकाशित होंगे।",
+    rows: [
+      ["20 सेंट के भीतर सुर-माप", "100%", "20 क्लिप, 98 सेकंड, पुरुष और महिला आवाज़ें, गमक, मींड और पृष्ठभूमि शोर के साथ"],
+      ["खामोशी में सुना गया सुर", "0%", "साँस और विराम के समय गलती से बताए गए माप"],
+      ["सा मिला, राग और आवाज़ का प्रकार ज्ञात", "56 / 56", "यमन, भैरव, भूपाली और मालकौंस, सा 110 से 233 Hz तक"],
+      ["सा मिला, केवल राग ज्ञात", "91%", "वही 56 आलाप, आवाज़ का प्रकार बताए बिना"],
+    ],
+    tablesPre: "पूरी तालिकाएँ:", pitch: "सुर", and: "और", sa: "सा की पहचान",
+    helpPre: "असली गायन पर इसे परखने में मदद के लिए देखिए", guide: "रिकॉर्डिंग गाइड", helpPost: "।",
+  },
+  practise: {
+    h: "आप क्या अभ्यास कर सकते हैं",
+    items: [
+      ["तानपुरा और ताल", "आपके सा पर मिला रिकॉर्ड किया हुआ तानपुरा, और रिकॉर्ड किए तबला बोलों के साथ दस ताल।"],
+      ["पलटे", "हर राग के आरोह-अवरोह से बने अभ्यास, हर स्वर पर अंक, और 85 पर तेज़ लय खुलती है।"],
+      ["सा साधना", "सा को जितना लंबा और स्थिर हो सके, लगाइए; आपका सबसे अच्छा रिकॉर्ड रखा जाता है।"],
+      ["कान की तालीम", "सा के बाद एक स्वर सुनकर उसे पहचानिए; आगे चलकर एक वाक्य सुनकर राग पहचानिए।"],
+      ["डायरी और प्रगति", "हर रिकॉर्डिंग का माप रखा जाता है, ताकि आप देख सकें कौन-से स्वर स्थिर हो रहे हैं।"],
+    ],
+  },
+  privacy: {
+    h: "आपकी आवाज़ कहाँ जाती है",
+    lede: "कहीं नहीं। रिकॉर्डिंग का विश्लेषण आपके ब्राउज़र में ही होता है, और प्रोफ़ाइल व अभ्यास का इतिहास इसी डिवाइस पर रहता है। कोई अकाउंट या पासवर्ड नहीं है। दूसरे डिवाइस पर ले जाने के लिए प्रोफ़ाइल एक्सपोर्ट कर सकते हैं।",
+  },
+  credit: "तानपुरा और तबला की रिकॉर्डिंग", creditLink: "Naad by Oormi Creations", creditPost: "से (MIT लाइसेंस)।",
+  review: "राग-विवरण की गुरु द्वारा जाँच बाकी है।",
+  sourceCode: "GitHub पर सोर्स कोड",
+  gate: {
+    back: "स्वागत पेज पर लौटें", who: "कौन अभ्यास कर रहा है?", newSinger: "नया गायक",
+    savedHere: "प्रोफ़ाइल केवल इसी ब्राउज़र में सहेजी जाती हैं। कोई अकाउंट या पासवर्ड नहीं चाहिए।",
+    add: "गायक जोड़ें", name: "नाम", enterName: "कृपया नाम लिखिए।",
+    yourSa: "आपका सा। बाद में \"मेरा सा खोजें\" से इसे ठीक-ठीक माप सकते हैं।",
+    start: "अभ्यास शुरू करें", backToProfiles: "प्रोफ़ाइल पर लौटें", import: "दूसरे डिवाइस से प्रोफ़ाइल लाएँ",
+    importFailed: "यह फ़ाइल नहीं खुल सकी।",
+    presets: ["नीची पुरुष आवाज़", "ऊँची पुरुष आवाज़", "नीची महिला आवाज़", "ऊँची महिला आवाज़"],
+  },
+  tabs: { home: "होम", tanpura: "तानपुरा और ताल", analyzer: "विश्लेषण", practice: "पलटे", journal: "डायरी", progress: "प्रगति", library: "राग-कोश", profile: "प्रोफ़ाइल" },
+  streak: n => `लगातार ${n} दिन`,
+  switchSinger: "गायक बदलें",
+  englishOnlyNote: "अंदर के कुछ पेज अभी अंग्रेज़ी में हैं।",
+};
+
+const bn: Strings = {
+  langLabel: "ভাষা",
+  nav: { listens: "এটি কীভাবে শোনে", accuracy: "নির্ভুলতা", source: "সোর্স কোড", open: "অ্যাপ খুলুন", continueAs: n => `${n} হিসেবে চালিয়ে যান` },
+  stageLabel: "রাগ ইমনের স্বর-রেখায় আপনার কণ্ঠের সুর",
+  read: { onNote: "ঠিক সুরে", sharp: n => `${n} সেন্ট চড়া`, flat: n => `${n} সেন্ট নিচু`, mandra: "মন্দ্র", taar: "তার" },
+  title: "গাইতে গাইতে দেখুন নিজের রেওয়াজ।",
+  intro: "নাদ AI রেকর্ড করা তানপুরার সঙ্গে আপনার গলা শোনে আর দেখায় প্রতিটি স্বর কোথায় লাগল: স্বর থেকে কতটা দূরে, কতটা স্থির, আর কোন স্বর রাগের বাইরে চলে গেল।",
+  sing: "তানপুরার সঙ্গে গান",
+  saLegend: "আপনার সা",
+  saLow: "সা C", saHigh: "সা G", saLowHint: "বেশিরভাগ পুরুষের জন্য", saHighHint: "বেশিরভাগ মহিলার জন্য",
+  demo: "ডেমো আলাপ শুনুন",
+  stop: "থামান",
+  status: {
+    listening: "শুনছে। ইয়ারফোন পরুন, যাতে তানপুরার আওয়াজ মাইক্রোফোনে না ঢোকে।",
+    demo: "কম্পিউটারে তৈরি ইমনের একটি আলাপ, যেখানে একটি শুদ্ধ মা রাগের বাইরে।",
+    loading: "তানপুরা বাঁধা হচ্ছে...",
+    idle: "কিছুই রেকর্ড বা আপলোড হয় না। আপনার গলা এই ট্যাবেই মাপা হয়, তারপর ভুলে যাওয়া হয়।",
+    seeAnalysis: "এই আলাপের পুরো বিশ্লেষণ দেখুন",
+  },
+  err: {
+    demoMissing: "ডেমো রেকর্ডিং লোড হয়নি। ইন্টারনেট দেখে পেজটি আবার খুলুন।",
+    micBlocked: "মাইক্রোফোনের অনুমতি পাওয়া যায়নি। ব্রাউজারের অ্যাড্রেস বারে এই সাইটকে অনুমতি দিন, তারপর আবার গান টিপুন।",
+    micFailed: m => `মাইক্রোফোন খোলেনি: ${m}`,
+  },
+  hour: (p, night, raags) => {
+    const ord = ["প্রথম", "দ্বিতীয়", "তৃতীয়", "চতুর্থ"][p - 1];
+    const base = `আপনার ওখানে এখন ${night ? "রাতের" : "দিনের"} ${ord} প্রহর।`;
+    return raags.length ? `${base} এই সময়ের কয়েকটি রাগ: ${listOf(raags, "আর")}।` : base;
+  },
+  listens: {
+    h: "এটি কীভাবে শোনে",
+    lede: "প্রতি সেকেন্ডে একশো বার এটি আপনার গলার সুর মাপে আর আপনার সা-এর সঙ্গে মেলায়। গান থামালে সেই মাপগুলোকে এমন কথায় বদলায়, যা একজন গুরু ধরিয়ে দিতেন।",
+    items: [
+      ["আপনার সা", "আপনার বেছে নেওয়া সা ব্যবহার করে, অথবা রাগের স্বর থেকে বুঝে নেয় আপনি কোন সা-তে গাইছিলেন।"],
+      ["প্রতিটি টানা স্বর", "কত সেন্ট চড়া বা নিচু লাগল, আর কতটা কাঁপল।"],
+      ["আলাপ আর শ্বাস", "প্রতিটি বাক্য কোথায় শুরু আর শেষ; এক সেকেন্ডের তিন ভাগের এক ভাগ বা তার বেশি শ্বাসে ভাগ করা হয়।"],
+      ["রাগের বাইরের স্বর", "টানা স্বর যা বেছে নেওয়া রাগে নেই, আর সেগুলো কখন লাগল।"],
+      ["আন্দোলন আর গমক", "সেকেন্ডে আধটা থেকে বারোটা দোলা পর্যন্ত কম্পন, আর তা কতটা চওড়া ছিল।"],
+    ],
+  },
+  accuracy: {
+    h: "এটি কতটা ঠিক মাপে",
+    lede: "নিচের প্রতিটি সংখ্যা রিপোজিটরির টেস্ট স্ক্রিপ্ট থেকে এসেছে, যা কম্পিউটারে তৈরি এমন কণ্ঠে চালানো হয়েছে যার সুর একদম জানা। আসল গলা আরও কঠিন। রেফারেন্সসহ যথেষ্ট রেকর্ডিং জমলে সেই ফলাফলও প্রকাশ করা হবে।",
+    rows: [
+      ["২০ সেন্টের মধ্যে সুর-মাপ", "100%", "২০টি ক্লিপ, ৯৮ সেকেন্ড, পুরুষ ও মহিলা কণ্ঠ, গমক, মীড় আর পিছনের আওয়াজসহ"],
+      ["নীরবতায় শোনা সুর", "0%", "শ্বাস আর বিরতির সময় ভুল করে জানানো মাপ"],
+      ["সা পাওয়া গেছে, রাগ ও কণ্ঠের ধরন জানা", "56 / 56", "ইমন, ভৈরব, ভূপালী আর মালকোষ, সা ১১০ থেকে ২৩৩ Hz"],
+      ["সা পাওয়া গেছে, শুধু রাগ জানা", "91%", "একই ৫৬টি আলাপ, কণ্ঠের ধরন না জানিয়ে"],
+    ],
+    tablesPre: "পুরো তালিকা:", pitch: "সুর", and: "আর", sa: "সা শনাক্তকরণ",
+    helpPre: "আসল গানে এটি যাচাই করতে সাহায্য করতে দেখুন", guide: "রেকর্ডিং গাইড", helpPost: "।",
+  },
+  practise: {
+    h: "আপনি কী অনুশীলন করতে পারেন",
+    items: [
+      ["তানপুরা আর তাল", "আপনার সা-তে বাঁধা রেকর্ড করা তানপুরা, আর রেকর্ড করা তবলার বোলে দশটি তাল।"],
+      ["পাল্টা", "প্রতিটি রাগের আরোহ-অবরোহ থেকে তৈরি অনুশীলন, প্রতি স্বরে নম্বর, আর ৮৫ পেলে দ্রুত লয় খোলে।"],
+      ["সা সাধনা", "সা যতটা লম্বা আর স্থির পারেন ধরে রাখুন; আপনার সেরা রেকর্ড রাখা হয়।"],
+      ["কানের তালিম", "সা-এর পরে একটি স্বর শুনে চিনুন; পরে একটি বাক্য শুনে রাগ চিনুন।"],
+      ["ডায়েরি আর অগ্রগতি", "প্রতিটি রেকর্ডিংয়ের মাপ রাখা হয়, যাতে দেখতে পান কোন স্বর স্থির হচ্ছে।"],
+    ],
+  },
+  privacy: {
+    h: "আপনার গলা কোথায় যায়",
+    lede: "কোথাও না। রেকর্ডিংয়ের বিশ্লেষণ আপনার ব্রাউজারেই হয়, আর প্রোফাইল ও অনুশীলনের ইতিহাস এই ডিভাইসেই থাকে। কোনো অ্যাকাউন্ট বা পাসওয়ার্ড নেই। অন্য ডিভাইসে নিতে প্রোফাইল এক্সপোর্ট করতে পারেন।",
+  },
+  credit: "তানপুরা আর তবলার রেকর্ডিং", creditLink: "Naad by Oormi Creations", creditPost: "থেকে (MIT লাইসেন্স)।",
+  review: "রাগের বিবরণ এখনও গুরুর যাচাইয়ের অপেক্ষায়।",
+  sourceCode: "GitHub-এ সোর্স কোড",
+  gate: {
+    back: "স্বাগত পেজে ফিরুন", who: "কে অনুশীলন করছেন?", newSinger: "নতুন শিল্পী",
+    savedHere: "প্রোফাইল শুধু এই ব্রাউজারেই রাখা হয়। কোনো অ্যাকাউন্ট বা পাসওয়ার্ড লাগে না।",
+    add: "শিল্পী যোগ করুন", name: "নাম", enterName: "অনুগ্রহ করে নাম লিখুন।",
+    yourSa: "আপনার সা। পরে \"আমার সা খুঁজুন\" দিয়ে ঠিকঠাক মাপতে পারবেন।",
+    start: "অনুশীলন শুরু করুন", backToProfiles: "প্রোফাইলে ফিরুন", import: "অন্য ডিভাইস থেকে প্রোফাইল আনুন",
+    importFailed: "এই ফাইলটি আনা গেল না।",
+    presets: ["নিচু পুরুষ কণ্ঠ", "উঁচু পুরুষ কণ্ঠ", "নিচু মহিলা কণ্ঠ", "উঁচু মহিলা কণ্ঠ"],
+  },
+  tabs: { home: "হোম", tanpura: "তানপুরা ও তাল", analyzer: "বিশ্লেষণ", practice: "পাল্টা", journal: "ডায়েরি", progress: "অগ্রগতি", library: "রাগ-কোষ", profile: "প্রোফাইল" },
+  streak: n => `টানা ${n} দিন`,
+  switchSinger: "শিল্পী বদলান",
+  englishOnlyNote: "ভেতরের কিছু পেজ এখনও ইংরেজিতে।",
+};
+
+export const STRINGS: Record<Lang, Strings> = { en, hi, bn };

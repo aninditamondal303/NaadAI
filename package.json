@@ -17,6 +17,10 @@
     "eval:real": "tsx eval/real-eval.ts"
   },
   "dependencies": {
+    "@fontsource/hind-siliguri": "^5.3.0",
+    "@fontsource/mukta": "^5.3.0",
+    "@fontsource/tiro-bangla": "^5.3.0",
+    "@fontsource/tiro-devanagari-hindi": "^5.3.0",
     "@google/genai": "^2.4.0",
     "@tailwindcss/vite": "^4.1.14",
     "@vitejs/plugin-react": "^5.0.4",
