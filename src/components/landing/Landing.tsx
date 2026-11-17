@@ -7,8 +7,8 @@ import React, { useEffect, useMemo, useRef, useState } from "react";
 import { MicSession } from "../../audio/mic";
 import { TanpuraEngine } from "../../audio/tanpura";
 import { decodeAudioFile } from "../../audio/decode";
-import { trackPitch, windowSizeFor, rmsOf, VOICING, MAX_JUMP_CENTS } from "../../analysis/track";
-import { makeMpmDetector } from "../../analysis/pitch/mpm";
+import { trackPitch } from "../../analysis/track";
+import { createLiveTracker } from "../../analysis/live";
 import { RAAG_LIST } from "../../data/allRaags";
 import { praharFor, raagsForHour } from "../../practice/raagTime";
 import { drawStage, nearestSwara, type Script, type TracePoint, type View } from "./stage";
@@ -240,26 +240,12 @@ export const Landing: React.FC<Props> = ({ returningName, onOpenApp, onDemoAnaly
     audio.current = { ctx, tanpura, mic };
     setMode("live");
 
-    const detect = makeMpmDetector(60, 1100);
-    const size = windowSizeFor(mic.sampleRate, 60);
-    const silence = Math.pow(10, -45 / 20);
-    const points: TracePoint[] = [];
-    let prevHz: number | null = null;
+    const tracker = createLiveTracker(mic, saHz);
+    const points = tracker.points;
     loop(() => {
       if (!audio.current) return false;
       const now = ctx.currentTime;
-      const win = mic.latest(size);
-      let hz: number | null = null;
-      if (rmsOf(win) >= silence) {
-        const r = detect(win, mic.sampleRate);
-        // Same two-level voicing rule as the full analysis (src/analysis/track.ts)
-        const smooth = prevHz !== null && r.hz !== null && Math.abs(1200 * Math.log2(r.hz / prevHz)) <= MAX_JUMP_CENTS;
-        if (r.hz !== null && (r.clarity >= VOICING.mpm.start || (smooth && r.clarity >= VOICING.mpm.keep))) hz = r.hz;
-      }
-      prevHz = hz;
-      const c = hz === null ? null : 1200 * Math.log2(hz / saHz);
-      points.push({ t: now, c });
-      while (points.length && points[0].t < now - 9) points.shift();
+      const c = tracker.step(now);
       view.current = { kind: "live", points, duration: 0, reveal: 0, ghostRest: false, now };
       setReadout(c);
       return true;
