@@ -14,7 +14,8 @@
     "eval:pitch": "tsx eval/pitch-benchmark.ts",
     "eval:sa": "tsx eval/sa-benchmark.ts",
     "raag:review": "tsx eval/raag-review.ts",
-    "eval:real": "tsx eval/real-eval.ts"
+    "eval:real": "tsx eval/real-eval.ts",
+    "eval:f0": "tsx eval/f0-eval.ts"
   },
   "dependencies": {
     "@fontsource/hind-siliguri": "^5.3.0",
