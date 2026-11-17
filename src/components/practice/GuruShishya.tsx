@@ -20,11 +20,18 @@ import { matchPhrase, segmentNotes, type NoteMark } from "../../practice/phraseM
 import { SwaraCanvas } from "../shared/SwaraCanvas";
 import { gridFor, type View } from "../landing/stage";
 import { Note } from "../study/Swaralipi";
+import { scheduleContour } from "../../audio/contourVoice";
+import { CONTOUR_RATE, encodeGuruPhrase, guruPhraseUrl, loadGuruPhrases, phraseFromPoints, removeGuruPhrase, saveGuruPhrase, type GuruPhrase } from "../../practice/guruPhrase";
+import { toast } from "../shell/Toaster";
+import { useUi } from "../../i18n/ui";
+import { Mic, Share2, Square, Trash2 } from "lucide-react";
 
 const NOTE_SEC = 0.75;
 
-function phrasesFor(raag: ComprehensiveRaag): { source: string; text: string }[] {
-  const out: { source: string; text: string }[] = [];
+type Phrase = { source: string; text: string; contour?: (number | null)[]; guruId?: string };
+
+function phrasesFor(raag: ComprehensiveRaag): Phrase[] {
+  const out: Phrase[] = [];
   for (const st of ALAAP[raag.id] ?? []) for (const p of st.phrases) out.push({ source: `Alaap: ${st.name}`, text: p });
   const d = RAAG_DETAILS[raag.id];
   const pk = pakadFor(raag.id);
@@ -34,7 +41,13 @@ function phrasesFor(raag: ComprehensiveRaag): { source: string; text: string }[]
 }
 
 export const GuruShishya: React.FC<{ raag: ComprehensiveRaag; saHz: number }> = ({ raag, saHz }) => {
-  const phrases = useMemo(() => phrasesFor(raag), [raag]);
+  const u = useUi();
+  const [guruVersion, setGuruVersion] = useState(0);
+  const guruList = useMemo(() => loadGuruPhrases(), [guruVersion]);
+  const [from, setFrom] = useState<"app" | "guru">(() => (loadGuruPhrases().length ? "guru" : "app"));
+  const phrases: Phrase[] = useMemo(() => from === "guru"
+    ? guruList.map(g => ({ source: g.by ? u("gsSungBy", g.by) : u("gsYourGuru"), text: g.notes, contour: g.contour, guruId: g.id }))
+    : phrasesFor(raag), [raag, from, guruList]);
   const [idx, setIdx] = useState(0);
   const [phase, setPhase] = useState<"idle" | "guru" | "shishya" | "done">("idle");
   const [marks, setMarks] = useState<NoteMark[] | null>(null);
@@ -53,7 +66,7 @@ export const GuruShishya: React.FC<{ raag: ComprehensiveRaag; saHz: number }> = 
     await r.mic.close();
   };
   useEffect(() => () => { void close(); }, []);
-  useEffect(() => { void close(); setIdx(0); setPhase("idle"); setMarks(null); setScore(null); setHistory([]); }, [raag.id]);
+  useEffect(() => { void close(); setIdx(0); setPhase("idle"); setMarks(null); setScore(null); setHistory([]); }, [raag.id, from]);
 
   const go = async () => {
     if (!phrase) return;
@@ -72,10 +85,15 @@ export const GuruShishya: React.FC<{ raag: ComprehensiveRaag; saHz: number }> = 
       r = run.current = { mic, tanpura, tracker: createLiveTracker(mic, saHz, 30) };
     }
     const ctx = r.mic.context;
-    const notes = timePhrases([phrase.text], NOTE_SEC, 0);
-    const len = notes.length ? notes[notes.length - 1].start + notes[notes.length - 1].dur : 0;
     const t0 = ctx.currentTime + 0.3;
-    scheduleSwaras(ctx, ctx.destination, notes, saHz, t0, 0.28);
+    let len: number;
+    if (phrase.contour) {
+      len = scheduleContour(ctx, ctx.destination, phrase.contour, CONTOUR_RATE, saHz, t0, 0.28).duration;
+    } else {
+      const notes = timePhrases([phrase.text], NOTE_SEC, 0);
+      len = notes.length ? notes[notes.length - 1].start + notes[notes.length - 1].dur : 0;
+      scheduleSwaras(ctx, ctx.destination, notes, saHz, t0, 0.28);
+    }
     setPhase("guru");
     const from = t0 + len + 0.4;
     const to = from + len + 1.5;
@@ -109,13 +127,83 @@ export const GuruShishya: React.FC<{ raag: ComprehensiveRaag; saHz: number }> = 
     return { kind: "live", points: r.tracker.points, duration: 0, reveal: 0, ghostRest: false, now: r.mic.context.currentTime };
   };
 
-  if (!phrase) return <p className="sm-muted">No phrases are available for this raag yet.</p>;
+  // ---- recording a phrase as the guru
+  const [recName, setRecName] = useState("");
+  const [rec, setRec] = useState<{ mic: MicSession; tracker: ReturnType<typeof createLiveTracker>; raf: number } | null>(null);
+  const [recOpen, setRecOpen] = useState(false);
+  const startRec = async () => {
+    await close();
+    let mic: MicSession;
+    try { mic = await MicSession.open(); } catch { setError("Microphone access was blocked. Allow it and try again."); return; }
+    const tracker = createLiveTracker(mic, saHz, 20);
+    const tick = () => { tracker.step(mic.context.currentTime); r.raf = requestAnimationFrame(tick); };
+    const r = { mic, tracker, raf: requestAnimationFrame(tick) };
+    setRec(r);
+  };
+  const stopRec = async () => {
+    const r = rec;
+    if (!r) return;
+    cancelAnimationFrame(r.raf);
+    setRec(null);
+    await r.mic.close();
+    const g = phraseFromPoints(r.tracker.points, raag.id, recName);
+    if (!g) { setError("No clear swaras were heard. Sing the phrase a little louder and hold each swara briefly."); return; }
+    saveGuruPhrase(g);
+    setGuruVersion(v => v + 1);
+    setFrom("guru");
+    setRecOpen(false);
+    toast(u("gsSaved"));
+  };
+  const shareGuru = async (g: GuruPhrase) => {
+    const url = guruPhraseUrl(await encodeGuruPhrase(g));
+    try {
+      if (navigator.share) { await navigator.share({ title: "A phrase to sing back", text: `${g.notes} (Naad AI)`, url }); return; }
+    } catch { /* cancelled */ }
+    try { await navigator.clipboard.writeText(url); toast("Link copied"); } catch { window.prompt("Copy this link", url); }
+  };
+  const recView = (): View | null => rec ? { kind: "live", points: rec.tracker.points, duration: 0, reveal: 0, ghostRest: false, now: rec.mic.context.currentTime } : null;
+
+  const sourceBar = (
+    <div className="gs-source">
+      <div className="az-modes" role="group" aria-label="Phrases from">
+        <button type="button" aria-current={from === "app" ? "true" : undefined} onClick={() => setFrom("app")}>{u("gsRaagPhrases")}</button>
+        <button type="button" aria-current={from === "guru" ? "true" : undefined} onClick={() => setFrom("guru")}>{u("gsFromGuru")}{guruList.length ? ` (${guruList.length})` : ""}</button>
+      </div>
+      <button type="button" className="btn btn-ghost" onClick={() => setRecOpen(o => !o)} aria-expanded={recOpen}><Mic size={15} aria-hidden /> {u("gsRecord")}</button>
+    </div>
+  );
+  const recorder = recOpen && (
+    <div className="gs-rec">
+      <p className="sm-muted">{u("gsRecIntro", saHz.toFixed(1))}</p>
+      <div className="gs-rec-row">
+        <label className="tp-field"><span>{u("gsName")}</span><input value={recName} onChange={e => setRecName(e.target.value)} maxLength={40} placeholder="e.g. Guruji" /></label>
+        {!rec ? <button type="button" className="btn btn-primary" onClick={() => void startRec()}><Mic size={15} aria-hidden /> {u("gsStart")}</button>
+          : <button type="button" className="btn btn-danger" onClick={() => void stopRec()}><Square size={14} fill="currentColor" aria-hidden /> {u("gsStopSave")}</button>}
+      </div>
+      {rec && <SwaraCanvas className="rz-live" grid={grid} getView={recView} running label="The phrase being recorded" />}
+    </div>
+  );
+
+  if (!phrase) return (
+    <div className="sm">
+      {sourceBar}
+      {recorder}
+      <div className="empty-state">
+        <Mic size={28} strokeWidth={1.5} aria-hidden />
+        <strong>{u("gsEmptyH")}</strong>
+        <span>{u("gsEmptyP")}</span>
+      </div>
+    </div>
+  );
+  const currentGuru = phrase.guruId ? guruList.find(g => g.id === phrase.guruId) : undefined;
   const tokens = phrase.text.split(/\s+/);
   let k = -1;
   let prevSemi: number | null = null;
 
   return (
     <div className="sm">
+      {sourceBar}
+      {recorder}
       <div className="sm-top">
         <div>
           <h3 className="sm-h">Guru-shishya</h3>
@@ -123,6 +211,13 @@ export const GuruShishya: React.FC<{ raag: ComprehensiveRaag; saHz: number }> = 
         </div>
         <span className="sm-muted">Phrase {idx % phrases.length + 1} of {phrases.length}, {phrase.source}</span>
       </div>
+      {currentGuru && (
+        <div className="gs-guru-actions">
+          <span className="sm-muted">{u("gsFollows")}</span>
+          <button type="button" className="rz-link" onClick={() => void shareGuru(currentGuru)}><Share2 size={14} aria-hidden /> {u("gsShare")}</button>
+          <button type="button" className="rz-link" onClick={() => { if (window.confirm("Remove this phrase?")) { removeGuruPhrase(currentGuru.id); setGuruVersion(v => v + 1); setIdx(0); } }}><Trash2 size={14} aria-hidden /> {u("gsRemove")}</button>
+        </div>
+      )}
 
       <p className="gs-phrase" aria-label="The phrase">
         {tokens.map((tok, i) => {

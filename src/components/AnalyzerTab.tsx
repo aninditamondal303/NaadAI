@@ -7,6 +7,7 @@
  *  - Sa sadhana:      hold Sa against the tanpura; length, offset and wobble
  *  - Analyse singing: record or upload; per-swara measurements, breath and pitch curve
  */
+import { useUi } from '../i18n/ui';
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { Activity, Headphones, Mic, Play, Square, Upload } from 'lucide-react';
 import { centsBetween, signedCents, westernNote } from '../analysis/music';
@@ -22,6 +23,8 @@ import { addRecord, newId } from '../lib/practiceHistory';
 import { SwaraCanvas } from './shared/SwaraCanvas';
 import { gridFor, type View } from './landing/stage';
 import { createLiveTracker } from '../analysis/live';
+import { createLiveRaag } from '../analysis/liveRaag';
+import type { RaagGuess } from '../analysis/raagGuess';
 import { useLang } from '../i18n/lang';
 import { TakeReport } from './analysis/TakeReport';
 import { LevelMeter, useMic } from './analysis/micHooks';
@@ -289,6 +292,8 @@ const AnalyseSinging: React.FC<{ saHz: number; autoDemo?: boolean }> = ({ saHz, 
   const grid = useMemo(() => gridFor(raag.allowedSwaras), [raag]);
   // Live drawing while recording (the saved analysis is computed separately from the full recording)
   const tracker = useRef<ReturnType<typeof createLiveTracker> | null>(null);
+  const liveRaag = useRef<ReturnType<typeof createLiveRaag> | null>(null);
+  const [liveGuess, setLiveGuess] = useState<RaagGuess | null>(null);
   const liveView = (): View | null => {
     const m = mic.session.current;
     const tr = tracker.current;
@@ -362,12 +367,19 @@ const AnalyseSinging: React.FC<{ saHz: number; autoDemo?: boolean }> = ({ saHz, 
     const m = await mic.open();
     if (!m) return;
     tracker.current = createLiveTracker(m, saHz);
+    liveRaag.current = createLiveRaag(RAAG_LIST);
+    setLiveGuess(null);
     m.startRecording();
     setRecording(true);
     setElapsed(0);
+    let ticks = 0;
     timer.current = window.setInterval(() => {
       setElapsed(m.recordedSeconds);
       setLevel(m.level());
+      if (tracker.current && liveRaag.current) {
+        liveRaag.current.add(tracker.current.points);
+        if (++ticks % 15 === 0) setLiveGuess(liveRaag.current.guess());
+      }
       if (m.recordedSeconds >= MAX_RECORD_SECONDS) void stopRecording();
     }, 100);
   };
@@ -433,6 +445,7 @@ const AnalyseSinging: React.FC<{ saHz: number; autoDemo?: boolean }> = ({ saHz, 
             <SwaraCanvas className="rz-live" grid={grid} getView={liveView} running={recording}
               label={`Your voice drawn on the swaras of ${raag.name} while recording`} />
             <span className="az-live-note">{A.liveNote}</span>
+            <LiveRaagLine guess={liveGuess} />
           </div>
         )}
 
@@ -460,6 +473,22 @@ const AnalyseSinging: React.FC<{ saHz: number; autoDemo?: boolean }> = ({ saHz, 
 
       {result && <div ref={reportRef} className="az-report"><TakeReport audio={result.audio} m={result.m} track={result.track} raagName={result.raagName} allowedSwaras={result.allowedSwaras} saNotes={result.saNotes} /></div>}
     </div>
+  );
+};
+
+/** One line under the live trace: which raag the held notes point to so far. */
+const LiveRaagLine: React.FC<{ guess: RaagGuess | null }> = ({ guess }) => {
+  const u = useUi();
+  const name = (r: { name: string }) => r.name.replace(/^Raag\s+/i, "").replace(/\s*\(.*\)/, "");
+  if (!guess || guess.candidates.length === 0) return <p className="az-live-raag" aria-live="polite">{u("lrListening")}</p>;
+  const [best, ...rest] = guess.candidates;
+  const label = guess.confidence === "clear" ? u("lrClear") : guess.confidence === "likely" ? u("lrLikely") : u("lrPerhaps");
+  return (
+    <p className="az-live-raag" aria-live="polite">
+      {label} <b>{name(best.raag)}</b>
+      {guess.sameSwaras.length > 0 ? <span>{u("lrOr", guess.sameSwaras.slice(0, 2).map(name).join(" / "))}</span>
+        : rest.length > 0 ? <span>{u("lrNext", name(rest[0].raag))}</span> : null}
+    </p>
   );
 };
 

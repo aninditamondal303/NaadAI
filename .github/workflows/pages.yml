@@ -31,6 +31,7 @@ jobs:
         env:
           VITE_BASE: /NaadAI/
           VITE_STATIC_SITE: "1"
+          VITE_ANDROID_APK_URL: https://github.com/aninditamondal303/NaadAI/releases/latest/download/naad-ai.apk
       - name: Publish to gh-pages branch
         run: |
           cd dist

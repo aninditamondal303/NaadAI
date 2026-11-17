@@ -3,54 +3,37 @@
 [![Tests](https://github.com/aninditamondal303/naadai/actions/workflows/ci.yml/badge.svg)](https://github.com/aninditamondal303/naadai/actions/workflows/ci.yml)
 [![Website](https://github.com/aninditamondal303/naadai/actions/workflows/pages.yml/badge.svg)](https://aninditamondal303.github.io/NaadAI/)
 
-A riyaz (practice) companion for Hindustani classical vocalists. It listens
-while you sing and measures how you hold each swara against your own Sa,
-plays the tanpura and taal itself, and turns your measurements into practice:
-paltas across four layas, pakad practice, raag-grammar checks, ear training
-and a daily plan.
+A riyaz (practice) companion for Hindustani classical vocalists. It plays a
+recorded tanpura and tabla tuned to your Sa, listens while you sing, and
+measures every swara: how close it sat to its place, how steadily it was held,
+and whether it belonged to the raag. Everything runs on your device; nothing
+is uploaded.
 
-You only need a laptop or phone microphone and earphones (earphones keep the
-app's tanpura out of the microphone).
+**Try it:** https://aninditamondal303.github.io/NaadAI/ (Chrome, Edge, Firefox
+or Safari; allow the microphone; use earphones). **Android:**
+[download the app](https://github.com/aninditamondal303/NaadAI/releases/latest/download/naad-ai.apk).
+Available in **English, हिन्दी and বাংলা**.
 
-**Try it:** https://aninditamondal303.github.io/NaadAI/ (works in Chrome, Edge,
-Firefox and Safari; allow the microphone when asked; use earphones)
+<p align="center"><img src="docs/screenshots/demo-analysis.gif" width="300" alt="Running the demo analysis on a phone: the record screen, then the take summary with the in-tune gauge and the swara table"></p>
 
-The welcome page is itself an instrument: press **Sing with the tanpura** and
-your voice is drawn live on the swara lines, or play the demo phrase and watch
-it drawn as it plays. Its colours follow the sky at your local time, and it
-suggests raags for the current prahar. The welcome page, singer picker and
-menus are available in **English, हिन्दी and বাংলা** (the Hindi and Bengali
-text awaits review by native speakers; the inner practice screens are still
-in English).
+![The app on a phone: analysis, tanpura, riyaz and the raag library](docs/screenshots/phone.webp)
 
-![Welcome page](docs/screenshots/welcome.png)
+### What a singer can do
 
-![Analysis of a recording](docs/screenshots/analysis.png)
+- **Riyaz with the tanpura**, with lock-screen controls so it keeps playing when the phone sleeps; ten taals with editable thekas.
+- **Analyse a take**: a summary of held-in-tune time, the raag rule check, range and breath, then the pitch line, each swara's position and wobble, the shruti view, andolan and gamak, and which raag it sounds like. While recording, the raag is recognised live.
+- **Paltas and pakad** graded note by note across four layas; **Guru-shishya**, where the phrase can come from the app or from your own guru (the guru records once and sends a link; the guide follows the guru's own pitch line, meends included).
+- **Learn a raag**: 45 raags with thaat, aroh, avaroh, vadi, samvadi, mukhya ang and vishranti sthan (sourced), alaap, sargam geet and bandish in swaralipi with **sing-along** at any laya, and **side-by-side comparison** of close raags.
+- **Progress**: a weekly report (this week against last), swara tuning ring, streaks, journal, and a daily riyaz reminder (a notification in the Android app).
+- **Quick find** (Ctrl/⌘ K) to reach any screen or raag.
 
-### Learning a raag
+| | |
+|---|---|
+| ![Today, with the riyaz plan and the raags for this hour](docs/screenshots/today.webp) | ![Comparing Marwa and Puriya](docs/screenshots/compare.webp) |
 
-For Yaman, Bhupali, Bhairav, Malkauns, Bhimpalasi, Bageshree, Marwa, Puriya
-and Todi, the Library has alaap in three stages, a sargam geet and a bandish
-in Bhatkhande-style swaralipi (in Devanagari, Bengali or S R G letters), with
-what each is based on: the raag, the taal and its theka, the laya and the
-form. Each can be played with a guide voice, the recorded tanpura and the
-recorded tabla. These compositions and lyrics were written for this app to
-follow each raag's rules (tests check every swara); they are not traditional
-bandishes and await a guru's review. "Give me more" generates further sargam
-and alaap phrases for any raag from its aroh and avaroh.
-
-After each recording the report also guesses **which raag it sounds like**
-(from the swaras held and how the singer moved between them, with raags that
-share swaras named together), shows a **shruti view** of where each swara sat
-between the keyboard position and the natural just-intonation position, and
-can make a **share link for a guru**: the measurements and pitch line are
-packed into the link itself, with no recording and no server.
-
-Practice also has **Guru-shishya** (the app sings a phrase, you sing it back,
-each swara is marked), basic paltas on the shuddha swaras (12 alankars), the same
-patterns for every raag, and Sur milao: hear a swara, sing it, and see how
-close you were. The app can be installed and works offline after the first
-visit.
+How the measuring works, and how accurate it is, is written up in the
+[case study](docs/case-study.md) and on the app's own
+[method page](https://aninditamondal303.github.io/NaadAI/#how-it-works).
 
 ## Working in VS Code
 
@@ -99,11 +82,6 @@ npm run eval:f0 -- eval/datasets/vocadito --name vocadito
 | **Raag library** | 45 raags; 9 with pakad, chalan, nyas swaras and comparisons with similar raags |
 | **Profiles** | Several singers per device, no passwords, data stays in the browser; export/import |
 | **Written feedback (optional)** | An AI model comments only on the measured numbers, through gharana-style lenses; never invents numbers or quotes real musicians |
-
-| | | |
-|---|---|---|
-| ![Home](docs/screenshots/home.png) | ![Paltas](docs/screenshots/palta.png) | ![Tanpura and taal](docs/screenshots/tanpura-taal.png) |
-| ![Sa sadhana](docs/screenshots/sa-sadhana.png) | ![Raag library](docs/screenshots/library.png) | ![Progress](docs/screenshots/progress.png) |
 
 ## Accuracy
 
@@ -168,6 +146,7 @@ npm run dev            # http://localhost:3000
 | Command | |
 |---|---|
 | `npm test` | Unit tests (analysis, scoring, data consistency, profiles) |
+| `npm run build:site && npm run e2e` | End-to-end flows in a real Chrome: welcome page, quick find, raag comparison, demo analysis, journal, phone layout and Hindi (also run in CI) |
 | `npm run lint` | Type check |
 | `npm run eval:pitch` / `eval:sa` / `eval:real` | Accuracy reports |
 | `npm run raag:review` | Writes `docs/raag-review.md`, a checklist for a guru to verify the raag data |

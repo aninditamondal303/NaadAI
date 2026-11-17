@@ -55,6 +55,18 @@ async function pipe(bytes: Uint8Array, stream: CompressionStream | Decompression
   return new Uint8Array(await out.arrayBuffer());
 }
 
+/** Compact, URL-safe text for any JSON value (deflated where the browser can). */
+export async function encodeJson(value: unknown): Promise<string> {
+  const json = new TextEncoder().encode(JSON.stringify(value));
+  if (typeof CompressionStream !== "undefined") return "z" + toB64url(await pipe(json, new CompressionStream("deflate-raw")));
+  return "j" + toB64url(json);
+}
+export async function decodeJson<T>(s: string): Promise<T> {
+  const kind = s[0], body = fromB64url(s.slice(1));
+  const bytes = kind === "z" ? await pipe(body, new DecompressionStream("deflate-raw")) : body;
+  return JSON.parse(new TextDecoder().decode(bytes)) as T;
+}
+
 export async function encodeTake(t: SharedTake): Promise<string> {
   const json = new TextEncoder().encode(JSON.stringify(t));
   if (typeof CompressionStream !== "undefined") return "z" + toB64url(await pipe(json, new CompressionStream("deflate-raw")));

@@ -3,6 +3,7 @@
  * (analyses, Sa checks and timed riyaz sessions). A new user sees empty
  * charts with an explanation, never sample data.
  */
+import { WeeklyReport } from './progress/WeeklyReport';
 import React, { useEffect, useMemo, useState } from 'react';
 import { SwaraRing, RiyazThread } from './progress/SwaraRing';
 import { useUi } from '../i18n/ui';
@@ -97,6 +98,7 @@ export const ProgressTab: React.FC = () => {
           <span><b>{raags}</b> {u("raagsCount", raags)}</span>
         </p>
       </header>
+      <WeeklyReport history={history} />
       <section className="pg-hero">
         <SwaraRing analyses={analyses} />
         <RiyazThread days={minutesPerDay(history, 56)} />

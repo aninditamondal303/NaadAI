@@ -4,9 +4,11 @@ import type { TakeMeasurements } from "../../analysis/summary";
 import type { PitchTrack } from "../../analysis/types";
 import { Share2 } from "lucide-react";
 import { toast } from "../shell/Toaster";
+import { useUi } from "../../i18n/ui";
 import { encodeTake, shareUrl, summariseForShare } from "../../lib/shareTake";
 
 export const ShareTake: React.FC<{ m: TakeMeasurements; track: PitchTrack; raagName: string; allowedSwaras: number[] }> = ({ m, track, raagName, allowedSwaras }) => {
+  const u = useUi();
   const [link, setLink] = useState<string | null>(null);
   const [status, setStatus] = useState<string | null>(null);
 
@@ -16,7 +18,7 @@ export const ShareTake: React.FC<{ m: TakeMeasurements; track: PitchTrack; raagN
     try {
       if (navigator.share) { await navigator.share({ title: `Riyaz in ${raagName}`, text: "My riyaz, measured by Naad AI", url }); setStatus("Shared."); return; }
     } catch { /* cancelled; fall back to copying */ }
-    try { await navigator.clipboard.writeText(url); setStatus("Paste it in a message to your guru."); toast("Link copied"); }
+    try { await navigator.clipboard.writeText(url); setStatus("Paste it in a message to your guru."); toast(u("linkCopied")); }
     catch { setStatus("Copy the link below and send it to your guru."); }
   };
 
@@ -24,10 +26,10 @@ export const ShareTake: React.FC<{ m: TakeMeasurements; track: PitchTrack; raagN
     <section className="rg">
       <div className="tr-share">
         <div>
-          <h3 className="rg-h">Share with your guru</h3>
-          <p className="rg-muted">The link carries your measurements and pitch line, never the recording.</p>
+          <h3 className="rg-h">{u("shareH")}</h3>
+          <p className="rg-muted">{u("shareP")}</p>
         </div>
-        <button type="button" className="btn btn-primary" onClick={() => void make()}><Share2 size={16} aria-hidden /> Share link</button>
+        <button type="button" className="btn btn-primary" onClick={() => void make()}><Share2 size={16} aria-hidden /> {u("shareBtn")}</button>
       </div>
       {status && <p className="rg-muted" role="status">{status}</p>}
       {link && <input className="sh-link" readOnly value={link} onFocus={e => e.currentTarget.select()} aria-label="Share link" />}

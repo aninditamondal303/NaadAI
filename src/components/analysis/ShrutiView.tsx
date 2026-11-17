@@ -4,6 +4,7 @@
  * tanpura's harmonics suggest. Measurements only; which is "right" depends
  * on the raag and the tradition (for example ati-komal Ga in Darbari).
  */
+import { useUi } from "../../i18n/ui";
 import React from "react";
 import type { SwaraStats } from "../../analysis/summary";
 
@@ -17,15 +18,13 @@ const RANGE = 40;
 const x = (c: number) => `${50 + (Math.max(-RANGE, Math.min(RANGE, c)) / RANGE) * 50}%`;
 
 export const ShrutiView: React.FC<{ swaras: SwaraStats[] }> = ({ swaras }) => {
+  const u = useUi();
   const shown = swaras.filter(s => s.totalHeldSec >= 0.5).sort((a, b) => a.swara - b.swara);
   if (shown.length === 0) return null;
   return (
     <section className="sh">
-      <h3 className="rg-h">Shruti view</h3>
-      <p className="rg-muted">
-        Each line spans 40 cents flat to 40 cents sharp of the keyboard note (|). The ring is the natural position from simple ratios,
-        which a tanpura's overtones point to; the dot is where you held the swara.
-      </p>
+      <h3 className="rg-h">{u("shH")}</h3>
+      <p className="rg-muted">{u("shIntro")}</p>
       <div className="sh-rows">
         {shown.map(s => {
           const j = JUST[s.swara];
@@ -40,13 +39,13 @@ export const ShrutiView: React.FC<{ swaras: SwaraStats[] }> = ({ swaras }) => {
                 <span className="sh-you" style={{ left: x(you) }} />
               </div>
               <span className="sh-num">
-                {you > 0 ? "+" : ""}{you.toFixed(0)} cents{s.swara !== 0 && <>, nearer the {nearer} {s.name}</>}
+                {you > 0 ? "+" : ""}{you.toFixed(0)} cents{s.swara !== 0 && <>, {u("shNearer", nearer === "natural", s.name)}</>}
               </span>
             </div>
           );
         })}
       </div>
-      <p className="rg-muted">Traditions differ: some raags want a swara higher or lower than either mark. Use this to notice, then ask your guru.</p>
+      <p className="rg-muted">{u("shNote")}</p>
     </section>
   );
 };

@@ -5,6 +5,8 @@
  * can be played: a guide voice for the swaras, with the recorded tanpura,
  * and the recorded tabla for compositions.
  */
+import { useUi } from "../../i18n/ui";
+import { Mic, Play, Square } from "lucide-react";
 import { closeContext } from '../../audio/closeContext';
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import type { ComprehensiveRaag } from "../../data/allRaags";
@@ -39,7 +41,7 @@ function usePlayer(saHz: number, raag: ComprehensiveRaag) {
   };
   useEffect(() => () => run.current?.stop(), []);
 
-  const play = async (k: string, notes: TimedNote[], opts: { secPerUnit: number; taal?: { id: string; bpm: number }; units: number }) => {
+  const play = async (k: string, notes: TimedNote[], opts: { secPerUnit: number; taal?: { id: string; bpm: number }; units: number; voice?: boolean; loop?: () => void }) => {
     stop();
     const Ctx = window.AudioContext || (window as any).webkitAudioContext;
     const ctx: AudioContext = new Ctx();
@@ -56,12 +58,12 @@ function usePlayer(saHz: number, raag: ComprehensiveRaag) {
       taal.start();
       t0 = taal.startedAt + tl.matras * opts.secPerUnit;
     }
-    const stopVoice = scheduleSwaras(ctx, ctx.destination, notes, saHz, t0);
+    const stopVoice = opts.voice === false ? () => {} : scheduleSwaras(ctx, ctx.destination, notes, saHz, t0);
     const end = t0 + (notes.length ? Math.max(...notes.map(n => n.start + n.dur)) : 0);
     let raf = 0;
     const tick = () => {
       const t = ctx.currentTime;
-      if (t > end + 0.4) { stop(); return; }
+      if (t > end + 0.4) { stop(); opts.loop?.(); return; }
       if (opts.taal) setPos(t >= t0 ? Math.floor((t - t0) / opts.secPerUnit) : null);
       else {
         const cur = notes.filter(n => n.start <= t - t0).pop();
@@ -88,6 +90,7 @@ function usePlayer(saHz: number, raag: ComprehensiveRaag) {
 
 export const RaagStudy: React.FC<{ raag: ComprehensiveRaag; saHz: number }> = ({ raag, saHz }) => {
   const { lang } = useLang();
+  const u = useUi();
   const [script, setScript] = useState<NoteScript>(lang === "bn" ? "beng" : lang === "en" ? "latin" : "deva");
   const d = RAAG_DETAILS[raag.id];
   const alaap = ALAAP[raag.id];
@@ -95,7 +98,7 @@ export const RaagStudy: React.FC<{ raag: ComprehensiveRaag; saHz: number }> = ({
   const userComps = useMemo(() => loadUserBandishes().filter(c => c.raagId === raag.id), [raag.id, userVersion]);
   const comps = [...userComps, ...compositionsForRaag(raag)];
   const removeUser = (id: string) => {
-    if (!window.confirm("Remove this bandish from this browser?")) return;
+    if (!window.confirm(u("stRemoveConfirm"))) return;
     saveUserBandishes(loadUserBandishes().filter(c => c.id !== id));
     setUserVersion(v => v + 1);
   };
@@ -111,12 +114,19 @@ export const RaagStudy: React.FC<{ raag: ComprehensiveRaag; saHz: number }> = ({
   const playPhrases = (k: string, phrases: string[]) =>
     player.key === k ? player.stop() : void player.play(k, timePhrases(phrases), { secPerUnit: 0.7, units: phrases.length });
 
-  const playComposition = (c: Composition) => {
-    const k = c.id;
+  // Laya as a share of the composition's own tempo, and whether the guide voice sings
+  const [layaPct, setLayaPct] = useState(100);
+  const [loop, setLoop] = useState(false);
+  const loopRef = useRef(loop);
+  loopRef.current = loop;
+  const playComposition = (c: Composition, voice = true) => {
+    const k = `${c.id}:${voice ? "v" : "s"}`;
     if (player.key === k) { player.stop(); return; }
     const lines = [...c.sthayi, ...c.antara].map(l => l.notes);
-    const spm = 60 / c.bpm;
-    void player.play(k, timeLines(lines, spm).notes, { secPerUnit: spm, taal: { id: c.taalId, bpm: c.bpm }, units: lines.length * 16 });
+    const bpm = Math.round((c.bpm * layaPct) / 100);
+    const spm = 60 / bpm;
+    const again = () => { if (loopRef.current) playComposition(c, voice); };
+    void player.play(k, timeLines(lines, spm).notes, { secPerUnit: spm, taal: { id: c.taalId, bpm }, units: lines.length * 16, voice, loop: again });
   };
 
   const scriptPicker = (
@@ -141,7 +151,7 @@ export const RaagStudy: React.FC<{ raag: ComprehensiveRaag; saHz: number }> = ({
       {/* ---------------------------------------------------------------- alaap */}
       {alaap && (
         <section className="st-sec">
-          <h3 className="st-h">Alaap</h3>
+          <h3 className="st-h">{u("stAlaap")}</h3>
           <p className="st-lede">Alaap is sung in aakar, slowly and without taal. Each stage develops a further region of the raag. The sign ऽ indicates that the swara is sustained.</p>
           {alaap.map((stage, si) => {
             const k = `alaap-${si}`;
@@ -149,7 +159,7 @@ export const RaagStudy: React.FC<{ raag: ComprehensiveRaag; saHz: number }> = ({
               <div key={si} className="st-stage">
                 <div className="st-stage-head">
                   <h4>{stage.name}</h4>
-                  <button type="button" className="st-play" onClick={() => playPhrases(k, stage.phrases)}>{player.key === k ? "Stop" : "Listen"}</button>
+                  <button type="button" className="st-play" onClick={() => playPhrases(k, stage.phrases)}>{player.key === k ? u("stStop") : u("stListen")}</button>
                 </div>
                 <p className="st-muted">{stage.about}</p>
                 <ol className="st-phrases">
@@ -164,16 +174,30 @@ export const RaagStudy: React.FC<{ raag: ComprehensiveRaag; saHz: number }> = ({
       {/* ---------------------------------------------------------------- compositions */}
       {comps.map(c => {
         const taal = TAALS.find(t => t.id === c.taalId)!;
-        const playing = player.key === c.id ? player.pos : null;
+        const active = player.key?.startsWith(`${c.id}:`) ?? false;
+        const playing = active ? player.pos : null;
         return (
           <section key={c.id} className="st-sec">
             <div className="st-stage-head">
-              <h3 className="st-h">{c.kind === "bandish" ? `Bandish: ${c.title}` : c.id.endsWith("basic-sargam-geet") ? c.title : "Sargam geet"}</h3>
-              {(c as UserComposition).user && <button type="button" className="tp-link" onClick={() => removeUser(c.id)}>Remove</button>}
-              <button type="button" className="st-play st-play-main" onClick={() => playComposition(c)}>
-                {player.key === c.id ? "Stop" : "Listen with tanpura and tabla"}
-              </button>
+              <h3 className="st-h">{c.kind === "bandish" ? u("stBandish", c.title) : c.id.endsWith("basic-sargam-geet") ? c.title : u("stSargamGeet")}</h3>
+              {(c as UserComposition).user && <button type="button" className="tp-link" onClick={() => removeUser(c.id)}>{u("stRemove")}</button>}
             </div>
+            <div className="st-practice" role="group" aria-label={u("stPractise")}>
+              <button type="button" className="btn btn-primary" onClick={() => playComposition(c, true)}>
+                {player.key === `${c.id}:v` ? <><Square size={14} fill="currentColor" aria-hidden /> {u("stStop")}</> : <><Play size={15} aria-hidden /> {u("stListen")}</>}
+              </button>
+              <button type="button" className="btn btn-ghost" onClick={() => playComposition(c, false)}>
+                {player.key === `${c.id}:s` ? <><Square size={14} fill="currentColor" aria-hidden /> {u("stStop")}</> : <><Mic size={15} aria-hidden /> {u("stSingAlong")}</>}
+              </button>
+              <label className="st-laya">
+                <span>{u("stLaya")}</span>
+                <select value={layaPct} disabled={active} onChange={e => setLayaPct(Number(e.target.value))}>
+                  {[60, 75, 90, 100, 115, 130].map(p => <option key={p} value={p}>{u("stPerMin", Math.round((c.bpm * p) / 100))}{p === 100 ? ` ${u("stAsWritten")}` : ""}</option>)}
+                </select>
+              </label>
+              <label className="st-loop"><input type="checkbox" checked={loop} onChange={e => setLoop(e.target.checked)} /> {u("stRepeat")}</label>
+            </div>
+            {active && player.key!.endsWith(":s") && <p className="st-muted st-small" role="status">{u("stSingAlongNote")}</p>}
 
             {(c as UserComposition).user && <p className="st-muted">Entered by you{(c as UserComposition).source ? `, ${(c as UserComposition).source}` : ""}.</p>}
             <dl className="st-basis">
@@ -188,9 +212,9 @@ export const RaagStudy: React.FC<{ raag: ComprehensiveRaag; saHz: number }> = ({
               {c.meaning && <div><dt>Meaning</dt><dd>{c.meaning}</dd></div>}
             </dl>
 
-            <h4 className="st-part">Sthayi</h4>
+            <h4 className="st-part">{u("stSthayi")}</h4>
             <Swaralipi taal={taal} lines={c.sthayi} script={script} playing={playing} offset={0} />
-            <h4 className="st-part">Antara</h4>
+            <h4 className="st-part">{u("stAntara")}</h4>
             <Swaralipi taal={taal} lines={c.antara} script={script} playing={playing} offset={c.sthayi.length * taal.matras} />
             <p className="st-muted st-small">
               Under each matra: the swara, {c.kind === "bandish" ? "the syllable, " : ""}and the taal mark (X sam, 0 khali, numbers taali). {script === "latin" ? "–" : "ऽ"}: hold the previous swara{c.kind === "bandish" ? " or syllable" : ""}. Two swaras in one cell share the matra.
@@ -203,7 +227,7 @@ export const RaagStudy: React.FC<{ raag: ComprehensiveRaag; saHz: number }> = ({
 
       {/* ---------------------------------------------------------------- more */}
       <section className="st-sec">
-        <h3 className="st-h">Further sargam exercises</h3>
+        <h3 className="st-h">{u("stFurtherSargam")}</h3>
         <p className="st-lede">
           These exercises are derived from the aroh and avaroh: ascending movement uses only the swaras of the aroh, descending
           movement only those of the avaroh, and each phrase ends on a nyas swara. They observe the raag's swaras but not every
@@ -215,17 +239,17 @@ export const RaagStudy: React.FC<{ raag: ComprehensiveRaag; saHz: number }> = ({
             <div key={si} className="st-stage">
               <div className="st-stage-head">
                 <h4>Set {si + 1}</h4>
-                <button type="button" className="st-play" onClick={() => playPhrases(k, set)}>{player.key === k ? "Stop" : "Listen"}</button>
+                <button type="button" className="st-play" onClick={() => playPhrases(k, set)}>{player.key === k ? u("stStop") : u("stListen")}</button>
               </div>
               <ol className="st-phrases">{set.map((ph, i) => <li key={i}><Phrase text={ph} script={script} active={player.key === k && player.pos === i} /></li>)}</ol>
             </div>
           );
         })}
-        <button type="button" className="st-more" onClick={() => setSargamSets(n => n + 1)}>Show further sargam exercises</button>
+        <button type="button" className="st-more" onClick={() => setSargamSets(n => n + 1)}>{u("stShowSargam")}</button>
       </section>
 
       <section className="st-sec">
-        <h3 className="st-h">Further alaap exercises</h3>
+        <h3 className="st-h">{u("stFurtherAlaap")}</h3>
         <p className="st-lede">Slow phrases with sustained nyas swaras, derived in the same manner. To be sung in aakar.</p>
         {extraAlaap.map((set, si) => {
           const k = `more-alaap-${si}`;
@@ -233,13 +257,13 @@ export const RaagStudy: React.FC<{ raag: ComprehensiveRaag; saHz: number }> = ({
             <div key={si} className="st-stage">
               <div className="st-stage-head">
                 <h4>Set {si + 1}</h4>
-                <button type="button" className="st-play" onClick={() => playPhrases(k, set)}>{player.key === k ? "Stop" : "Listen"}</button>
+                <button type="button" className="st-play" onClick={() => playPhrases(k, set)}>{player.key === k ? u("stStop") : u("stListen")}</button>
               </div>
               <ol className="st-phrases">{set.map((ph, i) => <li key={i}><Phrase text={ph} script={script} active={player.key === k && player.pos === i} /></li>)}</ol>
             </div>
           );
         })}
-        <button type="button" className="st-more" onClick={() => setAlaapSets(n => n + 1)}>Show further alaap exercises</button>
+        <button type="button" className="st-more" onClick={() => setAlaapSets(n => n + 1)}>{u("stShowAlaap")}</button>
       </section>
 
       {!alaap && (

@@ -177,7 +177,6 @@
 /* ---- toasts ---- */
 .ts-wrap { position: fixed; z-index: 70; left: 50%; transform: translateX(-50%); bottom: calc(1.5rem + env(safe-area-inset-bottom)); display: flex; flex-direction: column; gap: 0.5rem; align-items: center; pointer-events: none; }
 @media (max-width: 1023.98px) { .ts-wrap { bottom: calc(5.25rem + env(safe-area-inset-bottom)); } }
-@media (min-width: 1024px) { .ts-wrap { left: calc(50% + var(--nv-side-w) / 2); } }
 .ts {
   display: inline-flex; align-items: center; gap: 0.5rem; padding: 0.6rem 1rem; border-radius: 12px; font-size: 0.92rem;
   color: #062327; background: #EADBB8; box-shadow: 0 12px 30px -10px rgba(0, 0, 0, 0.5);

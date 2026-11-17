@@ -3,6 +3,7 @@
  * drawn on the raag's swara lines in step with the sound, so the singer can
  * hear and see each note together. The audio stays in memory only.
  */
+import { useUi } from "../../i18n/ui";
 import { closeContext } from '../../audio/closeContext';
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import type { PitchTrack } from "../../analysis/types";
@@ -17,6 +18,7 @@ interface Props {
 }
 
 export const ListenBack: React.FC<Props> = ({ audio, track, saHz, allowedSwaras }) => {
+  const u = useUi();
   const grid = useMemo(() => gridFor(allowedSwaras), [allowedSwaras]);
   const points: TracePoint[] = useMemo(() => track.frames.map(f => ({ t: f.timeSec, c: f.hz === null ? null : 1200 * Math.log2(f.hz / saHz) })), [track, saHz]);
   const duration = audio.samples.length / audio.sampleRate;
@@ -56,11 +58,11 @@ export const ListenBack: React.FC<Props> = ({ audio, track, saHz, allowedSwaras 
   return (
     <div className="lb">
       <div className="lb-head">
-        <h3 className="lb-h">Your take on the swaras</h3>
-        <button type="button" className="rz-link" onClick={play}>{playing ? "Stop" : "Listen back"}</button>
+        <h3 className="lb-h">{u("lbH")}</h3>
+        <button type="button" className="rz-link" onClick={play}>{playing ? u("lbStop") : u("lbListen")}</button>
       </div>
       <SwaraCanvas className="rz-live" grid={grid} getView={view} running={playing} label="Your measured pitch on the raag's swara lines" />
-      <p className="lb-note">Each line is a swara of the raag. Listening back draws your pitch as you hear it. The recording is kept only until you leave this page.</p>
+      <p className="lb-note">{u("lbNote")}</p>
     </div>
   );
 };

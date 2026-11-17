@@ -3,6 +3,9 @@
  * content). Raags with full grammar are marked; all entries are awaiting a
  * guru's review, and the page says so.
  */
+import { ArrowLeftRight } from 'lucide-react';
+import { RaagCompare } from './library/RaagCompare';
+import { CLOSE_PAIRS } from '../data/raagCompare';
 import React, { useMemo, useState } from 'react';
 import { ArrowLeft, Search, ShieldAlert } from 'lucide-react';
 import { RAAG_LIST, type ComprehensiveRaag } from '../data/allRaags';
@@ -35,6 +38,7 @@ export const LibraryTab: React.FC<{ saHz?: number; openRaagId?: string | null }>
   const [thaat, setThaat] = useState("All");
   const [fullOnly, setFullOnly] = useState(false);
   const [viewing, setViewing] = useState<ComprehensiveRaag | null>(() => RAAG_LIST.find(r => r.id === openRaagId) ?? null);
+  const [comparing, setComparing] = useState<[string, string] | null>(null);
 
   const list = useMemo(() => RAAG_LIST.filter(r => {
     const q = query.trim().toLowerCase();
@@ -43,6 +47,10 @@ export const LibraryTab: React.FC<{ saHz?: number; openRaagId?: string | null }>
   }).sort((a, b) => shortName(a).localeCompare(shortName(b))), [query, thaat, fullOnly]);
 
   const fullCount = Object.keys(RAAG_DETAILS).length;
+
+  if (comparing) {
+    return <RaagCompare initial={comparing} onBack={() => setComparing(null)} onOpen={r => { setComparing(null); setViewing(r); window.scrollTo({ top: 0 }); }} />;
+  }
 
   if (viewing) {
     const r = viewing;
@@ -53,27 +61,32 @@ export const LibraryTab: React.FC<{ saHz?: number; openRaagId?: string | null }>
         <button type="button" onClick={() => setViewing(null)} className="lib-back">{u("allRaags")}</button>
         <header className="lib-raag-head">
           <h1 className="lib-title">{shortName(r)}</h1>
-          <p className="lib-intro">{r.thaat} thaat. Jati: {r.jati}. Samay: {r.time}.</p>
+          <p className="lib-intro">{u("rdIntro", r.thaat, r.jati, r.time)}</p>
+          <button type="button" className="btn btn-ghost lib-compare" onClick={() => {
+            const pair = CLOSE_PAIRS.find(p => p.includes(r.id));
+            const other = pair ? pair.find(x => x !== r.id)! : (d?.similar.find(x => x.raagId)?.raagId ?? (r.id === "yaman" ? "bhupali" : "yaman"));
+            setComparing([r.id, other]); window.scrollTo({ top: 0 });
+          }}><ArrowLeftRight size={16} aria-hidden /> {u("rcCompareWith")}</button>
           <p className="lib-review">
-            {d?.review.status === "reviewed" ? `Reviewed by ${d.review.reviewer}` : "Awaiting a guru's review. Please check details with your teacher."}
+            {d?.review.status === "reviewed" ? `Reviewed by ${d.review.reviewer}` : u("rdReview")}
           </p>
         </header>
 
         <div className="lib-rows">
-          <Row label="Swaras">{r.allowedSwaras.map(i => `${SYM[i]} (${NAMES[i]})`).join(", ")}</Row>
-          <Row label="Varjit">{varjit.length ? varjit.join(", ") : "None (all seven swaras are used)"}</Row>
-          <Row label="Aroh"><span className="font-mono">{r.aroha.join(" ")}</span></Row>
-          <Row label="Avaroh"><span className="font-mono">{r.avaroha.join(" ")}</span></Row>
-          <Row label="Vadi / Samvadi">{NAMES[r.vadi]} ({SYM[r.vadi]}) / {NAMES[r.samvadi]} ({SYM[r.samvadi]})</Row>
-          <Row label="Time">{r.time}</Row>
+          <Row label={u("rdRowSwaras")}>{r.allowedSwaras.map(i => `${SYM[i]} (${NAMES[i]})`).join(", ")}</Row>
+          <Row label={u("rdRowVarjit")}>{varjit.length ? varjit.join(", ") : u("rdNoVarjit")}</Row>
+          <Row label={u("rdRowAroh")}><span className="font-mono">{r.aroha.join(" ")}</span></Row>
+          <Row label={u("rdRowAvaroh")}><span className="font-mono">{r.avaroha.join(" ")}</span></Row>
+          <Row label={u("rdRowVadi")}>{NAMES[r.vadi]} ({SYM[r.vadi]}) / {NAMES[r.samvadi]} ({SYM[r.samvadi]})</Row>
+          <Row label={u("rdRowTime")}>{r.time}</Row>
           {d ? (
             <>
-              <Row label="Pakad"><Phrase text={d.pakad} script="deva" /></Row>
-              {MUKHYA_ANG[r.id]?.source === "tanarang" && <Row label="Mukhya ang">{angPhrases(r.id).map((ph, i) => <span key={i} className="lib-ang"><Phrase text={ph} script="deva" /></span>)}</Row>}
-              <Row label="Chalan"><span className="font-mono space-y-1 block">{d.chalan.map((c, i) => <span key={i} className="block">{c}</span>)}</span></Row>
-              <Row label="Nyas swaras"><span className="font-mono">{d.nyas.join(", ")}</span></Row>
-              {d.specialNotes && <Row label="Notes">{d.specialNotes}</Row>}
-              <Row label="Similar raags">
+              <Row label={u("rdRowPakad")}><Phrase text={d.pakad} script="deva" /></Row>
+              {MUKHYA_ANG[r.id]?.source === "tanarang" && <Row label={u("rdRowAng")}>{angPhrases(r.id).map((ph, i) => <span key={i} className="lib-ang"><Phrase text={ph} script="deva" /></span>)}</Row>}
+              <Row label={u("rdRowChalan")}><span className="font-mono space-y-1 block">{d.chalan.map((c, i) => <span key={i} className="block">{c}</span>)}</span></Row>
+              <Row label={u("rdRowNyas")}><span className="font-mono">{d.nyas.join(", ")}</span></Row>
+              {d.specialNotes && <Row label={u("rdRowNotes")}>{d.specialNotes}</Row>}
+              <Row label={u("rdRowSimilar")}>
                 <span className="space-y-2 block">
                   {d.similar.map(s => (
                     <span key={s.name} className="block">
@@ -86,15 +99,15 @@ export const LibraryTab: React.FC<{ saHz?: number; openRaagId?: string | null }>
                   ))}
                 </span>
               </Row>
-              <Row label="Common mistakes">
+              <Row label={u("rdRowMistakes")}>
                 <ul className="list-disc pl-4 space-y-1">{d.commonMistakes.map((m, i) => <li key={i}>{m}</li>)}</ul>
               </Row>
             </>
           ) : (
-            <Row label="Mukhya ang">{angPhrases(r.id).map((ph, i) => <span key={i} className="lib-ang"><Phrase text={ph} script="deva" /></span>)}</Row>
+            <Row label={u("rdRowAng")}>{angPhrases(r.id).map((ph, i) => <span key={i} className="lib-ang"><Phrase text={ph} script="deva" /></span>)}</Row>
           )}
-          {vishrantiSwaras(r.id).length > 0 && <Row label="Vishranti sthan"><Phrase text={vishrantiSwaras(r.id).join(" ")} script="deva" /></Row>}
-          <Row label="Source">{(() => { const src = pakadSource(r.id); const e = MUKHYA_ANG[r.id];
+          {vishrantiSwaras(r.id).length > 0 && <Row label={u("rdRowVishranti")}><Phrase text={vishrantiSwaras(r.id).join(" ")} script="deva" /></Row>}
+          <Row label={u("rdRowSource")}>{(() => { const src = pakadSource(r.id); const e = MUKHYA_ANG[r.id];
             return <>{src.label}{e?.source === "tanarang" && e.url && <> (<a href={e.url} target="_blank" rel="noreferrer" className="lib-src">Raag {shortName(r)} on tanarang.com</a>)</>}. Vadi and samvadi have been checked against the same reference where it lists the raag.</>; })()}</Row>
         </div>
 
@@ -122,6 +135,7 @@ export const LibraryTab: React.FC<{ saHz?: number; openRaagId?: string | null }>
           <select value={thaat} onChange={e => setThaat(e.target.value)} aria-label="Thaat">
             {THAATS.map(t => <option key={t} value={t}>{t === "All" ? u("allThaats") : `${t} thaat`}</option>)}
           </select>
+          <button type="button" className="btn btn-ghost" onClick={() => setComparing(CLOSE_PAIRS[0])}><ArrowLeftRight size={16} aria-hidden /> {u("rcTitle")}</button>
           <label className="lib-check">
             <input type="checkbox" checked={fullOnly} onChange={e => setFullOnly(e.target.checked)} />
             {u("withStudy")}

@@ -3,6 +3,7 @@
  * moving with the real sound), today's plan, raags for the hour, and an
  * index of everything in the app.
  */
+import { BackgroundAudio } from '../audio/background';
 import { closeContext } from '../audio/closeContext';
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { RAAG_LIST } from '../data/allRaags';
@@ -65,7 +66,7 @@ export const HomeTab: React.FC<HomeTabProps> = ({ setActiveTab, setAnalyzerMode,
   const [pluck, setPluck] = useState<[number, number] | null>(null);
   const [analyser, setAnalyser] = useState<AnalyserNode | null>(null);
   const [recorded, setRecorded] = useState(false);
-  const audio = useRef<{ ctx: AudioContext; eng: TanpuraEngine } | null>(null);
+  const audio = useRef<{ ctx: AudioContext; eng: TanpuraEngine; bg: BackgroundAudio } | null>(null);
   const pluckCount = useRef(0);
 
   const raag = RAAGS.find(r => r.id === raagId) ?? RAAGS[0];
@@ -84,6 +85,7 @@ export const HomeTab: React.FC<HomeTabProps> = ({ setActiveTab, setAnalyzerMode,
     audio.current = null;
     if (!a) return;
     a.eng.disconnect();
+    a.bg.dispose();
     setTimeout(() => closeContext(a.ctx), 800);
     setAnalyser(null);
   };
@@ -97,14 +99,15 @@ export const HomeTab: React.FC<HomeTabProps> = ({ setActiveTab, setAnalyzerMode,
     const an = ctx.createAnalyser();
     an.fftSize = 1024;
     bus.connect(an);
-    an.connect(ctx.destination);
+    const bg = new BackgroundAudio(ctx, an);
     const first = firstStringForRaag(raag.allowedSwaras);
     const eng = new TanpuraEngine(ctx, bus, { saHz: baseTonicHz, firstString: first, cycleSec: 4.5, volume: 0.7 });
     eng.onPluck = s => setPluck([STRING_ORDER.indexOf(s), ++pluckCount.current]);
-    audio.current = { ctx, eng };
+    audio.current = { ctx, eng, bg };
     await eng.loadSamples();
     if (audio.current?.eng !== eng) return;
     eng.start();
+    bg.activate({ title: `Riyaz, Raag ${shortName(raag.name)}`, onPause: () => finishRef.current(true) });
     setRecorded(eng.usesRecordedDrone());
     setAnalyser(an);
     const t0 = Date.now();
@@ -126,6 +129,9 @@ export const HomeTab: React.FC<HomeTabProps> = ({ setActiveTab, setAnalyzerMode,
     }
     setSession(null);
   };
+
+  const finishRef = useRef(finish);
+  finishRef.current = finish;
 
   useEffect(() => {
     if (!session) return;

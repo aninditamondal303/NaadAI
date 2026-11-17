@@ -5,6 +5,7 @@
  * matra lit by the player's own clock. Thekas can be edited, since gharanas
  * differ, and are saved in this browser.
  */
+import { BackgroundAudio } from '../audio/background';
 import { closeContext } from '../audio/closeContext';
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { centsBetween, hzFromCents, signedCents, westernNote } from '../analysis/music';
@@ -48,7 +49,7 @@ function parseMatra(text: string): { bols: string[]; unknown: string[] } {
 }
 
 function useAudioContext() {
-  const ref = useRef<{ ctx: AudioContext; bus: GainNode; analyser: AnalyserNode } | null>(null);
+  const ref = useRef<{ ctx: AudioContext; bus: GainNode; analyser: AnalyserNode; bg: BackgroundAudio } | null>(null);
   const get = () => {
     if (!ref.current) {
       const Ctx = window.AudioContext || (window as any).webkitAudioContext;
@@ -57,12 +58,12 @@ function useAudioContext() {
       const analyser = ctx.createAnalyser();
       analyser.fftSize = 1024;
       bus.connect(analyser);
-      analyser.connect(ctx.destination);
-      ref.current = { ctx, bus, analyser };
+      const bg = new BackgroundAudio(ctx, analyser);
+      ref.current = { ctx, bus, analyser, bg };
     }
     return ref.current;
   };
-  useEffect(() => () => { closeContext(ref.current?.ctx); }, []);
+  useEffect(() => () => { ref.current?.bg.dispose(); closeContext(ref.current?.ctx); }, []);
   return get;
 }
 
@@ -191,9 +192,23 @@ export const TanpuraTab: React.FC<TanpuraTabProps> = ({ baseTonicHz, onTonicChan
     setDroneMode(eng.usesRecordedDrone());
   }, [baseTonicHz, first, cycleSec, tVolume]);
 
+  // Lock-screen controls and background playback while anything sounds
+  const syncBackground = () => {
+    const bg = getAudio().bg;
+    const anyPlaying = !!tanpura.current?.playing || !!player.current?.playing;
+    if (anyPlaying) {
+      const parts = [tanpura.current?.playing ? `Tanpura, Sa ${westernNote(baseTonicHz).name}` : "", player.current?.playing ? baseTaal.name : ""].filter(Boolean);
+      bg.activate({
+        title: parts.join(" and "),
+        onPause: () => { tanpura.current?.stop(); player.current?.stop(); setTPlaying(false); setBPlaying(false); setMatra(null); bg.deactivate(); },
+        onPlay: () => { tanpura.current?.start(); setTPlaying(true); syncBackground(); },
+      });
+    } else bg.deactivate();
+  };
   const toggleTanpura = async () => {
     const eng = await ensureTanpura();
     if (eng.playing) { eng.stop(); setTPlaying(false); } else { eng.start(); setTPlaying(true); }
+    syncBackground();
   };
   const pluckString = async (i: number) => {
     if (droneMode) return;
@@ -246,6 +261,7 @@ export const TanpuraTab: React.FC<TanpuraTabProps> = ({ baseTonicHz, onTonicChan
   const toggleTaal = async () => {
     const p = await ensurePlayer();
     if (p.playing) { p.stop(); setBPlaying(false); setMatra(null); } else { p.start(); setBPlaying(true); }
+    syncBackground();
   };
 
   const startEdit = () => { setDraft(theka.map(m => m.join(" "))); setEditing(true); };

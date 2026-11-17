@@ -11,7 +11,8 @@ import { MethodPage } from './components/landing/MethodPage';
 import { useLang } from './i18n/lang';
 import { Sidebar, MobileNav } from './components/shell/Nav';
 import { CommandBar } from './components/shell/CommandBar';
-import { Toaster } from './components/shell/Toaster';
+import { toast } from './components/shell/Toaster';
+import { decodeGuruPhrase, saveGuruPhrase } from './practice/guruPhrase';
 import { useUi } from './i18n/ui';
 import { westernNote } from './analysis/music';
 import './app-shell.css';
@@ -70,6 +71,8 @@ export default function App() {
   const [selectedTuning, setSelectedTuning] = useState<"Pa" | "Ma" | "Ni">("Pa");
   
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
+  const isAuthRef = React.useRef(false);
+  isAuthRef.current = isAuthenticated;
   const [activePage, setActivePage] = useState<string>("welcome"); // "welcome" | "profiles"
   const [vocalistName, setVocalistName] = useState<string>("");
   
@@ -77,6 +80,20 @@ export default function App() {
   const [analyzerMode, setAnalyzerMode] = useState<AnalyzerMode>("singing");
   const [practiceMode, setPracticeMode] = useState<"palta" | "pakad" | "ear" | "match" | "guru">("palta");
 
+
+  // A phrase shared by a guru (#guru=...): keep it, then open Guru-shishya
+  const pendingGuru = React.useRef(false);
+  useEffect(() => {
+    if (!window.location.hash.startsWith("#guru=")) return;
+    const code = window.location.hash.slice(6);
+    window.history.replaceState(null, "", window.location.pathname);
+    decodeGuruPhrase(code).then(g => {
+      saveGuruPhrase(g);
+      toast(g.by ? `Phrase from ${g.by} added to Guru-shishya` : "Phrase from your guru added to Guru-shishya");
+      pendingGuru.current = true;
+      if (isAuthRef.current) { pendingGuru.current = false; setPracticeMode("guru"); setActiveTab("practice"); }
+    }).catch(() => toast("This guru link could not be read"));
+  }, []);
 
   // The active singer (profiles live in this browser; see src/lib/profiles.ts)
   const [profileId, setProfileId] = useState<string | null>(null);
@@ -87,7 +104,11 @@ export default function App() {
     setBaseTonicHz(p.saHz);
     setStreakDays(practiceStreakDays(loadHistory()));
     setIsAuthenticated(true);
-    setActiveTab("home");
+    if (pendingGuru.current) {
+      pendingGuru.current = false;
+      setPracticeMode("guru");
+      setActiveTab("practice");
+    } else setActiveTab("home");
   };
 
   // The last singer on this device, offered on the welcome page
@@ -161,7 +182,6 @@ export default function App() {
       <MobileNav {...navProps} sheetOpen={sheetOpen} setSheetOpen={setSheetOpen} />
       <CommandBar open={findOpen} onClose={() => setFindOpen(false)} onScreen={navProps.onGo}
         onRaag={id => { setOpenRaagId(id); setActiveTab("library"); window.scrollTo({ top: 0 }); }} />
-      <Toaster />
       <div className="app-body">
       <main className="app-main" key={activeTab + (activeTab === "library" ? openRaagId ?? "" : "")}>
         <Suspense fallback={<div className="app-loading" aria-hidden="true" />}>

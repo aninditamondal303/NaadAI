@@ -1,6 +1,8 @@
 import {StrictMode} from 'react';
 import {createRoot} from 'react-dom/client';
 import App from './App.tsx';
+import { Toaster } from './components/shell/Toaster';
+import './components/shell/shell.css';
 import "@fontsource/tiro-devanagari-hindi/400.css";
 import "@fontsource/tiro-bangla/400.css";
 import "@fontsource/mukta/400.css";
@@ -17,6 +19,7 @@ createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <LangProvider>
       <App />
+      <Toaster />
     </LangProvider>
   </StrictMode>,
 );

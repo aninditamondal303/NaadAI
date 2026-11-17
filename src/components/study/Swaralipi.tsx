@@ -51,8 +51,16 @@ export const Swaralipi: React.FC<Props> = ({ taal, lines, script, playing, offse
   const groups: number[][] = [];
   let start = 0;
   for (const v of taal.vibhags) { groups.push(Array.from({ length: v }, (_, k) => start + k)); start += v; }
+  // Follow the playing matra: keep its line in view
+  const ref = React.useRef<HTMLDivElement>(null);
+  const row = playing === null ? null : Math.floor((playing - offset) / taal.matras);
+  React.useEffect(() => {
+    if (row === null || row < 0 || row >= lines.length) return;
+    const el = ref.current?.querySelector<HTMLElement>(".sl-on");
+    el?.scrollIntoView({ block: "nearest", inline: "nearest", behavior: "smooth" });
+  }, [row, lines.length, playing === null]);
   return (
-    <div className="sl" role="table" aria-label="Swaralipi">
+    <div className="sl" role="table" aria-label="Swaralipi" ref={ref}>
       {lines.map((line, li) => {
         const matras = parseLine(line.notes);
         const words = line.words?.trim().split(/\s+/);
