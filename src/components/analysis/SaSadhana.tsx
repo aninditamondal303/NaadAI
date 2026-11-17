@@ -81,24 +81,24 @@ export const SaSadhana: React.FC<{ saHz: number }> = ({ saHz }) => {
 
   return (
     <div className="space-y-5">
-      <div className="bg-[#151A2E] p-6 rounded-3xl border border-slate-800 shadow-xl space-y-5">
+      <div className="bg-[#1A2150] p-6 rounded-3xl border border-slate-800 shadow-xl space-y-5">
         <p className="text-sm text-slate-300 text-center max-w-xl mx-auto">
           Sing Sa on "aa" and hold it as long and as steadily as you comfortably can. Press stop when you're done
           (it stops on its own after {MAX_SEC / 60} minutes). Use earphones so the tanpura doesn't reach the microphone.
         </p>
         <div className="flex flex-col items-center gap-3">
           <label className="flex items-center gap-2 text-xs text-slate-300">
-            <input type="checkbox" checked={withTanpura} disabled={recording} onChange={e => setWithTanpura(e.target.checked)} className="accent-[#7C3AED]" />
+            <input type="checkbox" checked={withTanpura} disabled={recording} onChange={e => setWithTanpura(e.target.checked)} className="accent-[#E0A458]" />
             Play the tanpura while I sing (Sa {saHz.toFixed(1)} Hz)
           </label>
           {recording && (
             <>
-              <span className="text-xs font-mono text-[#FBBF24]">Recording {elapsed.toFixed(1)} s</span>
+              <span className="text-xs font-mono text-[#F4C56A]">Recording {elapsed.toFixed(1)} s</span>
               <LevelMeter level={level} />
             </>
           )}
           {!recording
-            ? <button type="button" onClick={start} className="px-5 py-3 rounded-xl bg-gradient-to-r from-[#7C3AED] to-[#38BDF8] text-slate-950 font-mono text-xs font-black uppercase tracking-wider flex items-center gap-2 cursor-pointer"><Mic className="h-4 w-4" /> Start Sa sadhana</button>
+            ? <button type="button" onClick={start} className="px-5 py-3 rounded-xl bg-[#F4C56A] text-slate-950 font-mono text-xs font-black uppercase tracking-wider flex items-center gap-2 cursor-pointer"><Mic className="h-4 w-4" /> Start Sa sadhana</button>
             : <button type="button" onClick={() => void finish()} className="px-5 py-3 rounded-xl bg-rose-600 hover:bg-rose-500 text-white font-mono text-xs font-bold uppercase tracking-wider flex items-center gap-2 cursor-pointer"><Square className="h-4 w-4 fill-white" /> Stop</button>}
           {mic.error && <p className="text-xs text-rose-300">{mic.error}</p>}
         </div>
@@ -111,8 +111,8 @@ export const SaSadhana: React.FC<{ saHz: number }> = ({ saHz }) => {
       )}
 
       {r && (
-        <div className="bg-[#151A2E] p-6 rounded-3xl border border-slate-800 space-y-4">
-          <h3 className="text-xs font-mono font-bold text-[#FBBF24] uppercase tracking-widest">Sa sadhana result</h3>
+        <div className="bg-[#1A2150] p-6 rounded-3xl border border-slate-800 space-y-4">
+          <h3 className="text-xs font-mono font-bold text-[#F4C56A] uppercase tracking-widest">Sa sadhana result</h3>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-3 font-mono">
             {[
               ["Longest hold", `${r.longestHoldSec.toFixed(1)} s`, previousBest ? `Your previous best: ${previousBest.toFixed(1)} s` : "First Sa sadhana saved"],
@@ -120,7 +120,7 @@ export const SaSadhana: React.FC<{ saHz: number }> = ({ saHz }) => {
               ["Wobble", `±${r.wobbleCents.toFixed(1)} cents`, "How much the note moved around its centre"],
               ["Total time on Sa", `${r.totalOnSaSec.toFixed(1)} s`, "Within 50 cents of Sa, any octave"],
             ].map(([label, value, note]) => (
-              <div key={label} className="bg-[#0F1115]/60 p-4 rounded-xl border border-slate-800">
+              <div key={label} className="bg-[#0D1230]/60 p-4 rounded-xl border border-slate-800">
                 <span className="text-[9px] text-slate-500 uppercase block font-bold">{label}</span>
                 <span className="text-xl font-black text-slate-100 block">{value}</span>
                 <span className="text-[10px] text-slate-400 font-sans">{note}</span>

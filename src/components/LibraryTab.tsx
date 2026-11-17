@@ -46,7 +46,7 @@ export const LibraryTab: React.FC = () => {
         <button type="button" onClick={() => setViewing(null)} className="flex items-center gap-1.5 text-xs font-mono text-slate-400 hover:text-slate-200 cursor-pointer">
           <ArrowLeft className="h-4 w-4" /> All raags
         </button>
-        <div className="bg-[#151A2E] p-6 rounded-2xl border border-slate-800 space-y-1">
+        <div className="bg-[#1A2150] p-6 rounded-2xl border border-slate-800 space-y-1">
           <h2 className="text-2xl font-bold font-serif text-slate-100">{shortName(r)}</h2>
           <p className="text-xs text-slate-400">{r.thaat} thaat · {r.jati} · {r.time}</p>
           <p className="text-[11px] text-amber-300/80 pt-2 flex items-center gap-1.5">
@@ -55,7 +55,7 @@ export const LibraryTab: React.FC = () => {
           </p>
         </div>
 
-        <div className="bg-[#151A2E] p-6 rounded-2xl border border-slate-800">
+        <div className="bg-[#1A2150] p-6 rounded-2xl border border-slate-800">
           <Row label="Swaras">{r.allowedSwaras.map(i => `${SYM[i]} (${NAMES[i]})`).join(", ")}</Row>
           <Row label="Varjit">{varjit.length ? varjit.join(", ") : "None (all seven swaras are used)"}</Row>
           <Row label="Aroh"><span className="font-mono">{r.aroha.join(" ")}</span></Row>
@@ -74,7 +74,7 @@ export const LibraryTab: React.FC = () => {
                   {d.similar.map(s => (
                     <span key={s.name} className="block">
                       {s.raagId ? (
-                        <button type="button" className="font-bold text-[#38BDF8] hover:underline cursor-pointer"
+                        <button type="button" className="font-bold text-[#9FB3E6] hover:underline cursor-pointer"
                           onClick={() => setViewing(RAAG_LIST.find(x => x.id === s.raagId) ?? r)}>{s.name}</button>
                       ) : <span className="font-bold">{s.name}</span>}
                       : {s.difference}
@@ -96,7 +96,7 @@ export const LibraryTab: React.FC = () => {
 
   return (
     <div className="space-y-5">
-      <div className="bg-[#151A2E] p-6 rounded-2xl border border-slate-800 space-y-4">
+      <div className="bg-[#1A2150] p-6 rounded-2xl border border-slate-800 space-y-4">
         <div>
           <h2 className="text-xl font-bold font-serif text-slate-100">Raag library</h2>
           <p className="text-xs text-slate-400 mt-1">
@@ -105,16 +105,16 @@ export const LibraryTab: React.FC = () => {
           </p>
         </div>
         <div className="flex flex-col md:flex-row gap-3">
-          <label className="flex-1 flex items-center gap-2 bg-[#0F1115] border border-slate-800 rounded-lg px-3">
+          <label className="flex-1 flex items-center gap-2 bg-[#0D1230] border border-slate-800 rounded-lg px-3">
             <Search className="h-4 w-4 text-slate-500" />
             <input value={query} onChange={e => setQuery(e.target.value)} placeholder="Search raags by name, thaat, mood or time..."
               className="flex-1 bg-transparent py-2 text-sm text-slate-200 outline-none" />
           </label>
-          <select value={thaat} onChange={e => setThaat(e.target.value)} className="bg-[#0F1115] border border-slate-800 rounded-lg px-3 py-2 text-sm text-slate-200">
+          <select value={thaat} onChange={e => setThaat(e.target.value)} className="bg-[#0D1230] border border-slate-800 rounded-lg px-3 py-2 text-sm text-slate-200">
             {THAATS.map(t => <option key={t} value={t}>{t === "All" ? "All thaats" : `${t} thaat`}</option>)}
           </select>
           <label className="flex items-center gap-2 text-xs text-slate-300">
-            <input type="checkbox" checked={fullOnly} onChange={e => setFullOnly(e.target.checked)} className="accent-[#7C3AED]" />
+            <input type="checkbox" checked={fullOnly} onChange={e => setFullOnly(e.target.checked)} className="accent-[#E0A458]" />
             Full details only
           </label>
         </div>
@@ -126,7 +126,7 @@ export const LibraryTab: React.FC = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
           {list.map(r => (
             <button key={r.id} type="button" onClick={() => setViewing(r)}
-              className="text-left bg-[#151A2E] p-4 rounded-xl border border-slate-800 hover:border-[#7C3AED]/60 cursor-pointer space-y-1.5">
+              className="text-left bg-[#1A2150] p-4 rounded-xl border border-slate-800 hover:border-[#E0A458]/60 cursor-pointer space-y-1.5">
               <div className="flex items-center justify-between gap-2">
                 <span className="font-bold font-serif text-slate-100">{shortName(r)}</span>
                 {RAAG_DETAILS[r.id] && <span className="text-[8px] font-mono uppercase text-emerald-300 border border-emerald-700/50 rounded px-1.5 py-0.5">Full details</span>}

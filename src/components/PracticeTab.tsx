@@ -188,11 +188,11 @@ export const PracticeTab: React.FC<Props> = ({ baseTonicHz, initialMode = "palta
     if (s?.grade === "green") return "bg-emerald-500/20 border-emerald-500 text-emerald-200";
     if (s?.grade === "yellow") return "bg-amber-500/20 border-amber-400 text-amber-100";
     if (s?.grade === "red") return "bg-rose-500/20 border-rose-500 text-rose-200";
-    if (i === current) return "bg-[#7C3AED]/30 border-[#7C3AED] text-white";
-    return "bg-[#0F1115]/60 border-slate-800 text-slate-300";
+    if (i === current) return "bg-[#E0A458]/30 border-[#E0A458] text-white";
+    return "bg-[#0D1230]/60 border-slate-800 text-slate-300";
   };
 
-  const card = "bg-[#151A2E] p-6 rounded-2xl border border-slate-800 shadow-xl space-y-4";
+  const card = "bg-[#1A2150] p-6 rounded-2xl border border-slate-800 shadow-xl space-y-4";
   const label = "text-[9px] font-mono text-slate-500 uppercase tracking-widest font-bold block";
 
   return (
@@ -208,7 +208,7 @@ export const PracticeTab: React.FC<Props> = ({ baseTonicHz, initialMode = "palta
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
           <label className="space-y-1 block">
             <span className={label}>Raag</span>
-            <select value={raagId} disabled={running} onChange={e => setRaagId(e.target.value)} className="w-full bg-[#0F1115] border border-slate-800 rounded-lg px-3 py-2 text-sm text-slate-200">
+            <select value={raagId} disabled={running} onChange={e => setRaagId(e.target.value)} className="w-full bg-[#0D1230] border border-slate-800 rounded-lg px-3 py-2 text-sm text-slate-200">
               {RAAGS.map(r => <option key={r.id} value={r.id}>{r.name.replace(/^Raag\s+/i, "")}</option>)}
             </select>
           </label>
@@ -217,7 +217,7 @@ export const PracticeTab: React.FC<Props> = ({ baseTonicHz, initialMode = "palta
             <div className="flex gap-2">
               {(["palta", "pakad", "ear"] as const).map(k => (
                 <button key={k} type="button" disabled={running || (k === "pakad" && !details)} onClick={() => setKind(k)}
-                  className={`px-3 py-2 rounded-lg border text-xs font-mono font-bold cursor-pointer disabled:opacity-40 ${kind === k ? "bg-[#7C3AED] border-[#7C3AED] text-white" : "border-slate-800 text-slate-300"}`}>
+                  className={`px-3 py-2 rounded-lg border text-xs font-mono font-bold cursor-pointer disabled:opacity-40 ${kind === k ? "bg-[#E0A458] border-[#E0A458] text-white" : "border-slate-800 text-slate-300"}`}>
                   {k === "palta" ? "Paltas" : k === "pakad" ? "Pakad" : "Ear training"}
                 </button>
               ))}
@@ -226,10 +226,10 @@ export const PracticeTab: React.FC<Props> = ({ baseTonicHz, initialMode = "palta
           </div>
           <label className="space-y-1 block">
             <span className={label}>Beat: {bpm} per minute</span>
-            <input type="range" min={40} max={120} value={bpm} disabled={running} onChange={e => setBpm(Number(e.target.value))} className="w-full accent-[#7C3AED]" />
+            <input type="range" min={40} max={120} value={bpm} disabled={running} onChange={e => setBpm(Number(e.target.value))} className="w-full accent-[#E0A458]" />
           </label>
           <label className="flex items-center gap-2 text-xs text-slate-300 pt-4">
-            <input type="checkbox" checked={withTanpura} disabled={running} onChange={e => setWithTanpura(e.target.checked)} className="accent-[#7C3AED]" />
+            <input type="checkbox" checked={withTanpura} disabled={running} onChange={e => setWithTanpura(e.target.checked)} className="accent-[#E0A458]" />
             Tanpura on (Sa {baseTonicHz.toFixed(1)} Hz)
           </label>
         </div>
@@ -239,7 +239,7 @@ export const PracticeTab: React.FC<Props> = ({ baseTonicHz, initialMode = "palta
         <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
           {exercises.map(e => (
             <button key={e.id} type="button" disabled={running} onClick={() => setExerciseId(e.id)}
-              className={`text-left p-4 rounded-xl border cursor-pointer ${exercise?.id === e.id ? "border-[#7C3AED] bg-[#7C3AED]/10" : "border-slate-800 bg-[#151A2E] hover:border-slate-600"}`}>
+              className={`text-left p-4 rounded-xl border cursor-pointer ${exercise?.id === e.id ? "border-[#E0A458] bg-[#E0A458]/10" : "border-slate-800 bg-[#1A2150] hover:border-slate-600"}`}>
               <span className="font-bold text-slate-100 block">{e.name}</span>
               <span className="text-[11px] font-mono text-slate-400 block truncate">{e.description}</span>
               <span className="text-[10px] text-slate-500 block mt-1">
@@ -261,14 +261,14 @@ export const PracticeTab: React.FC<Props> = ({ baseTonicHz, initialMode = "palta
                 return (
                   <button key={l.speed} type="button" disabled={running || locked} onClick={() => setSpeed(l.speed)}
                     title={locked ? `Score ${UNLOCK_SCORE}+ at ${LAYAS[l.speed - 2].name} to unlock` : undefined}
-                    className={`px-3 py-2 rounded-lg border text-xs font-mono font-bold flex items-center gap-1 cursor-pointer disabled:cursor-not-allowed ${speed === l.speed ? "bg-[#38BDF8] border-[#38BDF8] text-slate-950" : locked ? "border-slate-800 text-slate-600" : "border-slate-700 text-slate-200"}`}>
+                    className={`px-3 py-2 rounded-lg border text-xs font-mono font-bold flex items-center gap-1 cursor-pointer disabled:cursor-not-allowed ${speed === l.speed ? "bg-[#9FB3E6] border-[#9FB3E6] text-slate-950" : locked ? "border-slate-800 text-slate-600" : "border-slate-700 text-slate-200"}`}>
                     {locked && <Lock className="h-3 w-3" />}{l.name}
                   </button>
                 );
               })}
             </div>
             {!running
-              ? <button type="button" onClick={start} disabled={tooFast} className="px-5 py-2.5 rounded-xl bg-gradient-to-r from-[#7C3AED] to-[#38BDF8] text-slate-950 font-mono text-xs font-black uppercase flex items-center gap-2 cursor-pointer disabled:opacity-50"><Mic className="h-4 w-4" /> Start ({COUNT_IN}-beat count-in)</button>
+              ? <button type="button" onClick={start} disabled={tooFast} className="px-5 py-2.5 rounded-xl bg-[#F4C56A] text-slate-950 font-mono text-xs font-black uppercase flex items-center gap-2 cursor-pointer disabled:opacity-50"><Mic className="h-4 w-4" /> Start ({COUNT_IN}-beat count-in)</button>
               : <button type="button" onClick={stop} className="px-5 py-2.5 rounded-xl bg-rose-600 text-white font-mono text-xs font-bold uppercase flex items-center gap-2 cursor-pointer"><Square className="h-4 w-4 fill-white" /> Stop</button>}
           </div>
           {tooFast && <p className="text-xs text-amber-300">Notes would be shorter than {MIN_NOTE_SEC * 1000} ms at this beat and speed, which is too short to score reliably. Lower the beat.</p>}
@@ -286,7 +286,7 @@ export const PracticeTab: React.FC<Props> = ({ baseTonicHz, initialMode = "palta
           </div>
 
           {finalScore !== null && (
-            <div className="p-4 rounded-xl border border-slate-700 bg-[#0F1115]/60 text-sm text-slate-200">
+            <div className="p-4 rounded-xl border border-slate-700 bg-[#0D1230]/60 text-sm text-slate-200">
               Score: <b>{finalScore.toFixed(0)}</b> at {LAYAS[speed - 1].name}, {bpm} beats per minute.{" "}
               {finalScore >= UNLOCK_SCORE
                 ? speed < 4 ? `${LAYAS[speed].name} is now unlocked.` : "That's the top of the laya ladder."

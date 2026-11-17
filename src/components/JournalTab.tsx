@@ -73,11 +73,11 @@ export const JournalTab: React.FC = () => {
     <div className="space-y-6">
       
       {/* Page Header and Intro banner */}
-      <div className="bg-[#151A2E] p-6 rounded-2xl border border-[#7C3AED]/40 shadow-xl flex flex-col md:flex-row justify-between items-start md:items-center gap-4 relative overflow-hidden">
-        <div className="absolute top-0 right-0 h-32 w-32 bg-[#7C3AED]/10 rounded-full blur-2xl pointer-events-none" />
+      <div className="bg-[#1A2150] p-6 rounded-2xl border border-[#E0A458]/40 shadow-xl flex flex-col md:flex-row justify-between items-start md:items-center gap-4 relative overflow-hidden">
+        <div className="absolute top-0 right-0 h-32 w-32 bg-[#E0A458]/10 rounded-full blur-2xl pointer-events-none" />
         <div>
           <h2 className="text-xl font-bold text-slate-100 flex items-center gap-2">
-            <BookOpen className="h-5.5 w-5.5 text-[#FBBF24]" />
+            <BookOpen className="h-5.5 w-5.5 text-[#F4C56A]" />
             Riyāz Journal
           </h2>
           <p className="text-xs text-slate-400 mt-1 max-w-xl">
@@ -88,7 +88,7 @@ export const JournalTab: React.FC = () => {
         {!isAdding && (
           <button
             onClick={() => setIsAdding(true)}
-            className="px-4 py-2.5 rounded-xl bg-gradient-to-r from-[#7C3AED] to-[#38BDF8] text-slate-950 font-mono text-xs font-bold uppercase hover:opacity-90 flex items-center gap-1.5 cursor-pointer shadow-lg transition-transform hover:-translate-y-0.5"
+            className="px-4 py-2.5 rounded-xl bg-[#F4C56A] text-slate-950 font-mono text-xs font-bold uppercase hover:opacity-90 flex items-center gap-1.5 cursor-pointer shadow-lg transition-transform hover:-translate-y-0.5"
           >
             <Plus className="h-4 w-4" />
             Write Diary Entry
@@ -98,10 +98,10 @@ export const JournalTab: React.FC = () => {
 
       {/* Adding Module Sub-Form */}
       {isAdding && (
-        <form onSubmit={handleSaveEntry} className="bg-[#151A2E]/90 border border-[#7C3AED]/50 p-6 rounded-2xl shadow-2xl space-y-4 animate-in fade-in slide-in-from-top-4 duration-300">
+        <form onSubmit={handleSaveEntry} className="bg-[#1A2150]/90 border border-[#E0A458]/50 p-6 rounded-2xl shadow-2xl space-y-4 animate-in fade-in slide-in-from-top-4 duration-300">
           <div className="flex items-center gap-2 border-b border-slate-800 pb-3 justify-between">
             <h3 className="text-sm font-bold text-slate-100 font-sans tracking-wide flex items-center gap-2">
-              <PenTool className="h-4 w-4 text-[#FBBF24]" />
+              <PenTool className="h-4 w-4 text-[#F4C56A]" />
               New Riyaz Reflection Note
             </h3>
             <button 
@@ -121,7 +121,7 @@ export const JournalTab: React.FC = () => {
               <select
                 value={raagIdx}
                 onChange={(e) => setRaagIdx(Number(e.target.value))}
-                className="w-full bg-[#0F1115] border border-slate-800 rounded-xl px-3 py-2 text-xs text-slate-200 focus:border-[#7C3AED] focus:outline-none"
+                className="w-full bg-[#0D1230] border border-slate-800 rounded-xl px-3 py-2 text-xs text-slate-200 focus:border-[#E0A458] focus:outline-none"
               >
                 {RAAGS.map((r, i) => (
                   <option key={r.id} value={i}>{r.name}</option>
@@ -138,7 +138,7 @@ export const JournalTab: React.FC = () => {
                 max="300"
                 value={duration}
                 onChange={(e) => setDuration(Number(e.target.value))}
-                className="w-full bg-[#0F1115] border border-slate-800 rounded-xl px-3 py-2 text-xs text-slate-200 font-mono focus:border-[#7C3AED] focus:outline-none"
+                className="w-full bg-[#0D1230] border border-slate-800 rounded-xl px-3 py-2 text-xs text-slate-200 font-mono focus:border-[#E0A458] focus:outline-none"
               />
             </div>
 
@@ -148,7 +148,7 @@ export const JournalTab: React.FC = () => {
               <select
                 value={moodText}
                 onChange={(e) => setMoodText(e.target.value)}
-                className="w-full bg-[#0F1115] border border-slate-800 rounded-xl px-3 py-2 text-xs text-slate-200 focus:border-[#7C3AED] focus:outline-none"
+                className="w-full bg-[#0D1230] border border-slate-800 rounded-xl px-3 py-2 text-xs text-slate-200 focus:border-[#E0A458] focus:outline-none"
               >
                 <option value="Peaceful (Shanta)">Peaceful (Shāntā)</option>
                 <option value="Devotional (Bhakti)">Devotional (Bhakti)</option>
@@ -171,14 +171,14 @@ export const JournalTab: React.FC = () => {
               placeholder="e.g. Practiced Yaman meend glides. Felt pitch centering is shifting slightly flat on shuddha Madhyam entry. Corrected by sliding slower from Gandhar..."
               value={notesText}
               onChange={(e) => setNotesText(e.target.value)}
-              className="w-full bg-[#0F1115] border border-slate-800 rounded-xl p-3 text-xs text-slate-200 placeholder-slate-600 focus:border-[#7C3AED] focus:outline-none leading-relaxed"
+              className="w-full bg-[#0D1230] border border-slate-800 rounded-xl p-3 text-xs text-slate-200 placeholder-slate-600 focus:border-[#E0A458] focus:outline-none leading-relaxed"
             />
           </div>
 
           {/* Action trigger row */}
           <button
             type="submit"
-            className="w-full py-2 px-4 rounded-xl bg-gradient-to-r from-[#7C3AED] to-[#38BDF8] text-slate-950 font-mono text-xs font-bold uppercase hover:opacity-90 flex items-center justify-center gap-1 cursor-pointer"
+            className="w-full py-2 px-4 rounded-xl bg-[#F4C56A] text-slate-950 font-mono text-xs font-bold uppercase hover:opacity-90 flex items-center justify-center gap-1 cursor-pointer"
           >
             <Check className="h-4 w-4" />
             Log Entry to Journal Scroll
@@ -192,7 +192,7 @@ export const JournalTab: React.FC = () => {
         <h3 className="text-xs font-mono font-bold text-slate-400 uppercase tracking-widest pl-1">Historical Riyāz Scroll</h3>
         
         {entries.length === 0 ? (
-          <div className="border border-dashed border-slate-800 p-12 rounded-2xl text-center space-y-2 bg-[#151A2E]/20">
+          <div className="border border-dashed border-slate-800 p-12 rounded-2xl text-center space-y-2 bg-[#1A2150]/20">
             <BookOpen className="h-8 w-8 text-slate-600 mx-auto" />
             <p className="text-xs text-slate-400 font-bold">The Journal Scroll is currently empty</p>
             <p className="text-[10px] text-slate-550 max-w-sm mx-auto">Logged reflections can guide your musical path. Press the 'Write Diary Entry' button above to register your first notes.</p>
@@ -202,12 +202,12 @@ export const JournalTab: React.FC = () => {
             {entries.map((item) => (
               <div 
                 key={item.id} 
-                className="bg-[#151A2E] p-5 rounded-2xl border border-slate-850/80 shadow-lg flex flex-col justify-between hover:border-[#7C3AED]/40 transition-colors group animate-in fade-in"
+                className="bg-[#1A2150] p-5 rounded-2xl border border-slate-850/80 shadow-lg flex flex-col justify-between hover:border-[#E0A458]/40 transition-colors group animate-in fade-in"
               >
                 <div className="space-y-3">
                   <div className="flex items-center justify-between border-b border-slate-850 pb-2">
                     <div className="space-y-0.5">
-                      <span className="text-[10px] font-mono px-2 py-0.5 bg-[#7C3AED]/20 text-[#38BDF8] rounded-full border border-[#7C3AED]/10 font-bold">
+                      <span className="text-[10px] font-mono px-2 py-0.5 bg-[#E0A458]/20 text-[#9FB3E6] rounded-full border border-[#E0A458]/10 font-bold">
                         {item.raagName}
                       </span>
                       <span className="text-[8px] font-mono text-slate-500 block mt-1 uppercase">Rasa: {item.moodReflection}</span>

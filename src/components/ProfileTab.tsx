@@ -70,9 +70,9 @@ export const ProfileTab: React.FC<ProfileTabProps> = ({ baseTonicHz, vocalistNam
 
   return (
     <div className="space-y-6">
-      <div className="bg-[#151A2E] p-6 rounded-2xl border border-[#7C3AED]/40 shadow-xl">
+      <div className="bg-[#1A2150] p-6 rounded-2xl border border-[#E0A458]/40 shadow-xl">
         <h2 className="text-xl font-bold text-slate-100 flex items-center gap-2 font-serif">
-          <User className="h-5 w-5 text-[#FBBF24]" />
+          <User className="h-5 w-5 text-[#F4C56A]" />
           {vocalistName ? `${vocalistName}'s profile` : "Your profile"}
         </h2>
         <p className="text-xs text-slate-400 mt-1">
@@ -81,12 +81,12 @@ export const ProfileTab: React.FC<ProfileTabProps> = ({ baseTonicHz, vocalistNam
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <div className="bg-[#151A2E] p-5 rounded-2xl border border-slate-800 space-y-1">
+        <div className="bg-[#1A2150] p-5 rounded-2xl border border-slate-800 space-y-1">
           <span className="text-[9px] font-mono text-slate-500 uppercase tracking-widest block font-bold">Your Sa</span>
           <span className="text-2xl font-black font-mono text-slate-100 block">{baseTonicHz.toFixed(1)} Hz</span>
           <span className="text-[11px] text-slate-400">{sa.name} {signedCents(sa.cents)} cents</span>
         </div>
-        <div className="bg-[#151A2E] p-5 rounded-2xl border border-slate-800 space-y-1">
+        <div className="bg-[#1A2150] p-5 rounded-2xl border border-slate-800 space-y-1">
           <span className="text-[9px] font-mono text-slate-500 uppercase tracking-widest block font-bold">Latest Sa check</span>
           {lastSa ? (
             <>
@@ -95,7 +95,7 @@ export const ProfileTab: React.FC<ProfileTabProps> = ({ baseTonicHz, vocalistNam
             </>
           ) : <span className="text-xs text-slate-500 block">Use "Find my Sa" in the Analyzer to measure how steadily you hold Sa.</span>}
         </div>
-        <div className="bg-[#151A2E] p-5 rounded-2xl border border-slate-800 space-y-1">
+        <div className="bg-[#1A2150] p-5 rounded-2xl border border-slate-800 space-y-1">
           <span className="text-[9px] font-mono text-slate-500 uppercase tracking-widest block font-bold">Range of held notes</span>
           {range ? (
             <>
@@ -106,7 +106,7 @@ export const ProfileTab: React.FC<ProfileTabProps> = ({ baseTonicHz, vocalistNam
         </div>
       </div>
 
-      <div className="bg-[#151A2E] p-5 rounded-2xl border border-slate-800 space-y-3">
+      <div className="bg-[#1A2150] p-5 rounded-2xl border border-slate-800 space-y-3">
         <h3 className="text-xs font-mono font-bold text-slate-300 uppercase tracking-widest">Swara tendencies</h3>
         {enough.length === 0 ? (
           <p className="text-xs text-slate-500">

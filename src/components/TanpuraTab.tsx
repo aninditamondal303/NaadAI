@@ -137,7 +137,7 @@ export const TanpuraTab: React.FC<TanpuraTabProps> = ({ baseTonicHz, onTonicChan
   };
 
   const sa = westernNote(baseTonicHz);
-  const card = "bg-[#151A2E] p-6 rounded-2xl border border-slate-800 shadow-xl space-y-5";
+  const card = "bg-[#1A2150] p-6 rounded-2xl border border-slate-800 shadow-xl space-y-5";
   const label = "text-[9px] font-mono text-slate-500 uppercase tracking-widest font-bold block";
 
   return (
@@ -146,14 +146,14 @@ export const TanpuraTab: React.FC<TanpuraTabProps> = ({ baseTonicHz, onTonicChan
       <div className={card}>
         <div className="flex items-center justify-between gap-3 flex-wrap">
           <div className="flex items-center gap-3">
-            <div className="h-10 w-10 rounded-xl bg-[#7C3AED]/20 border border-[#7C3AED] flex items-center justify-center text-[#FBBF24]"><Music className="h-5 w-5" /></div>
+            <div className="h-10 w-10 rounded-xl bg-[#E0A458]/20 border border-[#E0A458] flex items-center justify-center text-[#F4C56A]"><Music className="h-5 w-5" /></div>
             <div>
               <h3 className="text-lg font-bold text-slate-100">Tanpura</h3>
               <p className="text-xs text-slate-400">Sa {baseTonicHz.toFixed(2)} Hz · {sa.name} {signedCents(sa.cents)} cents</p>
             </div>
           </div>
           <button type="button" onClick={toggleTanpura}
-            className={`px-5 py-2.5 rounded-xl font-mono text-xs font-bold uppercase flex items-center gap-2 cursor-pointer ${tPlaying ? "bg-rose-600 text-white" : "bg-gradient-to-r from-[#7C3AED] to-[#38BDF8] text-slate-950"}`}>
+            className={`px-5 py-2.5 rounded-xl font-mono text-xs font-bold uppercase flex items-center gap-2 cursor-pointer ${tPlaying ? "bg-rose-600 text-white" : "bg-[#F4C56A] text-slate-950"}`}>
             {tPlaying ? <><Square className="h-4 w-4 fill-white" /> Stop</> : <><Play className="h-4 w-4" /> Play tanpura</>}
           </button>
         </div>
@@ -165,7 +165,7 @@ export const TanpuraTab: React.FC<TanpuraTabProps> = ({ baseTonicHz, onTonicChan
             const name = s === "first" ? `${first},` : s === "kharaj" ? "S,," : "S";
             return (
               <button key={s} type="button" disabled={droneMode} onClick={async () => (await ensureTanpura()).pluckNow(s)}
-                className={`p-3 rounded-xl border text-center cursor-pointer transition-colors ${lit === s ? "border-[#FBBF24] bg-[#FBBF24]/10" : "border-slate-800 bg-[#0F1115]/60 hover:border-slate-600"}`}>
+                className={`p-3 rounded-xl border text-center cursor-pointer transition-colors ${lit === s ? "border-[#F4C56A] bg-[#F4C56A]/10" : "border-slate-800 bg-[#0D1230]/60 hover:border-slate-600"}`}>
                 <span className="block text-[9px] font-mono text-slate-500 uppercase">{STRING_LABEL[s]} string</span>
                 <span className="block text-lg font-black font-mono text-slate-100">{name}</span>
                 <span className="block text-[10px] font-mono text-slate-400">{hz.toFixed(1)} Hz</span>
@@ -185,7 +185,7 @@ export const TanpuraTab: React.FC<TanpuraTabProps> = ({ baseTonicHz, onTonicChan
             <div className="grid grid-cols-6 gap-1.5">
               {NOTES.map((n, i) => (
                 <button key={n} type="button" onClick={() => setSa(i, octave, 0)}
-                  className={`py-1.5 rounded-lg text-xs font-mono font-bold cursor-pointer border ${nearest.note === i && nearest.octave === octave ? "bg-[#7C3AED] border-[#7C3AED] text-white" : "border-slate-800 text-slate-300 hover:border-slate-600"}`}>
+                  className={`py-1.5 rounded-lg text-xs font-mono font-bold cursor-pointer border ${nearest.note === i && nearest.octave === octave ? "bg-[#E0A458] border-[#E0A458] text-white" : "border-slate-800 text-slate-300 hover:border-slate-600"}`}>
                   {n}{octave}
                 </button>
               ))}
@@ -193,7 +193,7 @@ export const TanpuraTab: React.FC<TanpuraTabProps> = ({ baseTonicHz, onTonicChan
             <div className="flex gap-2 text-[10px] font-mono">
               {([2, 3] as const).map(o => (
                 <button key={o} type="button" onClick={() => { setOctave(o); setSa(nearest.note, o, nearest.cents); }}
-                  className={`px-2.5 py-1 rounded-md border cursor-pointer ${octave === o ? "border-[#38BDF8] text-[#38BDF8]" : "border-slate-800 text-slate-400"}`}>
+                  className={`px-2.5 py-1 rounded-md border cursor-pointer ${octave === o ? "border-[#9FB3E6] text-[#9FB3E6]" : "border-slate-800 text-slate-400"}`}>
                   Octave {o}
                 </button>
               ))}
@@ -201,7 +201,7 @@ export const TanpuraTab: React.FC<TanpuraTabProps> = ({ baseTonicHz, onTonicChan
             <label className="block space-y-1 pt-1">
               <span className={label}>Fine tune: {signedCents(nearest.cents)} cents</span>
               <input type="range" min={-50} max={50} step={1} value={Math.round(nearest.cents)}
-                onChange={e => setSa(nearest.note, nearest.octave, Number(e.target.value))} className="w-full accent-[#7C3AED]" />
+                onChange={e => setSa(nearest.note, nearest.octave, Number(e.target.value))} className="w-full accent-[#E0A458]" />
             </label>
             <p className="text-[10px] text-slate-500">Tip: "Find my Sa" in the Analyzer measures your natural Sa and sets it exactly.</p>
           </div>
@@ -212,7 +212,7 @@ export const TanpuraTab: React.FC<TanpuraTabProps> = ({ baseTonicHz, onTonicChan
               <div className="flex gap-2">
                 {(["Pa", "Ma", "Ni"] as FirstString[]).map(f => (
                   <button key={f} type="button" onClick={() => { setFirst(f); onTuningChange?.(f); }}
-                    className={`px-3 py-2 rounded-lg border text-xs font-mono font-bold cursor-pointer ${first === f ? "bg-[#7C3AED] border-[#7C3AED] text-white" : "border-slate-800 text-slate-300"}`}>
+                    className={`px-3 py-2 rounded-lg border text-xs font-mono font-bold cursor-pointer ${first === f ? "bg-[#E0A458] border-[#E0A458] text-white" : "border-slate-800 text-slate-300"}`}>
                     {f}
                   </button>
                 ))}
@@ -222,12 +222,12 @@ export const TanpuraTab: React.FC<TanpuraTabProps> = ({ baseTonicHz, onTonicChan
             {!droneMode && (
               <label className="block space-y-1">
                 <span className={label}>Cycle: {cycleSec.toFixed(1)} s per four plucks</span>
-                <input type="range" min={3} max={8} step={0.1} value={cycleSec} onChange={e => setCycleSec(Number(e.target.value))} className="w-full accent-[#7C3AED]" />
+                <input type="range" min={3} max={8} step={0.1} value={cycleSec} onChange={e => setCycleSec(Number(e.target.value))} className="w-full accent-[#E0A458]" />
               </label>
             )}
             <label className="block space-y-1">
               <span className={label}>Volume</span>
-              <input type="range" min={0} max={1} step={0.01} value={tVolume} onChange={e => setTVolume(Number(e.target.value))} className="w-full accent-[#7C3AED]" />
+              <input type="range" min={0} max={1} step={0.01} value={tVolume} onChange={e => setTVolume(Number(e.target.value))} className="w-full accent-[#E0A458]" />
             </label>
           </div>
         </div>
@@ -238,14 +238,14 @@ export const TanpuraTab: React.FC<TanpuraTabProps> = ({ baseTonicHz, onTonicChan
       <div className={card}>
         <div className="flex items-center justify-between gap-3 flex-wrap">
           <div className="flex items-center gap-3">
-            <div className="h-10 w-10 rounded-xl bg-[#38BDF8]/15 border border-[#38BDF8]/60 flex items-center justify-center text-[#38BDF8]"><Drum className="h-5 w-5" /></div>
+            <div className="h-10 w-10 rounded-xl bg-[#9FB3E6]/15 border border-[#9FB3E6]/60 flex items-center justify-center text-[#9FB3E6]"><Drum className="h-5 w-5" /></div>
             <div>
               <h3 className="text-lg font-bold text-slate-100">Taal</h3>
               <p className="text-xs text-slate-400">{taal.name} · {taal.matras} matras · {bpm} matras per minute ({layaFor(bpm)})</p>
             </div>
           </div>
           <button type="button" onClick={toggleTaal}
-            className={`px-5 py-2.5 rounded-xl font-mono text-xs font-bold uppercase flex items-center gap-2 cursor-pointer ${bPlaying ? "bg-rose-600 text-white" : "bg-gradient-to-r from-[#38BDF8] to-[#7C3AED] text-slate-950"}`}>
+            className={`px-5 py-2.5 rounded-xl font-mono text-xs font-bold uppercase flex items-center gap-2 cursor-pointer ${bPlaying ? "bg-rose-600 text-white" : "bg-[#F4C56A] text-slate-950"}`}>
             {bPlaying ? <><Square className="h-4 w-4 fill-white" /> Stop</> : <><Play className="h-4 w-4" /> Play theka</>}
           </button>
         </div>
@@ -253,18 +253,18 @@ export const TanpuraTab: React.FC<TanpuraTabProps> = ({ baseTonicHz, onTonicChan
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
           <label className="block space-y-1">
             <span className={label}>Taal</span>
-            <select value={taalId} onChange={e => setTaalId(e.target.value)} className="w-full bg-[#0F1115] border border-slate-800 rounded-lg px-3 py-2 text-sm text-slate-200">
+            <select value={taalId} onChange={e => setTaalId(e.target.value)} className="w-full bg-[#0D1230] border border-slate-800 rounded-lg px-3 py-2 text-sm text-slate-200">
               {TAALS.map(t => <option key={t.id} value={t.id}>{t.name} ({t.matras})</option>)}
             </select>
             <span className="text-[10px] text-slate-500 block">{taal.usage}</span>
           </label>
           <label className="block space-y-1">
             <span className={label}>Tempo: {bpm} matras/min</span>
-            <input type="range" min={20} max={320} step={1} value={bpm} onChange={e => setBpm(Number(e.target.value))} className="w-full accent-[#38BDF8]" />
+            <input type="range" min={20} max={320} step={1} value={bpm} onChange={e => setBpm(Number(e.target.value))} className="w-full accent-[#9FB3E6]" />
           </label>
           <label className="block space-y-1">
             <span className={label}>Volume</span>
-            <input type="range" min={0} max={1} step={0.01} value={bVolume} onChange={e => setBVolume(Number(e.target.value))} className="w-full accent-[#38BDF8]" />
+            <input type="range" min={0} max={1} step={0.01} value={bVolume} onChange={e => setBVolume(Number(e.target.value))} className="w-full accent-[#9FB3E6]" />
           </label>
         </div>
 
@@ -279,7 +279,7 @@ export const TanpuraTab: React.FC<TanpuraTabProps> = ({ baseTonicHz, onTonicChan
                   {cells.map(i => {
                     const clap = clapAt(taal, i);
                     return (
-                      <div key={i} className={`w-16 p-1.5 rounded-lg text-center border ${matra === i ? "border-[#FBBF24] bg-[#FBBF24]/10" : "border-slate-800 bg-[#0F1115]/60"}`}>
+                      <div key={i} className={`w-16 p-1.5 rounded-lg text-center border ${matra === i ? "border-[#F4C56A] bg-[#F4C56A]/10" : "border-slate-800 bg-[#0D1230]/60"}`}>
                         <span className="block text-[9px] font-mono text-slate-500">{i}{clap !== null ? ` · ${clap}` : ""}</span>
                         <span className="block text-[11px] font-mono font-bold text-slate-200 leading-tight">{taal.theka[i - 1].join(" ")}</span>
                       </div>

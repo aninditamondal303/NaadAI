@@ -1,5 +1,8 @@
 # Naad AI
 
+[![Tests](https://github.com/aninditamondal303/naadai/actions/workflows/ci.yml/badge.svg)](https://github.com/aninditamondal303/naadai/actions/workflows/ci.yml)
+[![Website](https://github.com/aninditamondal303/naadai/actions/workflows/pages.yml/badge.svg)](https://aninditamondal303.github.io/NaadAI/)
+
 A riyaz (practice) companion for Hindustani classical vocalists. It listens
 while you sing and measures how you hold each swara against your own Sa,
 plays the tanpura and taal itself, and turns your measurements into practice:
@@ -11,6 +14,16 @@ app's tanpura out of the microphone).
 
 **Try it:** https://aninditamondal303.github.io/NaadAI/ (works in Chrome, Edge,
 Firefox and Safari; allow the microphone when asked; use earphones)
+
+The welcome page is itself an instrument: press **Sing with the tanpura** and
+your voice is drawn live on the swara lines, or play the demo phrase and watch
+it drawn as it plays. Its colours follow the sky at your local time, and it
+suggests raags for the current prahar. The welcome page, singer picker and
+menus are available in **English, हिन्दी and বাংলা** (the Hindi and Bengali
+text awaits review by native speakers; the inner practice screens are still
+in English).
+
+![Welcome page](docs/screenshots/welcome.png)
 
 ![Analysis of a recording](docs/screenshots/analysis.png)
 
