@@ -47,6 +47,27 @@ export interface Strings {
   streak: (n: number) => string;
   switchSinger: string;
   englishOnlyNote: string;
+  home: HomeStrings;
+  analyzer: AnalyzerStrings;
+}
+
+export interface HomeStrings {
+  greet: (name: string) => string;
+  yourSa: (note: string, hz: string) => string;
+  raag: string; minutes: string; minUnit: string; start: string; running: (raag: string) => string;
+  stopSave: string; discard: string; tuning: string; speed: string; volume: string; slow: string; fast: string;
+  saved: (min: number, raag: string) => string; tooShort: string; complete: (min: number, raag: string) => string;
+  stringsLabel: string; recordedDrone: string; left: string;
+  aroh: string; avaroh: string; pakad: string; notWritten: string; paltas: string; review: string;
+  plan: string; planEmpty: string; open: string; markDone: string; markNotDone: string;
+  nowRaags: string; noneNow: string; timesNote: string; streak: (n: number) => string; streakNote: string;
+  index: string; items: Record<"tanpura" | "analyzer" | "practice" | "journal" | "progress" | "library", string>;
+}
+
+export interface AnalyzerStrings {
+  title: string; intro: string; modes: Record<"tuner" | "scale" | "sadhana" | "singing", string>;
+  raag: string; measureAgainst: string; mySa: (hz: string) => string; detect: string;
+  record: string; stop: string; upload: string; demo: string; recording: string; liveNote: string; saveImage: string;
 }
 
 const listOf = (names: string[], and: string) =>
@@ -134,6 +155,39 @@ const en: Strings = {
   streak: n => `${n}-day streak`,
   switchSinger: "Switch singer",
   englishOnlyNote: "",
+  home: {
+    greet: n => `Pranam, ${n}.`,
+    yourSa: (note, hz) => `Your Sa is ${note}, ${hz} Hz.`,
+    raag: "Raag", minutes: "How long", minUnit: "min", start: "Start riyaz", running: r => `Riyaz in ${r}`,
+    stopSave: "Stop and save", discard: "Stop without saving", tuning: "First string", speed: "Pluck speed", volume: "Volume",
+    slow: "slow", fast: "fast",
+    saved: (m, r) => `Saved ${m} min of riyaz in ${r}.`, tooShort: "Sessions shorter than 30 seconds are not saved.",
+    complete: (m, r) => `Riyaz complete: ${m} min in ${r} saved.`,
+    stringsLabel: "Tanpura strings, moving with the sound you hear",
+    recordedDrone: "Recorded tanpura. The strings move with its sound.", left: "left",
+    aroh: "Aroh", avaroh: "Avaroh", pakad: "Pakad", notWritten: "Not written yet", paltas: "Paltas for this raag", review: "From the raag library, awaiting a guru's review.",
+    plan: "Today's plan", planEmpty: "No measurements yet, so time is split evenly. The plan adapts as you practise.",
+    open: "Open", markDone: "Mark done", markNotDone: "Mark not done",
+    nowRaags: "Raags for this hour", noneNow: "No raag in the library is listed for this hour.",
+    timesNote: "Times come from the raag library; traditions differ on exact hours.",
+    streak: n => (n === 1 ? "1 day" : `${n} days`), streakNote: "in a row with practice saved in this browser",
+    index: "Everything in the app",
+    items: {
+      tanpura: "Tanpura tuned to your Sa, and ten taals with recorded tabla.",
+      analyzer: "Record or upload singing and see every swara measured.",
+      practice: "Paltas and pakad, scored note by note, and ear training.",
+      journal: "Every saved take, with notes.",
+      progress: "How your swaras and breath change over weeks.",
+      library: "45 raags: aroh, avaroh, vadi, samvadi, time.",
+    },
+  },
+  analyzer: {
+    title: "Analyzer", intro: "Everything shown here is measured from your voice. Recordings are analysed in your browser and are not uploaded.",
+    modes: { tuner: "Live tuner", scale: "Find my Sa", sadhana: "Sa sadhana", singing: "Analyse singing" },
+    raag: "Raag", measureAgainst: "Measure against", mySa: hz => `My Sa (${hz} Hz)`, detect: "Find Sa in the recording",
+    record: "Record", stop: "Stop and analyse", upload: "Upload a recording", demo: "Try the demo recording",
+    recording: "Recording", liveNote: "Drawn live against your Sa; the full analysis runs when you stop.", saveImage: "Save as image",
+  },
 };
 
 const hi: Strings = {
@@ -218,6 +272,39 @@ const hi: Strings = {
   streak: n => `लगातार ${n} दिन`,
   switchSinger: "गायक बदलें",
   englishOnlyNote: "अंदर के कुछ पेज अभी अंग्रेज़ी में हैं।",
+  home: {
+    greet: n => `प्रणाम, ${n}।`,
+    yourSa: (note, hz) => `आपका सा ${note} है, ${hz} Hz।`,
+    raag: "राग", minutes: "कितनी देर", minUnit: "मिनट", start: "रियाज़ शुरू करें", running: r => `${r} में रियाज़`,
+    stopSave: "रोकें और सहेजें", discard: "बिना सहेजे रोकें", tuning: "पहला तार", speed: "छेड़ने की गति", volume: "आवाज़",
+    slow: "धीमी", fast: "तेज़",
+    saved: (m, r) => `${r} में ${m} मिनट का रियाज़ सहेजा गया।`, tooShort: "30 सेकंड से छोटे सत्र सहेजे नहीं जाते।",
+    complete: (m, r) => `रियाज़ पूरा: ${r} में ${m} मिनट सहेजे गए।`,
+    stringsLabel: "तानपुरे के तार, सुनाई दे रही आवाज़ के साथ हिलते हुए",
+    recordedDrone: "रिकॉर्ड किया हुआ तानपुरा। तार उसकी आवाज़ के साथ हिलते हैं।", left: "बाकी",
+    aroh: "आरोह", avaroh: "अवरोह", pakad: "पकड़", notWritten: "अभी लिखा नहीं गया", paltas: "इस राग के पलटे", review: "राग-कोश से, गुरु की जाँच बाकी।",
+    plan: "आज की योजना", planEmpty: "अभी कोई माप नहीं है, इसलिए समय बराबर बाँटा गया है। अभ्यास के साथ योजना बदलती है।",
+    open: "खोलें", markDone: "पूरा हुआ", markNotDone: "पूरा नहीं हुआ",
+    nowRaags: "इस समय के राग", noneNow: "राग-कोश में इस समय का कोई राग नहीं है।",
+    timesNote: "समय राग-कोश से हैं; परंपराओं में घंटे अलग-अलग माने जाते हैं।",
+    streak: n => `${n} दिन`, streakNote: "लगातार, इस ब्राउज़र में सहेजे अभ्यास के साथ",
+    index: "ऐप में सब कुछ",
+    items: {
+      tanpura: "आपके सा पर मिला तानपुरा, और रिकॉर्ड किए तबले के साथ दस ताल।",
+      analyzer: "गायन रिकॉर्ड या अपलोड कीजिए और हर स्वर का माप देखिए।",
+      practice: "पलटे और पकड़, हर स्वर पर अंक, और कान की तालीम।",
+      journal: "सहेजी गई हर रिकॉर्डिंग, नोट्स के साथ।",
+      progress: "हफ़्तों में आपके स्वर और साँस कैसे बदलते हैं।",
+      library: "45 राग: आरोह, अवरोह, वादी, संवादी, समय।",
+    },
+  },
+  analyzer: {
+    title: "विश्लेषण", intro: "यहाँ दिखाई गई हर चीज़ आपकी आवाज़ से मापी गई है। रिकॉर्डिंग आपके ब्राउज़र में ही जाँची जाती है, अपलोड नहीं होती।",
+    modes: { tuner: "लाइव ट्यूनर", scale: "मेरा सा खोजें", sadhana: "सा साधना", singing: "गायन का विश्लेषण" },
+    raag: "राग", measureAgainst: "किससे मापें", mySa: hz => `मेरा सा (${hz} Hz)`, detect: "रिकॉर्डिंग से सा खोजें",
+    record: "रिकॉर्ड करें", stop: "रोकें और जाँचें", upload: "रिकॉर्डिंग अपलोड करें", demo: "डेमो रिकॉर्डिंग आज़माएँ",
+    recording: "रिकॉर्डिंग", liveNote: "आपके सा के सामने लाइव बनाया गया; पूरा विश्लेषण रोकने पर होगा।", saveImage: "चित्र के रूप में सहेजें",
+  },
 };
 
 const bn: Strings = {
@@ -302,6 +389,39 @@ const bn: Strings = {
   streak: n => `টানা ${n} দিন`,
   switchSinger: "শিল্পী বদলান",
   englishOnlyNote: "ভেতরের কিছু পেজ এখনও ইংরেজিতে।",
+  home: {
+    greet: n => `প্রণাম, ${n}।`,
+    yourSa: (note, hz) => `আপনার সা ${note}, ${hz} Hz।`,
+    raag: "রাগ", minutes: "কতক্ষণ", minUnit: "মিনিট", start: "রেওয়াজ শুরু করুন", running: r => `${r}-এ রেওয়াজ`,
+    stopSave: "থামিয়ে সংরক্ষণ করুন", discard: "সংরক্ষণ না করে থামান", tuning: "প্রথম তার", speed: "তার ছাড়ার গতি", volume: "আওয়াজ",
+    slow: "ধীর", fast: "দ্রুত",
+    saved: (m, r) => `${r}-এ ${m} মিনিটের রেওয়াজ সংরক্ষিত হল।`, tooShort: "৩০ সেকেন্ডের কম সময়ের সেশন সংরক্ষণ হয় না।",
+    complete: (m, r) => `রেওয়াজ শেষ: ${r}-এ ${m} মিনিট সংরক্ষিত।`,
+    stringsLabel: "তানপুরার তার, শোনা আওয়াজের সঙ্গে কাঁপছে",
+    recordedDrone: "রেকর্ড করা তানপুরা। তারগুলো তার আওয়াজের সঙ্গে কাঁপে।", left: "বাকি",
+    aroh: "আরোহ", avaroh: "অবরোহ", pakad: "পকড়", notWritten: "এখনও লেখা হয়নি", paltas: "এই রাগের পাল্টা", review: "রাগ-কোষ থেকে, গুরুর যাচাই বাকি।",
+    plan: "আজকের পরিকল্পনা", planEmpty: "এখনও কোনো মাপ নেই, তাই সময় সমান ভাগ করা হয়েছে। অনুশীলনের সঙ্গে পরিকল্পনা বদলায়।",
+    open: "খুলুন", markDone: "হয়ে গেছে", markNotDone: "হয়নি",
+    nowRaags: "এই সময়ের রাগ", noneNow: "রাগ-কোষে এই সময়ের কোনো রাগ নেই।",
+    timesNote: "সময় রাগ-কোষ থেকে; ঘরানাভেদে সময় আলাদা ধরা হয়।",
+    streak: n => `${n} দিন`, streakNote: "টানা, এই ব্রাউজারে সংরক্ষিত অনুশীলনসহ",
+    index: "অ্যাপে যা আছে",
+    items: {
+      tanpura: "আপনার সা-তে বাঁধা তানপুরা, আর রেকর্ড করা তবলায় দশটি তাল।",
+      analyzer: "গান রেকর্ড বা আপলোড করুন, প্রতিটি স্বরের মাপ দেখুন।",
+      practice: "পাল্টা আর পকড়, প্রতি স্বরে নম্বর, আর কানের তালিম।",
+      journal: "সংরক্ষিত প্রতিটি রেকর্ডিং, নোটসহ।",
+      progress: "সপ্তাহে সপ্তাহে আপনার স্বর আর শ্বাস কীভাবে বদলায়।",
+      library: "৪৫টি রাগ: আরোহ, অবরোহ, বাদী, সমবাদী, সময়।",
+    },
+  },
+  analyzer: {
+    title: "বিশ্লেষণ", intro: "এখানে যা দেখানো হয় সবই আপনার গলা থেকে মাপা। রেকর্ডিং আপনার ব্রাউজারেই বিশ্লেষণ হয়, আপলোড হয় না।",
+    modes: { tuner: "লাইভ টিউনার", scale: "আমার সা খুঁজুন", sadhana: "সা সাধনা", singing: "গানের বিশ্লেষণ" },
+    raag: "রাগ", measureAgainst: "কীসের সঙ্গে মাপবে", mySa: hz => `আমার সা (${hz} Hz)`, detect: "রেকর্ডিং থেকে সা খুঁজুন",
+    record: "রেকর্ড করুন", stop: "থামিয়ে বিশ্লেষণ করুন", upload: "রেকর্ডিং আপলোড করুন", demo: "ডেমো রেকর্ডিং চালান",
+    recording: "রেকর্ডিং", liveNote: "আপনার সা-এর সঙ্গে লাইভ আঁকা; পুরো বিশ্লেষণ থামালে হবে।", saveImage: "ছবি হিসেবে সংরক্ষণ করুন",
+  },
 };
 
 export const STRINGS: Record<Lang, Strings> = { en, hi, bn };
