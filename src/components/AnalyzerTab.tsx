@@ -15,6 +15,7 @@ import { measureHeldSa, type HeldSaResult } from '../analysis/sa';
 import { noteLabel, summariseTake, type TakeMeasurements } from '../analysis/summary';
 import { rmsOf, trackPitch, VOICING, windowSizeFor } from '../analysis/track';
 import { DEFAULT_PITCH_SETTINGS, type PitchTrack } from '../analysis/types';
+import { runAnalysis } from '../analysis/runAnalysis';
 import { decodeAudioFile } from '../audio/decode';
 import { RAAG_LIST } from '../data/allRaags';
 import { addRecord, newId } from '../lib/practiceHistory';
@@ -270,61 +271,40 @@ const AnalyseSinging: React.FC<{ saHz: number }> = ({ saHz }) => {
 
   const raag = useMemo(() => RAAG_OPTIONS.find(r => r.id === raagId) ?? RAAG_OPTIONS[0], [raagId]);
 
-  const analyse = (samples: Float32Array, sampleRate: number, source: string) => {
+  const analyse = async (samples: Float32Array, sampleRate: number) => {
     setBusy("Measuring pitch...");
     setError(null);
-    // Let the "Measuring" message render before the (synchronous) analysis runs.
-    window.setTimeout(() => {
-      try {
-        const track = trackPitch(samples, sampleRate, "mpm");
-        const notes: string[] = [];
-        const allowed = raag.allowedSwaras;
-        let m = summariseTake(track, saChoice === "mine" ? { saHz, expectedSaHz: saHz, allowedSwaras: allowed } : { expectedSaHz: saHz, allowedSwaras: allowed });
-        const det = m.saDetection;
-
-        if (saChoice === "detect") {
-          if (!det || det.saHz === null || det.unsure) {
-            notes.push(`Couldn't detect Sa confidently from this recording${det && det.saHz ? ` (best guess ${det.saHz.toFixed(1)} Hz, confidence ${(det.confidence * 100).toFixed(0)}%)` : ""}. Measured against your Sa (${saHz.toFixed(1)} Hz) instead.`);
-            m = summariseTake(track, { saHz, expectedSaHz: saHz, allowedSwaras: allowed });
-          } else {
-            notes.push(`Sa detected from the recording: ${det.saHz.toFixed(1)} Hz (confidence ${(det.confidence * 100).toFixed(0)}%, based on ${det.steadySec.toFixed(0)} s of steady singing).`);
-          }
-        } else if (det && det.saHz !== null && !det.unsure && Math.abs(centsBetween(det.saHz, saHz)) > 50) {
-          notes.push(`This recording seems to use a different Sa (about ${det.saHz.toFixed(1)} Hz) from yours (${saHz.toFixed(1)} Hz). If so, choose "Detect from recording" and analyse again.`);
-        }
-        if (m.voicedSec < 2) notes.push("Very little clear singing was found in this recording, so these numbers are based on very little data.");
-
-        setResult({ m, track, raagName: raag.name, allowedSwaras: allowed, saNotes: notes });
-        addRecord({
-          kind: "analysis",
-          id: newId(),
-          dateIso: new Date().toISOString(),
-          raagId: raag.id,
-          raagName: raag.name,
-          durationSec: m.durationSec,
-          singingSec: m.voicedSec,
-          saHz: m.saHz,
-          heldWithin20CentsPct: m.heldWithin20CentsPct,
-          medianAbsDeviationCents: m.medianAbsDeviationCents,
-          lowest: m.lowestNote,
-          highest: m.highestNote,
-          swaras: m.swaras.map(s => ({
-            symbol: s.symbol,
-            medianDeviationCents: s.medianDeviationCents,
-            medianWobbleCents: s.medianWobbleCents,
-            totalHeldSec: s.totalHeldSec,
-          })),
-          longestPhraseSec: m.longestPhraseSec,
-          medianPhraseSec: m.medianPhraseSec,
-          phraseCount: m.phrases.length,
-        });
-        void source;
-      } catch (e: any) {
-        setError(`Analysis failed: ${e?.message || e}`);
-      } finally {
-        setBusy(null);
-      }
-    }, 30);
+    try {
+      const { m, track, notes } = await runAnalysis({ samples, sampleRate, saHz, saChoice, allowedSwaras: raag.allowedSwaras });
+      setResult({ m, track, raagName: raag.name, allowedSwaras: raag.allowedSwaras, saNotes: notes });
+      addRecord({
+        kind: "analysis",
+        id: newId(),
+        dateIso: new Date().toISOString(),
+        raagId: raag.id,
+        raagName: raag.name,
+        durationSec: m.durationSec,
+        singingSec: m.voicedSec,
+        saHz: m.saHz,
+        heldWithin20CentsPct: m.heldWithin20CentsPct,
+        medianAbsDeviationCents: m.medianAbsDeviationCents,
+        lowest: m.lowestNote,
+        highest: m.highestNote,
+        swaras: m.swaras.map(s => ({
+          symbol: s.symbol,
+          medianDeviationCents: s.medianDeviationCents,
+          medianWobbleCents: s.medianWobbleCents,
+          totalHeldSec: s.totalHeldSec,
+        })),
+        longestPhraseSec: m.longestPhraseSec,
+        medianPhraseSec: m.medianPhraseSec,
+        phraseCount: m.phrases.length,
+      });
+    } catch (e: any) {
+      setError(`Analysis failed: ${e?.message || e}`);
+    } finally {
+      setBusy(null);
+    }
   };
 
   const stopRecording = async () => {
@@ -337,7 +317,7 @@ const AnalyseSinging: React.FC<{ saHz: number }> = ({ saHz }) => {
     await mic.close();
     setRecording(false);
     setLevel(0);
-    analyse(samples, sr, "microphone");
+    void analyse(samples, sr);
   };
 
   const startRecording = async () => {
@@ -363,7 +343,7 @@ const AnalyseSinging: React.FC<{ saHz: number }> = ({ saHz }) => {
     setBusy(`Reading ${file.name}...`);
     try {
       const { samples, sampleRate } = await decodeAudioFile(file);
-      analyse(samples, sampleRate, file.name);
+      await analyse(samples, sampleRate);
     } catch (err: any) {
       setBusy(null);
       setError(err?.message?.startsWith("Recording is") ? err.message : "Couldn't read this audio file. Try WAV, MP3, M4A or WebM.");
