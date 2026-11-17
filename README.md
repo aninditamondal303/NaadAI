@@ -9,6 +9,9 @@ and a daily plan.
 You only need a laptop or phone microphone and earphones (earphones keep the
 app's tanpura out of the microphone).
 
+**Try it:** https://aninditamondal303.github.io/NaadAI/ (works in Chrome, Edge,
+Firefox and Safari; allow the microphone when asked; use earphones)
+
 ![Analysis of a recording](docs/screenshots/analysis.png)
 
 ## Principles
@@ -106,7 +109,12 @@ by Oormi Creations, MIT licence (see `public/samples/*/LICENSE`).
 
 ## Deploy
 
-Any Node host works (for example Render or Railway): build command
+The website above is built automatically by `.github/workflows/pages.yml` on
+every push to `main` and served by GitHub Pages from the `gh-pages` branch
+(Settings → Pages → Deploy from a branch → `gh-pages`, `/ (root)`). It is a
+static site, so the optional written feedback is switched off there.
+
+To run with the server (and written feedback), any Node host works (for example Render or Railway): build command
 `npm install && npm run build`, start command `npm start`, and optionally the
 `GEMINI_API_KEY` environment variable for written feedback.
 
