@@ -15,18 +15,21 @@ import { RAAG_LIST } from '../data/allRaags';
 import { RAAG_DETAILS } from '../data/raagDetails';
 import { addRecord, loadHistory, newId, onHistoryChange, type PracticeRecord } from '../lib/practiceHistory';
 import { parseSargam, type SargamToken } from '../practice/notation';
-import { generatePaltas, LAYAS, UNLOCK_SCORE } from '../practice/paltas';
+import { generatePaltas, LAYAS, SHUDDHA_SWARAS, UNLOCK_SCORE } from '../practice/paltas';
 import { expectedHz, scoreNote, totalScore, type NoteScore } from '../practice/scoring';
 import { useMic } from './analysis/micHooks';
+import { SurMilao } from './practice/SurMilao';
 import { EarTraining } from './practice/EarTraining';
 import { weakSwaraPalta, weakSwaras } from '../practice/weakSwaras';
 
-interface Props { baseTonicHz: number; initialMode?: "palta" | "pakad" | "ear" }
+interface Props { baseTonicHz: number; initialMode?: "palta" | "pakad" | "ear" | "match" }
 
 type Exercise = { id: string; name: string; description: string; tokens: SargamToken[] };
 type PracticeRec = Extract<PracticeRecord, { kind: "palta" | "pakad" }>;
 
-const RAAGS = [...RAAG_LIST].sort((a, b) => a.name.localeCompare(b.name));
+const RAAG_ONLY = [...RAAG_LIST].sort((a, b) => a.name.localeCompare(b.name));
+/** Basic paltas on the shuddha swaras come first, then every raag. */
+const RAAGS = [SHUDDHA_SWARAS, ...RAAG_ONLY];
 const COUNT_IN = 4;
 /** Shortest note we can score reliably (the pitch window is ~46 ms). */
 const MIN_NOTE_SEC = 0.12;
@@ -55,8 +58,8 @@ function click(ctx: AudioContext, when: number, accent: boolean) {
 
 export const PracticeTab: React.FC<Props> = ({ baseTonicHz, initialMode = "palta" }) => {
   const mic = useMic();
-  const [raagId, setRaagId] = useState("yaman");
-  const [kind, setKind] = useState<"palta" | "pakad" | "ear">(initialMode);
+  const [raagId, setRaagId] = useState("shuddha");
+  const [kind, setKind] = useState<"palta" | "pakad" | "ear" | "match">(initialMode);
   useEffect(() => setKind(initialMode), [initialMode]);
   const [exerciseId, setExerciseId] = useState("aroh-avaroh");
   const [bpm, setBpm] = useState(60);
@@ -209,16 +212,21 @@ export const PracticeTab: React.FC<Props> = ({ baseTonicHz, initialMode = "palta
           <label className="space-y-1 block">
             <span className={label}>Raag</span>
             <select value={raagId} disabled={running} onChange={e => setRaagId(e.target.value)} className="w-full bg-[#0D1230] border border-slate-800 rounded-lg px-3 py-2 text-sm text-slate-200">
-              {RAAGS.map(r => <option key={r.id} value={r.id}>{r.name.replace(/^Raag\s+/i, "")}</option>)}
+              <optgroup label="Basic paltas">
+                <option value={SHUDDHA_SWARAS.id}>Shuddha swaras (S R G M P D N)</option>
+              </optgroup>
+              <optgroup label="Raag paltas">
+                {RAAG_ONLY.map(r => <option key={r.id} value={r.id}>{r.name.replace(/^Raag\s+/i, "")}</option>)}
+              </optgroup>
             </select>
           </label>
           <div className="space-y-1">
             <span className={label}>Exercise type</span>
             <div className="flex gap-2">
-              {(["palta", "pakad", "ear"] as const).map(k => (
+              {(["palta", "pakad", "ear", "match"] as const).map(k => (
                 <button key={k} type="button" disabled={running || (k === "pakad" && !details)} onClick={() => setKind(k)}
                   className={`px-3 py-2 rounded-lg border text-xs font-mono font-bold cursor-pointer disabled:opacity-40 ${kind === k ? "bg-[#E0A458] border-[#E0A458] text-white" : "border-slate-800 text-slate-300"}`}>
-                  {k === "palta" ? "Paltas" : k === "pakad" ? "Pakad" : "Ear training"}
+                  {k === "palta" ? "Paltas" : k === "pakad" ? "Pakad" : k === "ear" ? "Ear training" : "Sur milao"}
                 </button>
               ))}
             </div>
@@ -251,8 +259,9 @@ export const PracticeTab: React.FC<Props> = ({ baseTonicHz, initialMode = "palta
       )}
 
       {kind === "ear" && <EarTraining raag={raag} saHz={baseTonicHz} />}
+      {kind === "match" && <SurMilao raag={raag} saHz={baseTonicHz} />}
 
-      {kind !== "ear" && exercise && (
+      {kind !== "ear" && kind !== "match" && exercise && (
         <div className={card}>
           <div className="flex flex-wrap items-center justify-between gap-3">
             <div className="flex gap-2">
