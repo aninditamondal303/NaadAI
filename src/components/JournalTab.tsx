@@ -2,6 +2,8 @@
  * Riyaz journal: the singer's own notes on each practice session, kept in
  * this browser (same storage key as earlier versions, so entries are kept).
  */
+import { toast } from './shell/Toaster';
+import { NotebookPen } from 'lucide-react';
 import React, { useEffect, useState } from 'react';
 import { RAAG_LIST } from '../data/allRaags';
 import { useUi } from '../i18n/ui';
@@ -48,6 +50,7 @@ export const JournalTab: React.FC = () => {
     persist([{ id: `jentry_${Date.now()}`, date: new Date().toISOString().slice(0, 10), raagId: r.id, raagName: short(r.name), durationMinutes: duration, notes: notes.trim(), moodReflection: rasas[rasa] }, ...entries]);
     setNotes("");
     setAdding(false);
+    toast(u("journalSaved"));
   };
 
   return (
@@ -57,7 +60,7 @@ export const JournalTab: React.FC = () => {
           <h1 className="az-title">{u("journalTitle")}</h1>
           <p className="az-intro">{u("journalIntro")}</p>
         </div>
-        {!adding && <button type="button" className="rz-btn" onClick={() => setAdding(true)}>{u("newEntry")}</button>}
+        {!adding && entries.length > 0 && <button type="button" className="rz-btn" onClick={() => setAdding(true)}>{u("newEntry")}</button>}
       </header>
 
       {adding && (
@@ -84,8 +87,15 @@ export const JournalTab: React.FC = () => {
       )}
 
       <section className="jr-list">
-        <h2 className="rz-h2">{u("pastEntries")}</h2>
-        {entries.length === 0 ? <p className="rg-muted">{u("noEntries")}</p> : (
+        {entries.length > 0 && <h2 className="rz-h2">{u("pastEntries")}</h2>}
+        {entries.length === 0 ? (adding ? null : 
+          <div className="empty-state">
+            <NotebookPen size={28} strokeWidth={1.5} aria-hidden />
+            <strong>{u("noEntriesTitle")}</strong>
+            <span>{u("noEntries")}</span>
+            <button type="button" className="btn btn-primary" onClick={() => setAdding(true)}>{u("newEntry")}</button>
+          </div>
+        ) : (
           <ol>
             {entries.map(e => (
               <li key={e.id}>

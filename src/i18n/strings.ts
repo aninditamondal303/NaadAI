@@ -203,7 +203,7 @@ const en: Strings = {
     },
   },
   analyzer: {
-    title: "Analyzer", intro: "Everything shown here is measured from your voice. Recordings are analysed in your browser and are not uploaded.",
+    title: "Analysis", intro: "Record or upload a take and see every swara measured. Nothing leaves your device.",
     modes: { tuner: "Live tuner", scale: "Find my Sa", sadhana: "Sa sadhana", singing: "Analyse singing" },
     raag: "Raag", measureAgainst: "Measure against", mySa: hz => `My Sa (${hz} Hz)`, detect: "Find Sa in the recording",
     record: "Record", stop: "Stop and analyse", upload: "Upload a recording", demo: "Try the demo recording",
@@ -333,7 +333,7 @@ const hi: Strings = {
     },
   },
   analyzer: {
-    title: "विश्लेषण", intro: "यहाँ दिखाई गई हर चीज़ आपकी आवाज़ से मापी गई है। रिकॉर्डिंग आपके ब्राउज़र में ही जाँची जाती है, अपलोड नहीं होती।",
+    title: "विश्लेषण", intro: "रिकॉर्ड या अपलोड कीजिए और हर स्वर का माप देखिए। कुछ भी आपके डिवाइस से बाहर नहीं जाता।",
     modes: { tuner: "लाइव ट्यूनर", scale: "मेरा सा खोजें", sadhana: "सा साधना", singing: "गायन का विश्लेषण" },
     raag: "राग", measureAgainst: "किससे मापें", mySa: hz => `मेरा सा (${hz} Hz)`, detect: "रिकॉर्डिंग से सा खोजें",
     record: "रिकॉर्ड करें", stop: "रोकें और जाँचें", upload: "रिकॉर्डिंग अपलोड करें", demo: "डेमो रिकॉर्डिंग आज़माएँ",
@@ -463,7 +463,7 @@ const bn: Strings = {
     },
   },
   analyzer: {
-    title: "বিশ্লেষণ", intro: "এখানে যা দেখানো হয় সবই আপনার গলা থেকে মাপা। রেকর্ডিং আপনার ব্রাউজারেই বিশ্লেষণ হয়, আপলোড হয় না।",
+    title: "বিশ্লেষণ", intro: "রেকর্ড বা আপলোড করুন, প্রতিটি স্বরের মাপ দেখুন। কিছুই আপনার ডিভাইসের বাইরে যায় না।",
     modes: { tuner: "লাইভ টিউনার", scale: "আমার সা খুঁজুন", sadhana: "সা সাধনা", singing: "গানের বিশ্লেষণ" },
     raag: "রাগ", measureAgainst: "কীসের সঙ্গে মাপবে", mySa: hz => `আমার সা (${hz} Hz)`, detect: "রেকর্ডিং থেকে সা খুঁজুন",
     record: "রেকর্ড করুন", stop: "থামিয়ে বিশ্লেষণ করুন", upload: "রেকর্ডিং আপলোড করুন", demo: "ডেমো রেকর্ডিং চালান",

@@ -2,6 +2,7 @@
  * Ear training: name the swara (after a Sa reference), or name the raag
  * from a pakad/chalan phrase. Ten questions per round; results are saved.
  */
+import { closeContext } from '../../audio/closeContext';
 import React, { useEffect, useRef, useState } from 'react';
 import { Play } from 'lucide-react';
 import { synthPluck } from '../../audio/tanpura';
@@ -34,7 +35,7 @@ export const EarTraining: React.FC<{ raag: ComprehensiveRaag; saHz: number }> = 
     if (ctxRef.current.state === "suspended") void ctxRef.current.resume();
     return ctxRef.current;
   };
-  useEffect(() => () => { void ctxRef.current?.close(); }, []);
+  useEffect(() => () => { closeContext(ctxRef.current); }, []);
 
   const pluck = (hz: number, when: number, len = 1.2) => {
     const c = ctx();

@@ -76,7 +76,7 @@ export const FeedbackPanel: React.FC<{ m: TakeMeasurements; raagName: string }> 
             type="button"
             onClick={request}
             disabled={state === "loading"}
-            className="px-4 py-2 rounded-lg bg-[#C9A227] hover:bg-[#A8842A] disabled:opacity-60 text-white text-xs font-mono font-bold cursor-pointer shrink-0"
+            className="btn btn-ghost shrink-0"
           >
             {state === "loading" ? "Writing..." : "Get feedback"}
           </button>

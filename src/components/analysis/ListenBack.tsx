@@ -3,6 +3,7 @@
  * drawn on the raag's swara lines in step with the sound, so the singer can
  * hear and see each note together. The audio stays in memory only.
  */
+import { closeContext } from '../../audio/closeContext';
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import type { PitchTrack } from "../../analysis/types";
 import { SwaraCanvas } from "../shared/SwaraCanvas";
@@ -25,7 +26,7 @@ export const ListenBack: React.FC<Props> = ({ audio, track, saHz, allowedSwaras 
   const stop = () => {
     const r = run.current;
     run.current = null;
-    if (r) { try { r.src.stop(); } catch { /* done */ } void r.ctx.close(); }
+    if (r) { try { r.src.stop(); } catch { /* done */ } closeContext(r.ctx); }
     setPlaying(false);
   };
   useEffect(() => () => stop(), []);

@@ -7,6 +7,7 @@
  * Laya ladder: thah -> dugun -> tigun -> chaugun; the next speed unlocks at
  * a score of 85.
  */
+import { InfoTip } from './shell/InfoTip';
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { Lock, Mic, Square } from 'lucide-react';
 import { signedCents } from '../analysis/music';
@@ -208,11 +209,11 @@ export const PracticeTab: React.FC<Props> = ({ baseTonicHz, initialMode = "palta
       <div className={card}>
         <div>
           <h1 className="pg-title">{u("riyazTitle")}</h1>
-          <p className="pr-intro">{u("riyazIntro")}</p>
+          <p className="pr-intro">{u("riyazIntro")} <InfoTip label={u("aboutGrading")}>{u("riyazGrading")}</InfoTip></p>
         </div>
         <div className="pr-controls">
           <label className="space-y-1 block">
-            <span className={label}>Raag</span>
+            <span className={label}>{u("raag")}</span>
             <select value={raagId} disabled={running} onChange={e => setRaagId(e.target.value)} className="w-full bg-[#062327] border border-slate-800 rounded-lg px-3 py-2 text-sm text-slate-200">
               <optgroup label={u("basicPaltas")}>
                 <option value={SHUDDHA_SWARAS.id}>{u("shuddhaSwaras")}</option>
@@ -223,8 +224,8 @@ export const PracticeTab: React.FC<Props> = ({ baseTonicHz, initialMode = "palta
             </select>
           </label>
           <div className="space-y-1">
-            <span className={label}>Exercise type</span>
-            <div className="flex gap-2">
+            <span className={label}>{u("exerciseType")}</span>
+            <div className="pr-kinds">
               {(["palta", "pakad", "guru", "match", "ear"] as const).map(k => (
                 <button key={k} type="button" disabled={running || (k === "pakad" && !pakad)} onClick={() => setKind(k)}
                   aria-current={kind === k ? "true" : undefined} className="pr-kind">
@@ -254,7 +255,7 @@ export const PracticeTab: React.FC<Props> = ({ baseTonicHz, initialMode = "palta
               <span className="pr-ex-name">{e.name}</span>
               <span className="pr-ex-notes">{e.description}</span>
               <span className="pr-ex-best">
-                Best clean speed: {best[e.id] ? LAYAS[best[e.id] - 1].name : "none yet"}
+                {best[e.id] ? u("bestSpeed", LAYAS[best[e.id] - 1].name) : u("bestNone")}
               </span>
             </button>
           ))}

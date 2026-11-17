@@ -3,7 +3,7 @@
  * demo recordings are kept in the browser's cache after the first visit, so
  * riyaz works without a connection. Pages are fetched fresh when online.
  */
-const CACHE = "naad-v1";
+const CACHE = "naad-v2";
 const scope = self.registration.scope;
 
 self.addEventListener("install", event => {

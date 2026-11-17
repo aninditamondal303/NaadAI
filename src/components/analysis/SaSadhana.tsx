@@ -2,6 +2,7 @@
  * Sa sadhana: hold Sa against the tanpura for as long and as steadily as
  * you can. Measures the longest hold, its distance from Sa and its wobble.
  */
+import { closeContext } from '../../audio/closeContext';
 import React, { useEffect, useRef, useState } from 'react';
 import { Mic, Square } from 'lucide-react';
 import { signedCents } from '../../analysis/music';
@@ -27,7 +28,7 @@ export const SaSadhana: React.FC<{ saHz: number }> = ({ saHz }) => {
   const stopTanpura = () => {
     if (!tanpura.current) return;
     tanpura.current.eng.disconnect();
-    void tanpura.current.ctx.close();
+    closeContext(tanpura.current.ctx);
     tanpura.current = null;
   };
 
@@ -98,8 +99,8 @@ export const SaSadhana: React.FC<{ saHz: number }> = ({ saHz }) => {
             </>
           )}
           {!recording
-            ? <button type="button" onClick={start} className="px-5 py-3 rounded-xl bg-[#D9B45F] text-slate-950 font-mono text-xs font-black uppercase tracking-wider flex items-center gap-2 cursor-pointer"><Mic className="h-4 w-4" /> Start Sa sadhana</button>
-            : <button type="button" onClick={() => void finish()} className="px-5 py-3 rounded-xl bg-rose-600 hover:bg-rose-500 text-white font-mono text-xs font-bold uppercase tracking-wider flex items-center gap-2 cursor-pointer"><Square className="h-4 w-4 fill-white" /> Stop</button>}
+            ? <button type="button" onClick={start} className="btn btn-primary"><Mic className="h-4 w-4" /> Start Sa sadhana</button>
+            : <button type="button" onClick={() => void finish()} className="btn btn-danger"><Square className="h-4 w-4 fill-white" /> Stop</button>}
           {mic.error && <p className="text-xs text-rose-300">{mic.error}</p>}
         </div>
       </div>

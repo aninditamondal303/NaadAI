@@ -11,6 +11,7 @@ import "@fontsource/hind-siliguri/500.css";
 import "@fontsource/hind-siliguri/600.css";
 import './index.css';
 import { LangProvider } from './i18n/lang';
+import './lib/install';
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>

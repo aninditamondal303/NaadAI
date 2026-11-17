@@ -1,4 +1,5 @@
 /** Daily riyaz reminder: downloads a calendar file the phone or computer's calendar turns into a daily alert. */
+import { toast } from './shell/Toaster';
 import React, { useState } from "react";
 import { riyazIcs } from "../lib/reminder";
 import { useUi } from "../i18n/ui";
@@ -17,6 +18,7 @@ export const RiyazReminder: React.FC<{ saLabel: string }> = ({ saLabel }) => {
     document.body.appendChild(a); a.click(); a.remove();
     setTimeout(() => URL.revokeObjectURL(a.href), 2000);
     setDone(true);
+    toast(u("reminderAdded"));
   };
   return (
     <section className="rg ub">

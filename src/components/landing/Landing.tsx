@@ -3,6 +3,7 @@
  * drone, the swaras of Raag Yaman as lines, and the visitor's voice (or the
  * demo recording) drawn on them as it is measured.
  */
+import { closeContext } from '../../audio/closeContext';
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import { MicSession } from "../../audio/mic";
 import { TanpuraEngine } from "../../audio/tanpura";
@@ -16,6 +17,16 @@ import { SKIES, skyForHour, type Sky, type SkyName } from "./sky";
 import "./landing.css";
 import { useLang } from "../../i18n/lang";
 import { LangPicker } from "../../i18n/LangPicker";
+import { useUi } from "../../i18n/ui";
+import { ANDROID_APK_URL, canInstall, isNativeApp, onInstallChange, promptInstall } from "../../lib/install";
+import type { AppTab } from "../../types";
+
+const FEATURES: { shot: string; tab: AppTab; h: "lnF1h" | "lnF2h" | "lnF3h" | "lnF4h"; p: "lnF1p" | "lnF2p" | "lnF3p" | "lnF4p" }[] = [
+  { shot: "analysis", tab: "analyzer", h: "lnF1h", p: "lnF1p" },
+  { shot: "tanpura", tab: "tanpura", h: "lnF2h", p: "lnF2p" },
+  { shot: "riyaz", tab: "practice", h: "lnF3h", p: "lnF3p" },
+  { shot: "library", tab: "library", h: "lnF4h", p: "lnF4p" },
+];
 
 const DEMO_URL = `${import.meta.env.BASE_URL}samples/demo/yaman-demo.wav`;
 const DEMO_SA = 130.81;
@@ -57,6 +68,8 @@ export const Landing: React.FC<Props> = ({ returningName, onOpenApp, onDemoAnaly
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const readoutRef = useRef<HTMLDivElement | null>(null);
   const [mode, setMode] = useState<Mode>("idle");
+  const [installable, setInstallable] = useState(canInstall);
+  useEffect(() => onInstallChange(() => setInstallable(canInstall())), []);
   const [demoDone, setDemoDone] = useState(false);
   const [saId, setSaId] = useState<"low" | "high">("low");
   const [message, setMessage] = useState<string | null>(null);
@@ -166,7 +179,7 @@ export const Landing: React.FC<Props> = ({ returningName, onOpenApp, onDemoAnaly
     try { a.voice?.stop(); } catch { /* already stopped */ }
     a.tanpura.stop();
     if (a.mic) await a.mic.close();
-    else await a.ctx.close();
+    else closeContext(a.ctx);
   };
 
   const stop = async () => {
@@ -260,7 +273,7 @@ export const Landing: React.FC<Props> = ({ returningName, onOpenApp, onDemoAnaly
 
   const hourLine = t.hour(prahar.number, prahar.name.includes("night"), hourRaags);
   const openLabel = returningName ? t.nav.continueAs(returningName) : t.nav.open;
-  const A = t.accuracy;
+  const u = useUi();
 
   return (
     <div className={`ln ln-${sky.name}`} style={vars} lang={lang}>
@@ -268,8 +281,7 @@ export const Landing: React.FC<Props> = ({ returningName, onOpenApp, onDemoAnaly
         <header className="ln-top">
           <span className="ln-mark"><span lang={lang === "bn" ? "bn" : "hi"} className="ln-mark-deva">{lang === "bn" ? "নাদ" : "नाद"}</span> Naad AI</span>
           <nav className="ln-nav" aria-label="Page">
-            <a href="#listens">{t.nav.listens}</a>
-            <a href="#accuracy">{t.nav.accuracy}</a>
+            <a href="#features">{u("lnFeatures")}</a>
             <a href="#how-it-works">{t.nav.method}</a>
             <LangPicker />
             <button type="button" className="ln-open" onClick={onOpenApp}>{openLabel}</button>
@@ -332,41 +344,36 @@ export const Landing: React.FC<Props> = ({ returningName, onOpenApp, onDemoAnaly
         </section>
       </div>
 
-      <main className="ln-read">
-        <section id="listens" className="ln-sec">
-          <h2>{t.listens.h}</h2>
-          <p className="ln-lede">{t.listens.lede}</p>
-          <dl className="ln-dl">
-            {t.listens.items.map(([dt, dd]) => <div key={dt}><dt>{dt}</dt><dd>{dd}</dd></div>)}
-          </dl>
+      <main className="ln-read ln-read-2">
+        <section id="features" className="ln-show" aria-label={u("lnFeatures")}>
+          {FEATURES.map((f, i) => (
+            <article key={f.shot} className="ln-feat" data-flip={i % 2 === 1 || undefined}>
+              <figure className="ln-phone">
+                <img src={`${import.meta.env.BASE_URL}shots/${f.shot}.webp`} width={390} height={844} loading="lazy" decoding="async"
+                  alt={u("lnShotAlt", t.tabs[f.tab])} />
+              </figure>
+              <div className="ln-feat-text">
+                <h2>{u(f.h)}</h2>
+                <p>{u(f.p)}</p>
+              </div>
+            </article>
+          ))}
         </section>
 
-        <section id="accuracy" className="ln-sec">
-          <h2>{A.h}</h2>
-          <p className="ln-lede">{A.lede}</p>
-          <table className="ln-table">
-            <caption className="ln-visually-hidden">{A.h}</caption>
-            <tbody>
-              {A.rows.map(([th, v, note]) => <tr key={th}><th scope="row">{th}</th><td>{v}</td><td>{note}</td></tr>)}
-            </tbody>
-          </table>
+        <section className="ln-proof" aria-label={t.nav.method}>
+          <p className="ln-proof-n">92%</p>
+          <p className="ln-proof-text">{u("lnProof")} <a href="#how-it-works">{u("lnProofLink")}</a></p>
         </section>
 
-        <section className="ln-sec">
-          <h2>{t.practise.h}</h2>
-          <dl className="ln-dl">
-            {t.practise.items.map(([dt, dd]) => <div key={dt}><dt>{dt}</dt><dd>{dd}</dd></div>)}
-          </dl>
+        <section className="ln-get">
+          <h2>{u("lnGetH")}</h2>
+          <p>{u("lnGetP")} {u("lnPrivacyP")}</p>
+          <div className="ln-get-row">
+            <button type="button" className="ln-btn ln-btn-main" onClick={onOpenApp}>{openLabel}</button>
+            {installable && <button type="button" className="ln-btn ln-btn-quiet" onClick={() => void promptInstall()}>{u("lnInstall")}</button>}
+            {ANDROID_APK_URL && !isNativeApp() && <a className="ln-btn ln-btn-quiet" href={ANDROID_APK_URL}>{u("lnAndroid")}</a>}
+          </div>
         </section>
-
-        <section className="ln-sec">
-          <h2>{t.privacy.h}</h2>
-          <p className="ln-lede">{t.privacy.lede}</p>
-        </section>
-
-        <div className="ln-again">
-          <button type="button" className="ln-btn ln-btn-main" onClick={onOpenApp}>{openLabel}</button>
-        </div>
       </main>
 
       <footer className="ln-foot">

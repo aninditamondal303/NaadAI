@@ -29,12 +29,12 @@ const Row: React.FC<{ label: string; children: React.ReactNode }> = ({ label, ch
   </div>
 );
 
-export const LibraryTab: React.FC<{ saHz?: number }> = ({ saHz = 130.81 }) => {
+export const LibraryTab: React.FC<{ saHz?: number; openRaagId?: string | null }> = ({ saHz = 130.81, openRaagId = null }) => {
   const u = useUi();
   const [query, setQuery] = useState("");
   const [thaat, setThaat] = useState("All");
   const [fullOnly, setFullOnly] = useState(false);
-  const [viewing, setViewing] = useState<ComprehensiveRaag | null>(null);
+  const [viewing, setViewing] = useState<ComprehensiveRaag | null>(() => RAAG_LIST.find(r => r.id === openRaagId) ?? null);
 
   const list = useMemo(() => RAAG_LIST.filter(r => {
     const q = query.trim().toLowerCase();

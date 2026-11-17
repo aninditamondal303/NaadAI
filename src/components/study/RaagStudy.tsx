@@ -5,6 +5,7 @@
  * can be played: a guide voice for the swaras, with the recorded tanpura,
  * and the recorded tabla for compositions.
  */
+import { closeContext } from '../../audio/closeContext';
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import type { ComprehensiveRaag } from "../../data/allRaags";
 import { RAAG_DETAILS } from "../../data/raagDetails";
@@ -76,7 +77,7 @@ function usePlayer(saHz: number, raag: ComprehensiveRaag) {
         stopVoice();
         tanpura.disconnect();
         taal?.disconnect();
-        window.setTimeout(() => void ctx.close(), 400);
+        window.setTimeout(() => closeContext(ctx), 400);
       },
     };
     setKey(k);

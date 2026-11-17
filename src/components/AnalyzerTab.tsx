@@ -8,7 +8,7 @@
  *  - Analyse singing: record or upload; per-swara measurements, breath and pitch curve
  */
 import React, { useEffect, useMemo, useRef, useState } from 'react';
-import { Activity, Headphones, Mic, Square, Upload } from 'lucide-react';
+import { Activity, Headphones, Mic, Play, Square, Upload } from 'lucide-react';
 import { centsBetween, signedCents, westernNote } from '../analysis/music';
 import { makeMpmDetector } from '../analysis/pitch/mpm';
 import { measureHeldSa, type HeldSaResult } from '../analysis/sa';
@@ -46,9 +46,9 @@ const SA_SECONDS = 6;
 const MAX_RECORD_SECONDS = 10 * 60;
 const silenceRms = Math.pow(10, DEFAULT_PITCH_SETTINGS.silenceDb / 20);
 
-const card = "bg-[#0D3A40] p-6 rounded-3xl border border-slate-800 shadow-xl";
-const primaryBtn = "px-5 py-3 rounded-xl bg-[#D9B45F] text-slate-950 font-mono text-xs font-black uppercase tracking-wider flex items-center gap-2 cursor-pointer disabled:opacity-50";
-const stopBtn = "px-5 py-3 rounded-xl bg-rose-600 hover:bg-rose-500 text-white font-mono text-xs font-bold uppercase tracking-wider flex items-center gap-2 cursor-pointer";
+const card = "az-panel";
+const primaryBtn = "btn btn-primary";
+const stopBtn = "btn btn-danger";
 
 // ------------------------------------------------------------------ live tuner
 
@@ -276,6 +276,12 @@ const AnalyseSinging: React.FC<{ saHz: number; autoDemo?: boolean }> = ({ saHz, 
   const [busy, setBusy] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [result, setResult] = useState<AnalysisResult | null>(null);
+  const reportRef = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    if (!result) return;
+    const reduce = window.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
+    window.setTimeout(() => reportRef.current?.scrollIntoView({ behavior: reduce ? "auto" : "smooth", block: "start" }), 120);
+  }, [result]);
   const timer = useRef<number | null>(null);
   const fileInput = useRef<HTMLInputElement | null>(null);
 
@@ -404,75 +410,55 @@ const AnalyseSinging: React.FC<{ saHz: number; autoDemo?: boolean }> = ({ saHz, 
 
   return (
     <div className="space-y-5">
-      <div className={`${card} space-y-5`}>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <label className="space-y-1 block">
-            <span className="text-[9px] font-mono text-slate-500 uppercase tracking-widest font-bold block">{A.raag}</span>
-            <select
-              value={raagId}
-              onChange={e => setRaagId(e.target.value)}
-              disabled={recording || !!busy}
-              className="w-full bg-[#062327] border border-slate-800 rounded-lg px-3 py-2 text-sm text-slate-200"
-            >
+      <div className="az-studio" data-recording={recording || undefined}>
+        <div className="az-studio-opts">
+          <label className="az-field">
+            <span>{A.raag}</span>
+            <select value={raagId} onChange={e => setRaagId(e.target.value)} disabled={recording || !!busy}>
               {RAAG_OPTIONS.map(r => <option key={r.id} value={r.id}>{r.name}</option>)}
             </select>
           </label>
-          <div className="space-y-1">
-            <span className="text-[9px] font-mono text-slate-500 uppercase tracking-widest font-bold block">{A.measureAgainst}</span>
-            <div className="flex gap-2 text-xs font-mono">
+          <div className="az-field">
+            <span>{A.measureAgainst}</span>
+            <div className="az-modes" role="group" aria-label={A.measureAgainst}>
               {([["mine", A.mySa(saHz.toFixed(1))], ["detect", A.detect]] as const).map(([v, l]) => (
-                <button
-                  key={v}
-                  type="button"
-                  disabled={recording || !!busy}
-                  onClick={() => setSaChoice(v)}
-                  className={`px-3 py-2 rounded-lg border cursor-pointer ${saChoice === v ? "bg-[#C9A227] border-[#C9A227] text-white" : "border-slate-800 text-slate-400 hover:text-slate-200"}`}
-                >
-                  {l}
-                </button>
+                <button key={v} type="button" disabled={recording || !!busy} onClick={() => setSaChoice(v)} aria-current={saChoice === v ? "true" : undefined}>{l}</button>
               ))}
             </div>
           </div>
         </div>
 
-        <div className="flex flex-col items-center gap-3">
-          {recording && (
-            <>
-              <SwaraCanvas className="rz-live" grid={grid} getView={liveView} running={recording}
-                label={`Your voice drawn on the swaras of ${raag.name} while recording`} />
-              <span className="text-xs text-slate-400">{A.liveNote}</span>
-              <span className="text-xs font-mono text-[#D9B45F]">{A.recording} {Math.floor(elapsed / 60)}:{String(Math.floor(elapsed % 60)).padStart(2, "0")}</span>
-              <LevelMeter level={level} />
-            </>
-          )}
-          <div className="flex flex-wrap justify-center gap-3">
-            {!recording
-              ? <button type="button" className={primaryBtn} onClick={startRecording} disabled={!!busy}><Mic className="h-4 w-4" /> {A.record}</button>
-              : <button type="button" className={stopBtn} onClick={() => void stopRecording()}><Square className="h-4 w-4 fill-white" /> {A.stop}</button>}
-            {!recording && (
-              <button
-                type="button"
-                disabled={!!busy}
-                onClick={() => fileInput.current?.click()}
-                className="px-5 py-3 rounded-xl border border-slate-700 text-slate-200 hover:bg-slate-800 font-mono text-xs font-bold uppercase tracking-wider flex items-center gap-2 cursor-pointer disabled:opacity-50"
-              >
-                <Upload className="h-4 w-4" /> {A.upload}
-              </button>
-            )}
-            {!recording && (
-              <button type="button" disabled={!!busy} onClick={runDemo}
-                className="px-5 py-3 rounded-xl border border-dashed border-slate-700 text-slate-300 hover:bg-slate-800 font-mono text-xs font-bold uppercase tracking-wider cursor-pointer disabled:opacity-50">
-                {A.demo}
-              </button>
-            )}
-            <input ref={fileInput} type="file" accept="audio/*,.wav,.mp3,.m4a,.webm,.ogg" className="hidden" onChange={onFile} data-testid="audio-upload" />
+        {recording && (
+          <div className="az-live">
+            <SwaraCanvas className="rz-live" grid={grid} getView={liveView} running={recording}
+              label={`Your voice drawn on the swaras of ${raag.name} while recording`} />
+            <span className="az-live-note">{A.liveNote}</span>
           </div>
-          {busy && <p className="text-xs font-mono text-[#8CC7BD]">{busy}</p>}
-          {(error || mic.error) && <p className="text-xs text-rose-300">{error || mic.error}</p>}
+        )}
+
+        <div className="az-rec">
+          <button type="button" className="az-rec-btn" disabled={!!busy && !recording}
+            onClick={() => (recording ? void stopRecording() : void startRecording())}
+            aria-label={recording ? A.stop : A.record} style={{ ["--lvl" as any]: recording ? Math.min(1, level * 4) : 0 }}>
+            <span className="az-rec-ring" aria-hidden="true" />
+            {recording ? <Square className="h-6 w-6" fill="currentColor" aria-hidden /> : <Mic className="h-7 w-7" aria-hidden />}
+          </button>
+          <span className="az-rec-label">
+            {recording ? <>{A.recording} <b>{Math.floor(elapsed / 60)}:{String(Math.floor(elapsed % 60)).padStart(2, "0")}</b></> : A.record}
+          </span>
+          {!recording && (
+            <div className="az-rec-alt">
+              <button type="button" className="btn btn-ghost" disabled={!!busy} onClick={() => fileInput.current?.click()}><Upload className="h-4 w-4" aria-hidden /> {A.upload}</button>
+              <button type="button" className="btn btn-ghost" disabled={!!busy} onClick={runDemo}><Play className="h-4 w-4" aria-hidden /> {A.demo}</button>
+            </div>
+          )}
+          <input ref={fileInput} type="file" accept="audio/*,.wav,.mp3,.m4a,.webm,.ogg" className="hidden" onChange={onFile} data-testid="audio-upload" />
+          {busy && <p className="az-busy" role="status"><span className="az-spin" aria-hidden="true" />{busy}</p>}
+          {(error || mic.error) && <p className="az-error" role="alert">{error || mic.error}</p>}
         </div>
       </div>
 
-      {result && <TakeReport audio={result.audio} m={result.m} track={result.track} raagName={result.raagName} allowedSwaras={result.allowedSwaras} saNotes={result.saNotes} />}
+      {result && <div ref={reportRef} className="az-report"><TakeReport audio={result.audio} m={result.m} track={result.track} raagName={result.raagName} allowedSwaras={result.allowedSwaras} saNotes={result.saNotes} /></div>}
     </div>
   );
 };

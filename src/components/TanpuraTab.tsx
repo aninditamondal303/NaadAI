@@ -5,6 +5,7 @@
  * matra lit by the player's own clock. Thekas can be edited, since gharanas
  * differ, and are saved in this browser.
  */
+import { closeContext } from '../audio/closeContext';
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { centsBetween, hzFromCents, signedCents, westernNote } from '../analysis/music';
 import { TanpuraEngine, STRING_ORDER, stringHz, type FirstString } from '../audio/tanpura';
@@ -61,7 +62,7 @@ function useAudioContext() {
     }
     return ref.current;
   };
-  useEffect(() => () => { void ref.current?.ctx.close(); }, []);
+  useEffect(() => () => { closeContext(ref.current?.ctx); }, []);
   return get;
 }
 

@@ -3,6 +3,7 @@
  * moving with the real sound), today's plan, raags for the hour, and an
  * index of everything in the app.
  */
+import { closeContext } from '../audio/closeContext';
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { RAAG_LIST } from '../data/allRaags';
 import { RAAG_DETAILS } from '../data/raagDetails';
@@ -25,6 +26,7 @@ interface HomeTabProps {
   setPracticeMode?: (mode: "palta" | "pakad" | "ear" | "match" | "guru") => void;
   vocalistName?: string;
   baseTonicHz?: number;
+  onOpenRaag?: (id: string) => void;
 }
 
 interface Session {
@@ -51,7 +53,7 @@ function digits(lang: Lang) {
   return (n: number) => nf.format(n);
 }
 
-export const HomeTab: React.FC<HomeTabProps> = ({ setActiveTab, setAnalyzerMode, setPracticeMode, vocalistName = "", baseTonicHz = 130.81 }) => {
+export const HomeTab: React.FC<HomeTabProps> = ({ setActiveTab, setAnalyzerMode, setPracticeMode, vocalistName = "", baseTonicHz = 130.81, onOpenRaag }) => {
   const { lang, t } = useLang();
   const h = t.home;
   // Start with a raag suited to this hour, if the library lists one
@@ -82,7 +84,7 @@ export const HomeTab: React.FC<HomeTabProps> = ({ setActiveTab, setAnalyzerMode,
     audio.current = null;
     if (!a) return;
     a.eng.disconnect();
-    setTimeout(() => a.ctx.close().catch(() => {}), 800);
+    setTimeout(() => closeContext(a.ctx), 800);
     setAnalyser(null);
   };
   useEffect(() => () => stopAudio(), []);
@@ -227,7 +229,7 @@ export const HomeTab: React.FC<HomeTabProps> = ({ setActiveTab, setAnalyzerMode,
           {message && <p className="rz-message" role="status">{message}</p>}
         </div>
 
-        <figure className="rz-room-strings">
+        <figure className="rz-room-strings" data-live={session ? "true" : "false"}>
           <TanpuraStrings analyser={analyser} pluck={pluck} labels={labels} label={h.stringsLabel} />
           {session && recorded && <figcaption className="rz-muted">{h.recordedDrone}</figcaption>}
         </figure>
@@ -250,21 +252,8 @@ export const HomeTab: React.FC<HomeTabProps> = ({ setActiveTab, setAnalyzerMode,
         </section>
       )}
 
-      <TodayPanel onGo={(g) => go(g.tab as AppTab, g.mode)} />
+      <TodayPanel onGo={(g) => go(g.tab as AppTab, g.mode)} onOpenRaag={onOpenRaag} />
 
-      <section className="rz-index" aria-labelledby="rz-index-h">
-        <h2 id="rz-index-h" className="rz-h2">{h.index}</h2>
-        <ul>
-          {(["tanpura", "analyzer", "practice", "journal", "progress", "library"] as const).map(id => (
-            <li key={id}>
-              <button type="button" onClick={() => go(id, id === "analyzer" ? "singing" : undefined)}>
-                <span className="rz-index-name">{t.tabs[id]}</span>
-                <span className="rz-index-desc">{h.items[id]}</span>
-              </button>
-            </li>
-          ))}
-        </ul>
-      </section>
     </div>
   );
 };
