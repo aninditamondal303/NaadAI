@@ -62,6 +62,7 @@ export function findPairs(dir: string): { wav: string; ref: string }[] {
   const files: string[] = [];
   const walk = (d: string) => {
     for (const name of readdirSync(d)) {
+      if (name === "__MACOSX" || name.startsWith("._") || name.startsWith(".")) continue; // macOS zip leftovers
       const p = join(d, name);
       if (statSync(p).isDirectory()) walk(p); else files.push(p);
     }
