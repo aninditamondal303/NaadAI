@@ -39,6 +39,9 @@ export const FeedbackPanel: React.FC<{ m: TakeMeasurements; raagName: string }> 
   const [text, setText] = useState("");
   const [reason, setReason] = useState("");
 
+  // The static website (GitHub Pages) has no server, so written feedback can't run there.
+  const staticSite = import.meta.env.VITE_STATIC_SITE === "1";
+
   const request = async () => {
     setState("loading");
     try {
@@ -47,7 +50,7 @@ export const FeedbackPanel: React.FC<{ m: TakeMeasurements; raagName: string }> 
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ measurements: feedbackPayload(m, raagName) }),
       });
-      const data = await res.json();
+      const data = await res.json().catch(() => ({ unavailable: true, reason: "no feedback server here" }));
       if (data.unavailable) { setReason(data.reason || ""); setState("unavailable"); return; }
       if (!res.ok || !data.text) throw new Error(data.error || "No feedback returned");
       setText(data.text);
@@ -68,7 +71,7 @@ export const FeedbackPanel: React.FC<{ m: TakeMeasurements; raagName: string }> 
             It is a study aid, not a guru, and it is told never to invent numbers.
           </p>
         </div>
-        {state !== "done" && (
+        {state !== "done" && !staticSite && (
           <button
             type="button"
             onClick={request}
@@ -79,6 +82,12 @@ export const FeedbackPanel: React.FC<{ m: TakeMeasurements; raagName: string }> 
           </button>
         )}
       </div>
+      {staticSite && (
+        <p className="text-xs text-slate-400">
+          This online demo has no server, so written feedback is off. The measurements above are complete without it.
+          Run the app locally with an API key to try it.
+        </p>
+      )}
       {state === "unavailable" && (
         <p className="text-xs text-slate-400">Written feedback isn't set up on this server{reason ? ` (${reason})` : ""}. The measurements above are complete without it.</p>
       )}

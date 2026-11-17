@@ -164,7 +164,7 @@ export class TanpuraEngine {
   }
 
   /** Try to load recorded samples. Safe to skip: the synth is used if this fails. */
-  async loadSamples(baseUrl = "/samples/tanpura"): Promise<void> {
+  async loadSamples(baseUrl = `${import.meta.env.BASE_URL}samples/tanpura`): Promise<void> {
     try {
       const res = await fetch(`${baseUrl}/manifest.json`);
       if (!res.ok) return;

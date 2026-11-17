@@ -172,7 +172,7 @@ export class TaalPlayer {
     this.out.connect(destination);
   }
 
-  async loadSamples(baseUrl = "/samples/tabla"): Promise<void> {
+  async loadSamples(baseUrl = `${import.meta.env.BASE_URL}samples/tabla`): Promise<void> {
     try {
       const res = await fetch(`${baseUrl}/manifest.json`);
       if (!res.ok) return;
