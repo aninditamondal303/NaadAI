@@ -9,6 +9,8 @@ import type { TakeMeasurements } from '../../analysis/summary';
 import type { PitchTrack } from '../../analysis/types';
 import { PitchContour } from './PitchContour';
 import { FeedbackPanel } from './FeedbackPanel';
+import { downloadTakeImage } from '../../lib/takeImage';
+import { useLang } from '../../i18n/lang';
 
 const fmtSec = (s: number) => (s >= 60 ? `${Math.floor(s / 60)}m ${Math.round(s % 60)}s` : `${s.toFixed(1)} s`);
 const fmtCents = signedCents;
@@ -32,6 +34,7 @@ export interface TakeReportProps {
 
 export const TakeReport: React.FC<TakeReportProps> = ({ m, track, raagName, allowedSwaras, saNotes }) => {
   const sa = westernNote(m.saHz);
+  const { t } = useLang();
   const outside = m.swaras.filter(s => s.inRaag === false);
 
   return (
@@ -41,7 +44,13 @@ export const TakeReport: React.FC<TakeReportProps> = ({ m, track, raagName, allo
       ))}
 
       <div className="bg-[#1A2150] p-5 rounded-2xl border border-slate-800 space-y-4">
-        <h3 className="text-xs font-mono font-bold text-[#F4C56A] uppercase tracking-widest">Measurements · Raag {raagName}</h3>
+        <div className="flex flex-wrap items-baseline justify-between gap-3">
+          <h3 className="text-xs font-mono font-bold text-[#F4C56A] uppercase tracking-widest">Measurements, Raag {raagName.replace(/^Raag\s+/i, "")}</h3>
+          <button type="button" className="rz-link"
+            onClick={() => void downloadTakeImage({ m, track, raagName, allowedSwaras: allowedSwaras ?? [0, 2, 4, 5, 7, 9, 11], date: new Date() })}>
+            {t.analyzer.saveImage}
+          </button>
+        </div>
         <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
           <Stat
             label="Sa used"
