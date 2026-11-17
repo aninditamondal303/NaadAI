@@ -21,7 +21,7 @@ import type { Lang } from '../i18n/strings';
 interface HomeTabProps {
   setActiveTab: (tab: AppTab) => void;
   setAnalyzerMode?: (mode: AnalyzerMode) => void;
-  setPracticeMode?: (mode: "palta" | "pakad" | "ear") => void;
+  setPracticeMode?: (mode: "palta" | "pakad" | "ear" | "match") => void;
   vocalistName?: string;
   baseTonicHz?: number;
 }
@@ -151,7 +151,7 @@ export const HomeTab: React.FC<HomeTabProps> = ({ setActiveTab, setAnalyzerMode,
 
   const go = (tab: AppTab, mode?: string) => {
     if (tab === "analyzer" && mode) setAnalyzerMode?.(mode as AnalyzerMode);
-    if (tab === "practice") setPracticeMode?.((mode as "palta" | "pakad" | "ear") ?? "palta");
+    if (tab === "practice") setPracticeMode?.((mode as "palta" | "pakad" | "ear" | "match") ?? "palta");
     setActiveTab(tab);
   };
 

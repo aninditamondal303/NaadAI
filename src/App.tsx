@@ -44,7 +44,7 @@ export default function App() {
   // Seven active menu tabs for classical musicians
   const [activeTab, setActiveTab] = useState<AppTab>("home");
   const [analyzerMode, setAnalyzerMode] = useState<AnalyzerMode>("singing");
-  const [practiceMode, setPracticeMode] = useState<"palta" | "pakad" | "ear">("palta");
+  const [practiceMode, setPracticeMode] = useState<"palta" | "pakad" | "ear" | "match">("palta");
 
   // Custom raga selection and filter states
   const [searchQuery, setSearchQuery] = useState("");
@@ -157,7 +157,7 @@ export default function App() {
         {activeTab === "journal" && <JournalTab />}
         {activeTab === "progress" && <ProgressTab />}
         {activeTab === "practice" && <PracticeTab baseTonicHz={baseTonicHz} initialMode={practiceMode} />}
-        {activeTab === "library" && <LibraryTab />}
+        {activeTab === "library" && <LibraryTab saHz={baseTonicHz} />}
         {activeTab === "profile" && <ProfileTab baseTonicHz={baseTonicHz} vocalistName={vocalistName} profileId={profileId}
           onDeleted={() => { setProfileId(null); setIsAuthenticated(false); setActivePage("profiles"); }} />}
       </main>

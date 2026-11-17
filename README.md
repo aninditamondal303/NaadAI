@@ -27,6 +27,23 @@ in English).
 
 ![Analysis of a recording](docs/screenshots/analysis.png)
 
+### Learning a raag
+
+For Yaman, Bhupali, Bhairav, Malkauns, Bhimpalasi, Bageshree, Marwa, Puriya
+and Todi, the Library has alaap in three stages, a sargam geet and a bandish
+in Bhatkhande-style swaralipi (in Devanagari, Bengali or S R G letters), with
+what each is based on: the raag, the taal and its theka, the laya and the
+form. Each can be played with a guide voice, the recorded tanpura and the
+recorded tabla. These compositions and lyrics were written for this app to
+follow each raag's rules (tests check every swara); they are not traditional
+bandishes and await a guru's review. "Give me more" generates further sargam
+and alaap phrases for any raag from its aroh and avaroh.
+
+Practice also has basic paltas on the shuddha swaras (12 alankars), the same
+patterns for every raag, and Sur milao: hear a swara, sing it, and see how
+close you were. The app can be installed and works offline after the first
+visit.
+
 ## Principles
 
 - **Only real measurements.** Every number is measured from your voice. If
