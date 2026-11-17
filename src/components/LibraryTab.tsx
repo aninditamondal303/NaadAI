@@ -7,6 +7,7 @@ import React, { useMemo, useState } from 'react';
 import { ArrowLeft, Search, ShieldAlert } from 'lucide-react';
 import { RAAG_LIST, type ComprehensiveRaag } from '../data/allRaags';
 import { RAAG_DETAILS } from '../data/raagDetails';
+import { RaagStudy } from './study/RaagStudy';
 
 const SYM = ["S", "r", "R", "g", "G", "m", "M", "P", "d", "D", "n", "N"];
 const NAMES = ["Sa", "komal Re", "Re", "komal Ga", "Ga", "Ma", "tivra Ma", "Pa", "komal Dha", "Dha", "komal Ni", "Ni"];
@@ -23,7 +24,7 @@ const Row: React.FC<{ label: string; children: React.ReactNode }> = ({ label, ch
   </div>
 );
 
-export const LibraryTab: React.FC = () => {
+export const LibraryTab: React.FC<{ saHz?: number }> = ({ saHz = 130.81 }) => {
   const [query, setQuery] = useState("");
   const [thaat, setThaat] = useState("All");
   const [fullOnly, setFullOnly] = useState(false);
@@ -90,6 +91,8 @@ export const LibraryTab: React.FC = () => {
             <Row label="Pakad, chalan, nyas">Not written yet for this raag. Only the basic facts above are available.</Row>
           )}
         </div>
+
+        <RaagStudy raag={r} saHz={saHz} />
       </div>
     );
   }
