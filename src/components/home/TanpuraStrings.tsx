@@ -54,8 +54,8 @@ export const TanpuraStrings: React.FC<Props> = ({ analyser, pluck, labels, label
         energy.current[i] = e * 0.965;
         const amp = reduced ? 0 : Math.min(14, (level * 7 + e * 9) * (i === 3 ? 1.3 : 1));
         const lit = Math.min(1, level * 1.5 + e);
-        ctx.strokeStyle = `rgba(244,197,106,${0.25 + lit * 0.75})`;
-        ctx.shadowColor = "#F4C56A";
+        ctx.strokeStyle = `rgba(217,180,95,${0.25 + lit * 0.75})`;
+        ctx.shadowColor = "#D9B45F";
         ctx.shadowBlur = lit * 16;
         ctx.lineWidth = i === 3 ? 2.2 : 1.4;
         ctx.beginPath();
@@ -68,7 +68,7 @@ export const TanpuraStrings: React.FC<Props> = ({ analyser, pluck, labels, label
         }
         ctx.stroke();
         ctx.shadowBlur = 0;
-        ctx.fillStyle = `rgba(230,232,246,${0.55 + lit * 0.45})`;
+        ctx.fillStyle = `rgba(243,236,223,${0.55 + lit * 0.45})`;
         ctx.font = '20px "Tiro Devanagari Hindi", "Tiro Bangla", serif';
         ctx.textAlign = "center";
         ctx.fillText(labels[i] ?? "", x, h - 8);

@@ -20,24 +20,24 @@ export interface Sky {
 
 export const SKIES: Record<SkyName, Sky> = {
   dawn: {
-    name: "dawn", top: "#2C3264", bottom: "#9C6B78", ink: "#FBEFE6", muted: "rgba(251,239,230,0.72)",
-    line: "rgba(251,239,230,0.16)", lineStrong: "rgba(251,239,230,0.34)", voice: "#FFD9A0", glow: 14,
-    buttonBg: "#FBEFE6", buttonInk: "#2C3264",
+    name: "dawn", top: "#123B44", bottom: "#A9775E", ink: "#F7EEE2", muted: "rgba(247,238,226,0.74)",
+    line: "rgba(247,238,226,0.16)", lineStrong: "rgba(247,238,226,0.34)", voice: "#F4D79E", glow: 14,
+    buttonBg: "#F7EEE2", buttonInk: "#123B44",
   },
   day: {
-    name: "day", top: "#AFC4D3", bottom: "#E6DFD0", ink: "#1D2340", muted: "rgba(29,35,64,0.72)",
-    line: "rgba(29,35,64,0.14)", lineStrong: "rgba(29,35,64,0.32)", voice: "#9A3B22", glow: 0,
-    buttonBg: "#1D2340", buttonInk: "#E6DFD0",
+    name: "day", top: "#C9DDD8", bottom: "#EFE7D4", ink: "#0B3036", muted: "rgba(11,48,54,0.72)",
+    line: "rgba(11,48,54,0.14)", lineStrong: "rgba(11,48,54,0.32)", voice: "#8A5A12", glow: 0,
+    buttonBg: "#0B3036", buttonInk: "#EFE7D4",
   },
   dusk: {
-    name: "dusk", top: "#2A2350", bottom: "#A0546A", ink: "#FCEFE3", muted: "rgba(252,239,227,0.74)",
-    line: "rgba(252,239,227,0.15)", lineStrong: "rgba(252,239,227,0.34)", voice: "#FFD37A", glow: 16,
-    buttonBg: "#FCEFE3", buttonInk: "#2A2350",
+    name: "dusk", top: "#0F3940", bottom: "#83463A", ink: "#F7EEE2", muted: "rgba(247,238,226,0.74)",
+    line: "rgba(247,238,226,0.15)", lineStrong: "rgba(247,238,226,0.34)", voice: "#EBC673", glow: 16,
+    buttonBg: "#F7EEE2", buttonInk: "#0F3940",
   },
   night: {
-    name: "night", top: "#0D1230", bottom: "#27315F", ink: "#E6E8F6", muted: "rgba(230,232,246,0.7)",
-    line: "rgba(230,232,246,0.12)", lineStrong: "rgba(230,232,246,0.3)", voice: "#F4C56A", glow: 18,
-    buttonBg: "#F4C56A", buttonInk: "#0D1230",
+    name: "night", top: "#062327", bottom: "#155058", ink: "#F3ECDF", muted: "rgba(243,236,223,0.7)",
+    line: "rgba(243,236,223,0.12)", lineStrong: "rgba(243,236,223,0.3)", voice: "#D9B45F", glow: 18,
+    buttonBg: "#D9B45F", buttonInk: "#062327",
   },
 };
 

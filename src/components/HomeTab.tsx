@@ -16,6 +16,7 @@ import type { AnalyzerMode } from './AnalyzerTab';
 import { TodayPanel } from './home/TodayPanel';
 import { TanpuraStrings } from './home/TanpuraStrings';
 import { useLang } from '../i18n/lang';
+import { Phrase } from './study/Swaralipi';
 import type { Lang } from '../i18n/strings';
 
 interface HomeTabProps {
@@ -71,6 +72,7 @@ export const HomeTab: React.FC<HomeTabProps> = ({ setActiveTab, setAnalyzerMode,
   const fmt = digits(lang);
   const num = (n: number) => new Intl.NumberFormat(lang === "hi" ? "hi-IN-u-nu-deva" : lang === "bn" ? "bn-IN-u-nu-beng" : "en-IN").format(n);
   const script = lang === "bn" ? "beng" : "deva";
+  const noteScript = lang === "bn" ? "beng" as const : "deva" as const;
   const tuning = session?.tuning ?? firstStringForRaag(raag.allowedSwaras);
   const labels = useMemo(() => [STRING_LABELS[script][tuning], script === "beng" ? "সা" : "सा", script === "beng" ? "সা" : "सा", script === "beng" ? "সা" : "सा़"], [script, tuning]);
 
@@ -234,14 +236,14 @@ export const HomeTab: React.FC<HomeTabProps> = ({ setActiveTab, setAnalyzerMode,
       {session && sessionRaag && (
         <section className="rz-sheet">
           <dl className="rz-notation">
-            <div><dt>{h.aroh}</dt><dd>{sessionRaag.aroha.join(" ")}</dd></div>
-            <div><dt>{h.avaroh}</dt><dd>{sessionRaag.avaroha.join(" ")}</dd></div>
-            <div><dt>{h.pakad}</dt><dd>{details ? details.pakad : h.notWritten}</dd></div>
+            <div><dt>{h.aroh}</dt><dd><Phrase text={sessionRaag.aroha.join(" ")} script={noteScript} /></dd></div>
+            <div><dt>{h.avaroh}</dt><dd><Phrase text={sessionRaag.avaroha.join(" ")} script={noteScript} /></dd></div>
+            <div><dt>{h.pakad}</dt><dd>{details ? <Phrase text={details.pakad} script={noteScript} /> : h.notWritten}</dd></div>
           </dl>
           <h2 className="rz-h2">{h.paltas}</h2>
           <ol className="rz-paltas">
             {generatePaltas(sessionRaag).slice(0, 3).map(p => (
-              <li key={p.id}><span>{p.name}</span> {p.notes.map(n => n.label).join(" ")}</li>
+              <li key={p.id}><span>{p.name}</span> <Phrase text={p.notes.map(n => n.label).join(" ")} script={noteScript} /></li>
             ))}
           </ol>
           <p className="rz-muted rz-small">{h.review}</p>

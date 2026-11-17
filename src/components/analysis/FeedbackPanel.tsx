@@ -62,7 +62,7 @@ export const FeedbackPanel: React.FC<{ m: TakeMeasurements; raagName: string }> 
   };
 
   return (
-    <div className="bg-[#1A2150] p-5 rounded-2xl border border-slate-800 space-y-3">
+    <div className="bg-[#0D3A40] p-5 rounded-2xl border border-slate-800 space-y-3">
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
         <div>
           <h3 className="text-xs font-mono font-bold text-slate-300 uppercase tracking-widest">Written feedback (optional)</h3>
@@ -76,7 +76,7 @@ export const FeedbackPanel: React.FC<{ m: TakeMeasurements; raagName: string }> 
             type="button"
             onClick={request}
             disabled={state === "loading"}
-            className="px-4 py-2 rounded-lg bg-[#E0A458] hover:bg-[#C98B3E] disabled:opacity-60 text-white text-xs font-mono font-bold cursor-pointer shrink-0"
+            className="px-4 py-2 rounded-lg bg-[#C9A227] hover:bg-[#A8842A] disabled:opacity-60 text-white text-xs font-mono font-bold cursor-pointer shrink-0"
           >
             {state === "loading" ? "Writing..." : "Get feedback"}
           </button>

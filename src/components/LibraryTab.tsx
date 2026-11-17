@@ -73,7 +73,7 @@ export const LibraryTab: React.FC<{ saHz?: number }> = ({ saHz = 130.81 }) => {
                   {d.similar.map(s => (
                     <span key={s.name} className="block">
                       {s.raagId ? (
-                        <button type="button" className="font-bold text-[#9FB3E6] hover:underline cursor-pointer"
+                        <button type="button" className="font-bold text-[#8CC7BD] hover:underline cursor-pointer"
                           onClick={() => setViewing(RAAG_LIST.find(x => x.id === s.raagId) ?? r)}>{s.name}</button>
                       ) : <span className="font-bold">{s.name}</span>}
                       : {s.difference}
@@ -101,7 +101,7 @@ export const LibraryTab: React.FC<{ saHz?: number }> = ({ saHz = 130.81 }) => {
     <div className="lib">
       <header className="lib-head">
         <div>
-          <h1 className="lib-title">Raag library</h1>
+          <h1 className="lib-title">Raags, by the clock</h1>
           <p className="lib-intro">
             {RAAG_LIST.length} raags with their swaras, aroh, avaroh, vadi and samvadi. {fullCount} also have pakad, chalan,
             alaap, a sargam geet and a bandish to study. All entries await a guru's review.

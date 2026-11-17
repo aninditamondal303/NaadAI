@@ -191,8 +191,8 @@ export const PracticeTab: React.FC<Props> = ({ baseTonicHz, initialMode = "palta
     if (s?.grade === "green") return "bg-emerald-500/20 border-emerald-500 text-emerald-200";
     if (s?.grade === "yellow") return "bg-amber-500/20 border-amber-400 text-amber-100";
     if (s?.grade === "red") return "bg-rose-500/20 border-rose-500 text-rose-200";
-    if (i === current) return "bg-[#E0A458]/30 border-[#E0A458] text-white";
-    return "bg-[#0D1230]/60 border-slate-800 text-slate-300";
+    if (i === current) return "bg-[#C9A227]/30 border-[#C9A227] text-white";
+    return "bg-[#062327]/60 border-slate-800 text-slate-300";
   };
 
   const card = "pr-panel space-y-4";
@@ -211,7 +211,7 @@ export const PracticeTab: React.FC<Props> = ({ baseTonicHz, initialMode = "palta
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
           <label className="space-y-1 block">
             <span className={label}>Raag</span>
-            <select value={raagId} disabled={running} onChange={e => setRaagId(e.target.value)} className="w-full bg-[#0D1230] border border-slate-800 rounded-lg px-3 py-2 text-sm text-slate-200">
+            <select value={raagId} disabled={running} onChange={e => setRaagId(e.target.value)} className="w-full bg-[#062327] border border-slate-800 rounded-lg px-3 py-2 text-sm text-slate-200">
               <optgroup label="Basic paltas">
                 <option value={SHUDDHA_SWARAS.id}>Shuddha swaras (S R G M P D N)</option>
               </optgroup>
@@ -234,10 +234,10 @@ export const PracticeTab: React.FC<Props> = ({ baseTonicHz, initialMode = "palta
           </div>
           <label className="space-y-1 block">
             <span className={label}>Beat: {bpm} per minute</span>
-            <input type="range" min={40} max={120} value={bpm} disabled={running} onChange={e => setBpm(Number(e.target.value))} className="w-full accent-[#E0A458]" />
+            <input type="range" min={40} max={120} value={bpm} disabled={running} onChange={e => setBpm(Number(e.target.value))} className="w-full accent-[#C9A227]" />
           </label>
           <label className="flex items-center gap-2 text-xs text-slate-300 pt-4">
-            <input type="checkbox" checked={withTanpura} disabled={running} onChange={e => setWithTanpura(e.target.checked)} className="accent-[#E0A458]" />
+            <input type="checkbox" checked={withTanpura} disabled={running} onChange={e => setWithTanpura(e.target.checked)} className="accent-[#C9A227]" />
             Tanpura on (Sa {baseTonicHz.toFixed(1)} Hz)
           </label>
         </div>
@@ -270,14 +270,14 @@ export const PracticeTab: React.FC<Props> = ({ baseTonicHz, initialMode = "palta
                 return (
                   <button key={l.speed} type="button" disabled={running || locked} onClick={() => setSpeed(l.speed)}
                     title={locked ? `Score ${UNLOCK_SCORE}+ at ${LAYAS[l.speed - 2].name} to unlock` : undefined}
-                    className={`px-3 py-2 rounded-lg border text-xs font-mono font-bold flex items-center gap-1 cursor-pointer disabled:cursor-not-allowed ${speed === l.speed ? "bg-[#9FB3E6] border-[#9FB3E6] text-slate-950" : locked ? "border-slate-800 text-slate-600" : "border-slate-700 text-slate-200"}`}>
+                    className={`px-3 py-2 rounded-lg border text-xs font-mono font-bold flex items-center gap-1 cursor-pointer disabled:cursor-not-allowed ${speed === l.speed ? "bg-[#8CC7BD] border-[#8CC7BD] text-slate-950" : locked ? "border-slate-800 text-slate-600" : "border-slate-700 text-slate-200"}`}>
                     {locked && <Lock className="h-3 w-3" />}{l.name}
                   </button>
                 );
               })}
             </div>
             {!running
-              ? <button type="button" onClick={start} disabled={tooFast} className="px-5 py-2.5 rounded-xl bg-[#F4C56A] text-slate-950 font-mono text-xs font-black uppercase flex items-center gap-2 cursor-pointer disabled:opacity-50"><Mic className="h-4 w-4" /> Start ({COUNT_IN}-beat count-in)</button>
+              ? <button type="button" onClick={start} disabled={tooFast} className="px-5 py-2.5 rounded-xl bg-[#D9B45F] text-slate-950 font-mono text-xs font-black uppercase flex items-center gap-2 cursor-pointer disabled:opacity-50"><Mic className="h-4 w-4" /> Start ({COUNT_IN}-beat count-in)</button>
               : <button type="button" onClick={stop} className="px-5 py-2.5 rounded-xl bg-rose-600 text-white font-mono text-xs font-bold uppercase flex items-center gap-2 cursor-pointer"><Square className="h-4 w-4 fill-white" /> Stop</button>}
           </div>
           {tooFast && <p className="text-xs text-amber-300">Notes would be shorter than {MIN_NOTE_SEC * 1000} ms at this beat and speed, which is too short to score reliably. Lower the beat.</p>}
@@ -295,7 +295,7 @@ export const PracticeTab: React.FC<Props> = ({ baseTonicHz, initialMode = "palta
           </div>
 
           {finalScore !== null && (
-            <div className="p-4 rounded-xl border border-slate-700 bg-[#0D1230]/60 text-sm text-slate-200">
+            <div className="p-4 rounded-xl border border-slate-700 bg-[#062327]/60 text-sm text-slate-200">
               Score: <b>{finalScore.toFixed(0)}</b> at {LAYAS[speed - 1].name}, {bpm} beats per minute.{" "}
               {finalScore >= UNLOCK_SCORE
                 ? speed < 4 ? `${LAYAS[speed].name} is now unlocked.` : "That's the top of the laya ladder."

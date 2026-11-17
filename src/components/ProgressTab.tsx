@@ -13,7 +13,7 @@ import { loadHistory, onHistoryChange, type PracticeRecord } from '../lib/practi
 import { minutesPerDay, practiceStreakDays } from '../lib/stats';
 import { centsBetween } from '../analysis/music';
 
-const tooltipStyle = { backgroundColor: '#0D1230', borderColor: '#334155', borderRadius: '12px', fontSize: 11 };
+const tooltipStyle = { backgroundColor: '#062327', borderColor: '#334155', borderRadius: '12px', fontSize: 11 };
 const shortDate = (iso: string) => new Date(iso).toLocaleDateString(undefined, { day: "numeric", month: "short" });
 
 const Empty: React.FC<{ children: React.ReactNode }> = ({ children }) => (
@@ -21,8 +21,8 @@ const Empty: React.FC<{ children: React.ReactNode }> = ({ children }) => (
 );
 
 const Stat: React.FC<{ icon: React.ReactNode; label: string; value: string }> = ({ icon, label, value }) => (
-  <div className="bg-[#1A2150] p-4 rounded-xl border border-slate-800/80 shadow-lg flex items-center gap-4">
-    <div className="h-10 w-10 shrink-0 rounded-xl bg-[#E0A458]/20 border border-[#E0A458]/30 flex items-center justify-center text-[#F4C56A]">{icon}</div>
+  <div className="bg-[#0D3A40] p-4 rounded-xl border border-slate-800/80 shadow-lg flex items-center gap-4">
+    <div className="h-10 w-10 shrink-0 rounded-xl bg-[#C9A227]/20 border border-[#C9A227]/30 flex items-center justify-center text-[#D9B45F]">{icon}</div>
     <div>
       <span className="text-[9px] font-mono text-slate-500 uppercase tracking-widest block">{label}</span>
       <span className="text-2xl font-black font-mono text-slate-200">{value}</span>
@@ -87,7 +87,7 @@ export const ProgressTab: React.FC = () => {
   return (
     <div className="space-y-6">
       <header className="pg-head">
-        <h1 className="pg-title">Progress</h1>
+        <h1 className="pg-title">Your journey</h1>
         <p className="pg-figures">
           <span><b>{totalMinutes >= 60 ? `${(totalMinutes / 60).toFixed(1)} h` : `${Math.round(totalMinutes)} min`}</b> of riyaz</span>
           <span><b>{streak}</b> {streak === 1 ? "day" : "days"} in a row</span>
@@ -111,7 +111,7 @@ export const ProgressTab: React.FC = () => {
       </p>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-        <div className="bg-[#1A2150] p-5 rounded-2xl border border-slate-800 shadow-xl space-y-4">
+        <div className="bg-[#0D3A40] p-5 rounded-2xl border border-slate-800 shadow-xl space-y-4">
           <div>
             <h4 className="text-sm font-bold text-slate-200">Swara accuracy per recording</h4>
             <span className="text-[10px] font-mono text-slate-500">Held-note time within ±20 cents (%) and median distance from the swara (cents), last 20 recordings</span>
@@ -125,15 +125,15 @@ export const ProgressTab: React.FC = () => {
                   <YAxis yAxisId="pct" domain={[0, 100]} tick={{ fill: '#64748b', fontSize: 9 }} />
                   <YAxis yAxisId="cents" orientation="right" tick={{ fill: '#64748b', fontSize: 9 }} />
                   <Tooltip contentStyle={tooltipStyle} />
-                  <Line yAxisId="pct" name="Within ±20 cents (%)" dataKey="within20" stroke="#E0A458" strokeWidth={2} dot connectNulls={false} />
-                  <Line yAxisId="cents" name="Median distance (cents)" dataKey="medianCents" stroke="#9FB3E6" strokeWidth={1.5} dot connectNulls={false} />
+                  <Line yAxisId="pct" name="Within ±20 cents (%)" dataKey="within20" stroke="#C9A227" strokeWidth={2} dot connectNulls={false} />
+                  <Line yAxisId="cents" name="Median distance (cents)" dataKey="medianCents" stroke="#8CC7BD" strokeWidth={1.5} dot connectNulls={false} />
                 </LineChart>
               </ResponsiveContainer>
             )}
           </div>
         </div>
 
-        <div className="bg-[#1A2150] p-5 rounded-2xl border border-slate-800 shadow-xl space-y-4">
+        <div className="bg-[#0D3A40] p-5 rounded-2xl border border-slate-800 shadow-xl space-y-4">
           <div>
             <h4 className="text-sm font-bold text-slate-200">Practice time, last 7 days</h4>
             <span className="text-[10px] font-mono text-slate-500">Minutes from timed riyaz sessions and analysed recordings</span>
@@ -146,14 +146,14 @@ export const ProgressTab: React.FC = () => {
                   <XAxis dataKey="label" tick={{ fill: '#64748b', fontSize: 9 }} />
                   <YAxis tick={{ fill: '#64748b', fontSize: 9 }} />
                   <Tooltip contentStyle={tooltipStyle} />
-                  <Bar name="Minutes" dataKey="minutes" fill="#9FB3E6" radius={[4, 4, 0, 0]} maxBarSize={30} />
+                  <Bar name="Minutes" dataKey="minutes" fill="#8CC7BD" radius={[4, 4, 0, 0]} maxBarSize={30} />
                 </BarChart>
               </ResponsiveContainer>
             )}
           </div>
         </div>
 
-        <div className="bg-[#1A2150] p-5 rounded-2xl border border-slate-800 shadow-xl space-y-4">
+        <div className="bg-[#0D3A40] p-5 rounded-2xl border border-slate-800 shadow-xl space-y-4">
           <div>
             <h4 className="text-sm font-bold text-slate-200">Sa sadhana</h4>
             <span className="text-[10px] font-mono text-slate-500">Longest steady hold of Sa (s) and its wobble (cents), last 20 sessions</span>
@@ -167,15 +167,15 @@ export const ProgressTab: React.FC = () => {
                   <YAxis yAxisId="s" tick={{ fill: '#64748b', fontSize: 9 }} />
                   <YAxis yAxisId="c" orientation="right" tick={{ fill: '#64748b', fontSize: 9 }} />
                   <Tooltip contentStyle={tooltipStyle} />
-                  <Line yAxisId="s" name="Longest hold (s)" dataKey="hold" stroke="#F4C56A" strokeWidth={2} dot />
-                  <Line yAxisId="c" name="Wobble (cents)" dataKey="wobble" stroke="#9FB3E6" strokeWidth={1.5} dot />
+                  <Line yAxisId="s" name="Longest hold (s)" dataKey="hold" stroke="#D9B45F" strokeWidth={2} dot />
+                  <Line yAxisId="c" name="Wobble (cents)" dataKey="wobble" stroke="#8CC7BD" strokeWidth={1.5} dot />
                 </LineChart>
               </ResponsiveContainer>
             )}
           </div>
         </div>
 
-        <div className="bg-[#1A2150] p-5 rounded-2xl border border-slate-800 shadow-xl space-y-4">
+        <div className="bg-[#0D3A40] p-5 rounded-2xl border border-slate-800 shadow-xl space-y-4">
           <div>
             <h4 className="text-sm font-bold text-slate-200">Breath per phrase</h4>
             <span className="text-[10px] font-mono text-slate-500">Longest and typical phrase between breaths (s), per analysed recording</span>
@@ -188,15 +188,15 @@ export const ProgressTab: React.FC = () => {
                   <XAxis dataKey="date" tick={{ fill: '#64748b', fontSize: 9 }} />
                   <YAxis tick={{ fill: '#64748b', fontSize: 9 }} />
                   <Tooltip contentStyle={tooltipStyle} />
-                  <Line name="Longest phrase (s)" dataKey="longest" stroke="#E0A458" strokeWidth={2} dot />
-                  <Line name="Typical phrase (s)" dataKey="typical" stroke="#9FB3E6" strokeWidth={1.5} dot connectNulls={false} />
+                  <Line name="Longest phrase (s)" dataKey="longest" stroke="#C9A227" strokeWidth={2} dot />
+                  <Line name="Typical phrase (s)" dataKey="typical" stroke="#8CC7BD" strokeWidth={1.5} dot connectNulls={false} />
                 </LineChart>
               </ResponsiveContainer>
             )}
           </div>
         </div>
 
-        <div className="lg:col-span-2 bg-[#1A2150] p-5 rounded-2xl border border-slate-800 shadow-xl space-y-3">
+        <div className="lg:col-span-2 bg-[#0D3A40] p-5 rounded-2xl border border-slate-800 shadow-xl space-y-3">
           <div>
             <h4 className="text-sm font-bold text-slate-200">Laya ladder</h4>
             <span className="text-[10px] font-mono text-slate-500">Highest speed sung cleanly (score 85+) for each palta and pakad</span>
@@ -215,7 +215,7 @@ export const ProgressTab: React.FC = () => {
           )}
         </div>
 
-        <div className="lg:col-span-2 bg-[#1A2150] p-5 rounded-2xl border border-slate-800 shadow-xl space-y-4">
+        <div className="lg:col-span-2 bg-[#0D3A40] p-5 rounded-2xl border border-slate-800 shadow-xl space-y-4">
           <div>
             <h4 className="text-sm font-bold text-slate-200">Range of held notes</h4>
             <span className="text-[10px] font-mono text-slate-500">Lowest and highest held note per recording, in semitones from Sa (0 = Sa, 12 = taar Sa, −5 = mandra Pa)</span>
@@ -231,8 +231,8 @@ export const ProgressTab: React.FC = () => {
                     contentStyle={tooltipStyle}
                     formatter={(v: any, name: any, p: any) => [`${v} (${name === "Highest" ? p.payload.highLabel : p.payload.lowLabel})`, name]}
                   />
-                  <Line name="Highest" dataKey="high" stroke="#F4C56A" strokeWidth={2} dot />
-                  <Line name="Lowest" dataKey="low" stroke="#9FB3E6" strokeWidth={2} dot />
+                  <Line name="Highest" dataKey="high" stroke="#D9B45F" strokeWidth={2} dot />
+                  <Line name="Lowest" dataKey="low" stroke="#8CC7BD" strokeWidth={2} dot />
                 </LineChart>
               </ResponsiveContainer>
             )}

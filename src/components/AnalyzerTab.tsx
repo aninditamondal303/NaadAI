@@ -46,8 +46,8 @@ const SA_SECONDS = 6;
 const MAX_RECORD_SECONDS = 10 * 60;
 const silenceRms = Math.pow(10, DEFAULT_PITCH_SETTINGS.silenceDb / 20);
 
-const card = "bg-[#1A2150] p-6 rounded-3xl border border-slate-800 shadow-xl";
-const primaryBtn = "px-5 py-3 rounded-xl bg-[#F4C56A] text-slate-950 font-mono text-xs font-black uppercase tracking-wider flex items-center gap-2 cursor-pointer disabled:opacity-50";
+const card = "bg-[#0D3A40] p-6 rounded-3xl border border-slate-800 shadow-xl";
+const primaryBtn = "px-5 py-3 rounded-xl bg-[#D9B45F] text-slate-950 font-mono text-xs font-black uppercase tracking-wider flex items-center gap-2 cursor-pointer disabled:opacity-50";
 const stopBtn = "px-5 py-3 rounded-xl bg-rose-600 hover:bg-rose-500 text-white font-mono text-xs font-bold uppercase tracking-wider flex items-center gap-2 cursor-pointer";
 
 // ------------------------------------------------------------------ live tuner
@@ -114,10 +114,10 @@ const LiveTuner: React.FC<{ saHz: number }> = ({ saHz }) => {
           {reading ? `${signedCents(off)} cents · ${reading.hz.toFixed(1)} Hz` : running ? "Listening..." : "Not listening"}
         </span>
         <div className="relative w-full max-w-md h-6 rounded-full bg-slate-900 border border-slate-800">
-          <div className="absolute left-1/2 top-0 bottom-0 w-px bg-[#F4C56A]" />
+          <div className="absolute left-1/2 top-0 bottom-0 w-px bg-[#D9B45F]" />
           {reading && (
             <div
-              className="absolute top-1 bottom-1 w-1.5 rounded-full bg-[#9FB3E6]"
+              className="absolute top-1 bottom-1 w-1.5 rounded-full bg-[#8CC7BD]"
               style={{ left: `calc(${50 + Math.max(-50, Math.min(50, off))}% - 3px)` }}
             />
           )}
@@ -195,7 +195,7 @@ const FindSa: React.FC<{ saHz: number; onTonicChange?: (hz: number) => void }> =
         <div className="flex flex-col items-center gap-3">
           {recording && (
             <>
-              <span className="text-xs font-mono text-[#F4C56A]">Recording {elapsed.toFixed(1)} / {SA_SECONDS} s</span>
+              <span className="text-xs font-mono text-[#D9B45F]">Recording {elapsed.toFixed(1)} / {SA_SECONDS} s</span>
               <LevelMeter level={level} />
             </>
           )}
@@ -214,18 +214,18 @@ const FindSa: React.FC<{ saHz: number; onTonicChange?: (hz: number) => void }> =
 
       {r && wn && (
         <div className={`${card} space-y-4`}>
-          <h3 className="text-xs font-mono font-bold text-[#F4C56A] uppercase tracking-widest">Your measured Sa</h3>
+          <h3 className="text-xs font-mono font-bold text-[#D9B45F] uppercase tracking-widest">Your measured Sa</h3>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-3 font-mono">
-            <div className="bg-[#0D1230]/60 p-4 rounded-xl border border-slate-800">
+            <div className="bg-[#062327]/60 p-4 rounded-xl border border-slate-800">
               <span className="text-[9px] text-slate-500 uppercase block font-bold">Sa</span>
               <span className="text-2xl font-black text-slate-100 block">{r.saHz.toFixed(1)} Hz</span>
               <span className="text-[10px] text-slate-400">{wn.name} {signedCents(wn.cents)} cents</span>
             </div>
-            <div className="bg-[#0D1230]/60 p-4 rounded-xl border border-slate-800">
+            <div className="bg-[#062327]/60 p-4 rounded-xl border border-slate-800">
               <span className="text-[9px] text-slate-500 uppercase block font-bold">Held steadily for</span>
               <span className="text-2xl font-black text-slate-100 block">{r.heldSec.toFixed(1)} s</span>
             </div>
-            <div className="bg-[#0D1230]/60 p-4 rounded-xl border border-slate-800">
+            <div className="bg-[#062327]/60 p-4 rounded-xl border border-slate-800">
               <span className="text-[9px] text-slate-500 uppercase block font-bold">Wobble</span>
               <span className="text-2xl font-black text-slate-100 block">±{r.wobbleCents.toFixed(1)} cents</span>
               <span className="text-[10px] text-slate-400">Median distance from the note's centre</span>
@@ -240,7 +240,7 @@ const FindSa: React.FC<{ saHz: number; onTonicChange?: (hz: number) => void }> =
                 type="button"
                 disabled={applied}
                 onClick={() => { onTonicChange(Number(r.saHz.toFixed(2))); setApplied(true); }}
-                className="px-4 py-2 rounded-lg border border-[#E0A458] text-purple-200 hover:bg-[#E0A458] hover:text-white text-xs font-mono font-bold cursor-pointer disabled:opacity-60"
+                className="px-4 py-2 rounded-lg border border-[#C9A227] text-purple-200 hover:bg-[#C9A227] hover:text-white text-xs font-mono font-bold cursor-pointer disabled:opacity-60"
               >
                 {applied ? "Saved as your Sa" : "Use this as my Sa"}
               </button>
@@ -412,7 +412,7 @@ const AnalyseSinging: React.FC<{ saHz: number; autoDemo?: boolean }> = ({ saHz, 
               value={raagId}
               onChange={e => setRaagId(e.target.value)}
               disabled={recording || !!busy}
-              className="w-full bg-[#0D1230] border border-slate-800 rounded-lg px-3 py-2 text-sm text-slate-200"
+              className="w-full bg-[#062327] border border-slate-800 rounded-lg px-3 py-2 text-sm text-slate-200"
             >
               {RAAG_OPTIONS.map(r => <option key={r.id} value={r.id}>{r.name}</option>)}
             </select>
@@ -426,7 +426,7 @@ const AnalyseSinging: React.FC<{ saHz: number; autoDemo?: boolean }> = ({ saHz, 
                   type="button"
                   disabled={recording || !!busy}
                   onClick={() => setSaChoice(v)}
-                  className={`px-3 py-2 rounded-lg border cursor-pointer ${saChoice === v ? "bg-[#E0A458] border-[#E0A458] text-white" : "border-slate-800 text-slate-400 hover:text-slate-200"}`}
+                  className={`px-3 py-2 rounded-lg border cursor-pointer ${saChoice === v ? "bg-[#C9A227] border-[#C9A227] text-white" : "border-slate-800 text-slate-400 hover:text-slate-200"}`}
                 >
                   {l}
                 </button>
@@ -441,7 +441,7 @@ const AnalyseSinging: React.FC<{ saHz: number; autoDemo?: boolean }> = ({ saHz, 
               <SwaraCanvas className="rz-live" grid={grid} getView={liveView} running={recording}
                 label={`Your voice drawn on the swaras of ${raag.name} while recording`} />
               <span className="text-xs text-slate-400">{A.liveNote}</span>
-              <span className="text-xs font-mono text-[#F4C56A]">{A.recording} {Math.floor(elapsed / 60)}:{String(Math.floor(elapsed % 60)).padStart(2, "0")}</span>
+              <span className="text-xs font-mono text-[#D9B45F]">{A.recording} {Math.floor(elapsed / 60)}:{String(Math.floor(elapsed % 60)).padStart(2, "0")}</span>
               <LevelMeter level={level} />
             </>
           )}
@@ -467,7 +467,7 @@ const AnalyseSinging: React.FC<{ saHz: number; autoDemo?: boolean }> = ({ saHz, 
             )}
             <input ref={fileInput} type="file" accept="audio/*,.wav,.mp3,.m4a,.webm,.ogg" className="hidden" onChange={onFile} data-testid="audio-upload" />
           </div>
-          {busy && <p className="text-xs font-mono text-[#9FB3E6]">{busy}</p>}
+          {busy && <p className="text-xs font-mono text-[#8CC7BD]">{busy}</p>}
           {(error || mic.error) && <p className="text-xs text-rose-300">{error || mic.error}</p>}
         </div>
       </div>
@@ -503,7 +503,7 @@ export const AnalyzerTab: React.FC<AnalyzerTabProps> = ({ baseTonicHz, onTonicCh
       </header>
 
       <div className="flex items-center gap-2 text-[11px] text-slate-400 px-1">
-        <Headphones className="h-4 w-4 text-[#9FB3E6]" />
+        <Headphones className="h-4 w-4 text-[#8CC7BD]" />
         Use earphones if the tanpura is playing, so it doesn't reach the microphone.
       </div>
 

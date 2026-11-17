@@ -8,7 +8,7 @@
   --font-mono: "Mukta", "Hind Siliguri", system-ui, sans-serif;
 }
 :lang(bn) { --font-sans: "Hind Siliguri", "Mukta", system-ui, sans-serif; --font-serif: "Tiro Bangla", "Tiro Devanagari Hindi", Georgia, serif; --font-mono: "Hind Siliguri", system-ui, sans-serif; }
-body { background: #0D1230; }
+body { background: #062327; }
 
 @keyframes float-pattern {
   0% { transform: translateY(0px) rotate(0deg); opacity: 0.1; }

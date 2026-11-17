@@ -97,7 +97,7 @@ export const EarTraining: React.FC<{ raag: ComprehensiveRaag; saHz: number }> = 
     : q.optionIds.map(id => ({ id, label: shortName(id) }));
 
   return (
-    <div className="bg-[#1A2150] p-6 rounded-2xl border border-slate-800 shadow-xl space-y-4">
+    <div className="bg-[#0D3A40] p-6 rounded-2xl border border-slate-800 shadow-xl space-y-4">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
           <h3 className="text-lg font-bold text-slate-100">Ear training</h3>
@@ -106,8 +106,8 @@ export const EarTraining: React.FC<{ raag: ComprehensiveRaag; saHz: number }> = 
           </p>
         </div>
         <div className="flex gap-2">
-          <button type="button" onClick={() => start("swara")} className="px-3 py-2 rounded-lg border border-slate-700 text-xs font-mono font-bold text-slate-200 cursor-pointer hover:border-[#E0A458]">New round: swaras</button>
-          <button type="button" onClick={() => start("raag")} className="px-3 py-2 rounded-lg border border-slate-700 text-xs font-mono font-bold text-slate-200 cursor-pointer hover:border-[#E0A458]">New round: raags</button>
+          <button type="button" onClick={() => start("swara")} className="px-3 py-2 rounded-lg border border-slate-700 text-xs font-mono font-bold text-slate-200 cursor-pointer hover:border-[#C9A227]">New round: swaras</button>
+          <button type="button" onClick={() => start("raag")} className="px-3 py-2 rounded-lg border border-slate-700 text-xs font-mono font-bold text-slate-200 cursor-pointer hover:border-[#C9A227]">New round: raags</button>
         </div>
       </div>
 
@@ -115,7 +115,7 @@ export const EarTraining: React.FC<{ raag: ComprehensiveRaag; saHz: number }> = 
         <div className="space-y-3">
           <div className="flex items-center gap-3">
             <span className="text-xs font-mono text-slate-400">Question {Math.min(n + (chosen ? 0 : 1), ROUND)} of {ROUND} · {correct} correct</span>
-            <button type="button" onClick={() => play()} className="px-3 py-1.5 rounded-lg bg-[#E0A458] text-white text-xs font-mono font-bold flex items-center gap-1 cursor-pointer"><Play className="h-3.5 w-3.5" /> Play again</button>
+            <button type="button" onClick={() => play()} className="px-3 py-1.5 rounded-lg bg-[#C9A227] text-white text-xs font-mono font-bold flex items-center gap-1 cursor-pointer"><Play className="h-3.5 w-3.5" /> Play again</button>
           </div>
           <div className="flex flex-wrap gap-2">
             {options.map(o => {

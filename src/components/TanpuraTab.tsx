@@ -310,6 +310,8 @@ export const TanpuraTab: React.FC<TanpuraTabProps> = ({ baseTonicHz, onTonicChan
             </div>
             <p className="tp-muted tp-small">{T.firstHelp}</p>
           </div>
+          <details className="tp-more">
+            <summary>More settings</summary>
           {!droneMode && (
             <label className="tp-range">
               <span>{T.cycle(cycleSec.toFixed(1))}</span>
@@ -322,6 +324,7 @@ export const TanpuraTab: React.FC<TanpuraTabProps> = ({ baseTonicHz, onTonicChan
           </label>
           <p className="tp-muted tp-small">{droneMode ? T.droneHint : T.tapHint}</p>
           {tSource && <p className="tp-muted tp-small">{T.sound}: {tSource}</p>}
+          </details>
         </div>
         <div className="tp-strings-wrap">
           <TanpuraStrings analyser={analyser} pluck={pluck} labels={stringLabels} label={T.title} />
@@ -356,6 +359,8 @@ export const TanpuraTab: React.FC<TanpuraTabProps> = ({ baseTonicHz, onTonicChan
             <span>{T.tempo(bpm, T.laya[layaFor(bpm)])}</span>
             <input type="range" min={20} max={320} step={1} value={bpm} onChange={e => setBpm(Number(e.target.value))} />
           </label>
+          <details className="tp-more">
+            <summary>More settings</summary>
           <div className="tp-field">
             <span>Tabla tuned to</span>
             <div className="tp-choices" role="radiogroup" aria-label="Tabla tuned to">
@@ -370,8 +375,9 @@ export const TanpuraTab: React.FC<TanpuraTabProps> = ({ baseTonicHz, onTonicChan
             <span>{T.volume}</span>
             <input type="range" min={0} max={1} step={0.01} value={bVolume} onChange={e => setBVolume(Number(e.target.value))} />
           </label>
-          <p className="tp-muted tp-small">{T.legend}</p>
           {bSource && <p className="tp-muted tp-small">{T.sound}: {bSource}</p>}
+          </details>
+          <p className="tp-muted tp-small">{T.legend}</p>
         </div>
       </section>
 

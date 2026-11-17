@@ -17,7 +17,7 @@ const fmtSec = (s: number) => (s >= 60 ? `${Math.floor(s / 60)}m ${Math.round(s 
 const fmtCents = signedCents;
 
 const Stat: React.FC<{ label: string; value: string; note?: string }> = ({ label, value, note }) => (
-  <div className="bg-[#0D1230]/60 p-4 rounded-xl border border-slate-800 space-y-1">
+  <div className="bg-[#062327]/60 p-4 rounded-xl border border-slate-800 space-y-1">
     <span className="text-[9px] font-mono text-slate-500 uppercase tracking-widest block font-bold">{label}</span>
     <span className="text-lg font-black text-slate-100 block font-mono">{value}</span>
     {note && <span className="text-[10px] text-slate-500 block leading-snug">{note}</span>}
@@ -48,9 +48,9 @@ export const TakeReport: React.FC<TakeReportProps> = ({ audio, m, track, raagNam
 
       {audio && <ListenBack audio={audio} track={track} saHz={m.saHz} allowedSwaras={allowedSwaras ?? [0, 2, 4, 5, 7, 9, 11]} />}
 
-      <div className="bg-[#1A2150] p-5 rounded-2xl border border-slate-800 space-y-4">
+      <div className="bg-[#0D3A40] p-5 rounded-2xl border border-slate-800 space-y-4">
         <div className="flex flex-wrap items-baseline justify-between gap-3">
-          <h3 className="text-xs font-mono font-bold text-[#F4C56A] uppercase tracking-widest">Measurements, Raag {raagName.replace(/^Raag\s+/i, "")}</h3>
+          <h3 className="text-xs font-mono font-bold text-[#D9B45F] uppercase tracking-widest">Measurements, Raag {raagName.replace(/^Raag\s+/i, "")}</h3>
           <button type="button" className="rz-link"
             onClick={() => void downloadTakeImage({ m, track, raagName, allowedSwaras: allowedSwaras ?? [0, 2, 4, 5, 7, 9, 11], date: new Date() })}>
             {t.analyzer.saveImage}
@@ -87,7 +87,7 @@ export const TakeReport: React.FC<TakeReportProps> = ({ audio, m, track, raagNam
         </div>
       </div>
 
-      <div className="bg-[#1A2150] p-5 rounded-2xl border border-slate-800 space-y-2">
+      <div className="bg-[#0D3A40] p-5 rounded-2xl border border-slate-800 space-y-2">
         <h3 className="text-xs font-mono font-bold text-slate-300 uppercase tracking-widest">Pitch over time</h3>
         <p className="text-[11px] text-slate-500">
           Measured pitch in cents above Sa: meends show as smooth curves between swaras. Lines show the raag's swaras; the gold line is Sa.
@@ -97,7 +97,7 @@ export const TakeReport: React.FC<TakeReportProps> = ({ audio, m, track, raagNam
           marks={[...m.ruleFlags.map(f => ({ startSec: f.atSec, durSec: f.durSec, kind: "flag" as const })), ...m.oscillations.map(o => ({ startSec: o.startSec, durSec: o.durSec, kind: "oscillation" as const }))]} />
       </div>
 
-      <div className="bg-[#1A2150] p-5 rounded-2xl border border-slate-800 space-y-2">
+      <div className="bg-[#0D3A40] p-5 rounded-2xl border border-slate-800 space-y-2">
         <h3 className="text-xs font-mono font-bold text-slate-300 uppercase tracking-widest">Raag rule check</h3>
         {m.ruleFlags.length === 0 ? (
           <p className="text-xs text-emerald-300">No swara outside Raag {raagName} was held for 0.4 s or longer.</p>
@@ -113,7 +113,7 @@ export const TakeReport: React.FC<TakeReportProps> = ({ audio, m, track, raagNam
         <p className="text-[10px] text-slate-500">Only clear holds of 0.4 s or more are flagged. Short touches and passing notes are allowed and ignored.</p>
       </div>
 
-      <div className="bg-[#1A2150] p-5 rounded-2xl border border-slate-800 space-y-2">
+      <div className="bg-[#0D3A40] p-5 rounded-2xl border border-slate-800 space-y-2">
         <h3 className="text-xs font-mono font-bold text-slate-300 uppercase tracking-widest">Oscillations (andolan, gamak)</h3>
         {m.oscillations.length === 0 ? (
           <p className="text-xs text-slate-400">No regular oscillation (at least two full swings of 20 cents or more) was found.</p>
@@ -138,7 +138,7 @@ export const TakeReport: React.FC<TakeReportProps> = ({ audio, m, track, raagNam
         <p className="text-[10px] text-slate-500">These are measurements only: speed is swings per second, width is half the distance between the highest and lowest point. How an ornament should sound is for you and your guru to decide.</p>
       </div>
 
-      <div className="bg-[#1A2150] p-5 rounded-2xl border border-slate-800 space-y-3">
+      <div className="bg-[#0D3A40] p-5 rounded-2xl border border-slate-800 space-y-3">
         <h3 className="text-xs font-mono font-bold text-slate-300 uppercase tracking-widest">Swaras you held</h3>
         {m.swaras.length === 0 ? (
           <p className="text-xs text-slate-400">No note was held for 0.25 s or longer, so there is nothing to measure per swara.</p>

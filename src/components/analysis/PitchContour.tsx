@@ -46,23 +46,23 @@ export const PitchContour: React.FC<{ track: PitchTrack; saHz: number; allowedSw
             <ReferenceLine
               key={g.cents}
               y={g.cents}
-              stroke={g.cents % 1200 === 0 ? "#F4C56A" : "#334155"}
+              stroke={g.cents % 1200 === 0 ? "#D9B45F" : "#334155"}
               strokeDasharray={g.cents % 1200 === 0 ? undefined : "3 3"}
               label={{ value: g.label, position: "left", fill: "#94a3b8", fontSize: 10 }}
             />
           ))}
           {marks.map((m, i) => (
             <ReferenceArea key={`m${i}`} x1={m.startSec} x2={m.startSec + m.durSec} y1={lo} y2={hi}
-              fill={m.kind === "flag" ? "#f43f5e" : "#9FB3E6"} fillOpacity={m.kind === "flag" ? 0.18 : 0.1} ifOverflow="hidden" />
+              fill={m.kind === "flag" ? "#f43f5e" : "#8CC7BD"} fillOpacity={m.kind === "flag" ? 0.18 : 0.1} ifOverflow="hidden" />
           ))}
           <XAxis dataKey="t" type="number" domain={["dataMin", "dataMax"]} tick={{ fill: "#64748b", fontSize: 10 }} tickFormatter={(v: number) => `${Math.round(v)} s`} />
           <YAxis domain={[lo, hi]} tick={false} width={36} />
           <Tooltip
-            contentStyle={{ background: "#0D1230", border: "1px solid #334155", fontSize: 11 }}
+            contentStyle={{ background: "#062327", border: "1px solid #334155", fontSize: 11 }}
             formatter={(v: any) => [`${v} cents above Sa`, "Pitch"]}
             labelFormatter={(l: any) => `${l} s`}
           />
-          <Line type="linear" dataKey="c" stroke="#9FB3E6" dot={false} strokeWidth={1.5} isAnimationActive={false} connectNulls={false} />
+          <Line type="linear" dataKey="c" stroke="#8CC7BD" dot={false} strokeWidth={1.5} isAnimationActive={false} connectNulls={false} />
         </LineChart>
       </ResponsiveContainer>
     </div>
