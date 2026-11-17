@@ -11,7 +11,6 @@ import express from "express";
 import path from "path";
 import dotenv from "dotenv";
 import { createServer as createViteServer } from "vite";
-import { GoogleGenAI } from "@google/genai";
 import { FEEDBACK_SYSTEM_PROMPT, buildFeedbackPrompt, sanitiseMeasurements } from "./server/feedback.js";
 
 dotenv.config();
@@ -34,19 +33,30 @@ app.post("/api/feedback", async (req, res) => {
     return res.status(400).json({ error: "Missing or invalid measurements." });
   }
 
+  // Any service with a chat-completions style API: set its address, key and model in .env
   const apiKey = process.env.FEEDBACK_API_KEY?.trim();
-  if (!apiKey) {
-    return res.json({ unavailable: true, reason: "no API key configured" });
+  const apiUrl = process.env.FEEDBACK_API_URL?.trim();
+  const model = process.env.FEEDBACK_MODEL?.trim();
+  if (!apiKey || !apiUrl || !model) {
+    return res.json({ unavailable: true, reason: "feedback service not configured" });
   }
 
   try {
-    const ai = new GoogleGenAI({ apiKey });
-    const response = await ai.models.generateContent({
-      model: process.env.FEEDBACK_MODEL || "gemini-3.5-flash",
-      contents: buildFeedbackPrompt(measurements),
-      config: { systemInstruction: FEEDBACK_SYSTEM_PROMPT, temperature: 0.4 },
+    const response = await fetch(apiUrl, {
+      method: "POST",
+      headers: { "Content-Type": "application/json", Authorization: `Bearer ${apiKey}` },
+      body: JSON.stringify({
+        model,
+        temperature: 0.4,
+        messages: [
+          { role: "system", content: FEEDBACK_SYSTEM_PROMPT },
+          { role: "user", content: buildFeedbackPrompt(measurements) },
+        ],
+      }),
     });
-    const text = (response.text || "").trim();
+    if (!response.ok) throw new Error(`status ${response.status}`);
+    const data: any = await response.json();
+    const text = String(data?.choices?.[0]?.message?.content ?? "").trim();
     if (!text) throw new Error("empty response");
     res.json({ text });
   } catch (err: any) {

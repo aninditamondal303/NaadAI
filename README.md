@@ -175,7 +175,7 @@ static site, so the optional written feedback is switched off there.
 
 To run with the server (and written feedback), any Node host works (for example Render or Railway): build command
 `npm install && npm run build`, start command `npm start`, and optionally the
-`FEEDBACK_API_KEY` environment variable for written feedback.
+`FEEDBACK_API_URL`, `FEEDBACK_API_KEY` and `FEEDBACK_MODEL` environment variables (any chat-completions style service) for written feedback.
 
 ## Status and what's still needed
 
