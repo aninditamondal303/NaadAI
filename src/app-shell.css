@@ -1,0 +1,25 @@
+/* The practice app's frame, in the welcome page's night colours. */
+.app-shell { background: linear-gradient(to bottom, #0D1230 0, #141A42 32rem, #0D1230 100%); font-family: var(--font-sans); }
+.app-top {
+  position: relative; z-index: 20;
+  display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 0.75rem 2rem;
+  padding: 1rem clamp(1rem, 3vw, 2.5rem);
+  border-bottom: 1px solid rgba(230, 232, 246, 0.14);
+  color: #E6E8F6;
+}
+.app-mark { font-weight: 600; white-space: nowrap; }
+.app-mark-script { font-family: var(--font-serif); font-weight: 400; font-size: 1.5rem; margin-right: 0.3rem; }
+.app-tabs { display: flex; gap: 0.25rem; overflow-x: auto; scrollbar-width: none; max-width: 100%; }
+.app-tabs button {
+  flex: none; font: inherit; font-size: 0.98rem; color: rgba(230, 232, 246, 0.7); background: none; border: 0;
+  padding: 0.35rem 0.7rem; cursor: pointer; border-bottom: 2px solid transparent;
+}
+.app-tabs button:hover { color: #E6E8F6; }
+.app-tabs button[aria-current="page"] { color: #F4C56A; border-bottom-color: #F4C56A; }
+.app-side { display: flex; align-items: center; gap: 1rem; font-size: 0.92rem; color: rgba(230, 232, 246, 0.7); }
+.app-switch { font: inherit; color: #E6E8F6; background: none; border: 0; padding: 0; cursor: pointer; text-decoration: underline; text-underline-offset: 0.2em; }
+.app-note { margin: 0; padding: 0.4rem clamp(1rem, 3vw, 2.5rem); font-size: 0.85rem; color: rgba(230, 232, 246, 0.6); }
+.app-shell :focus-visible { outline: 2px solid #F4C56A; outline-offset: 2px; }
+/* the language switch reuses the welcome page's style */
+.app-side .ln-lang { --ink: #E6E8F6; --muted: rgba(230,232,246,0.7); --line-strong: rgba(230,232,246,0.3); }
+@media (max-width: 760px) { .app-who { display: none; } }
