@@ -143,6 +143,18 @@ src/lib        per-singer profiles and practice history (browser storage)
 server.ts      serves the app; optional /api/feedback (numbers in, text out)
 ```
 
+## Android app
+
+The same app is packaged for Android with Capacitor (`android/`). The **Android app** workflow in the Actions tab builds `naad-ai.apk`; pushing a tag such as `v1.0.0` also attaches it to a GitHub release. To install, open the APK on the phone and allow installation from the browser when Android asks. To build locally: `npx vite build && npx cap sync android`, then open `android/` in Android Studio.
+
+The build is debug-signed. Publishing on the Play Store needs a release signing key.
+
+**Audio delay:** Bluetooth earphones add 150–300 ms of delay, which makes the tanpura and taal lag behind your voice and can make Riyaz timing grades unfair. Wired earphones are recommended for riyaz.
+
+## Daily riyaz reminder
+
+Profile → Daily riyaz reminder downloads a calendar file (`.ics`) with a daily repeating event and an alert. Opening it adds the reminder to the phone's or computer's calendar, so it works even when the site is closed.
+
 ## Run locally
 
 Requires Node.js 20 or later.

@@ -14,6 +14,7 @@ import { TanpuraEngine, firstStringForRaag } from '../audio/tanpura';
 import { RAAG_LIST } from '../data/allRaags';
 import { RAAG_DETAILS } from '../data/raagDetails';
 import { pakadFor } from '../data/pakad';
+import { useUi } from '../i18n/ui';
 import { addRecord, loadHistory, newId, onHistoryChange, type PracticeRecord } from '../lib/practiceHistory';
 import { parseSargam, type SargamToken } from '../practice/notation';
 import { generatePaltas, LAYAS, SHUDDHA_SWARAS, UNLOCK_SCORE } from '../practice/paltas';
@@ -59,6 +60,7 @@ function click(ctx: AudioContext, when: number, accent: boolean) {
 }
 
 export const PracticeTab: React.FC<Props> = ({ baseTonicHz, initialMode = "palta" }) => {
+  const u = useUi();
   const mic = useMic();
   const [raagId, setRaagId] = useState("shuddha");
   const [kind, setKind] = useState<"palta" | "pakad" | "ear" | "match" | "guru">(initialMode);
@@ -205,20 +207,17 @@ export const PracticeTab: React.FC<Props> = ({ baseTonicHz, initialMode = "palta
     <div className="space-y-6">
       <div className={card}>
         <div>
-          <h1 className="pg-title">Riyaz</h1>
-          <p className="pr-intro">
-            Sing each swara on its beat. Every note is graded for pitch and timing: green (within 25 cents, on time), yellow (within 50 cents, or late), red (further off or missed).
-            Score {UNLOCK_SCORE} or more to unlock the next speed. Please use earphones.
-          </p>
+          <h1 className="pg-title">{u("riyazTitle")}</h1>
+          <p className="pr-intro">{u("riyazIntro")}</p>
         </div>
         <div className="pr-controls">
           <label className="space-y-1 block">
             <span className={label}>Raag</span>
             <select value={raagId} disabled={running} onChange={e => setRaagId(e.target.value)} className="w-full bg-[#062327] border border-slate-800 rounded-lg px-3 py-2 text-sm text-slate-200">
-              <optgroup label="Basic paltas">
-                <option value={SHUDDHA_SWARAS.id}>Shuddha swaras (S R G M P D N)</option>
+              <optgroup label={u("basicPaltas")}>
+                <option value={SHUDDHA_SWARAS.id}>{u("shuddhaSwaras")}</option>
               </optgroup>
-              <optgroup label="Raag paltas">
+              <optgroup label={u("raagPaltas")}>
                 {RAAG_ONLY.map(r => <option key={r.id} value={r.id}>{r.name.replace(/^Raag\s+/i, "")}</option>)}
               </optgroup>
             </select>
@@ -229,19 +228,19 @@ export const PracticeTab: React.FC<Props> = ({ baseTonicHz, initialMode = "palta
               {(["palta", "pakad", "guru", "match", "ear"] as const).map(k => (
                 <button key={k} type="button" disabled={running || (k === "pakad" && !pakad)} onClick={() => setKind(k)}
                   aria-current={kind === k ? "true" : undefined} className="pr-kind">
-                  {k === "palta" ? "Paltas" : k === "pakad" ? "Pakad" : k === "ear" ? "Ear training" : k === "guru" ? "Guru-shishya" : "Sur milao"}
+                  {u(k === "palta" ? "kindPalta" : k === "pakad" ? "kindPakad" : k === "ear" ? "kindEar" : k === "guru" ? "kindGuru" : "kindMatch")}
                 </button>
               ))}
             </div>
           </div>
           {(kind === "palta" || kind === "pakad") && <>
           <label className="space-y-1 block pr-beat">
-            <span className={label}>Beat: {bpm} per minute</span>
+            <span className={label}>{u("beat", bpm)}</span>
             <input type="range" min={40} max={120} value={bpm} disabled={running} onChange={e => setBpm(Number(e.target.value))} className="w-full accent-[#C9A227]" />
           </label>
           <label className="flex items-center gap-2 text-xs text-slate-300 pt-4">
             <input type="checkbox" checked={withTanpura} disabled={running} onChange={e => setWithTanpura(e.target.checked)} className="accent-[#C9A227]" />
-            Tanpura on (Sa {baseTonicHz.toFixed(1)} Hz)
+            {u("tanpuraOn", baseTonicHz.toFixed(1))}
           </label>
           </>}
         </div>

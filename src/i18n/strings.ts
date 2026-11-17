@@ -13,7 +13,7 @@ export const LANGS: { id: Lang; name: string }[] = [
 
 export interface Strings {
   langLabel: string;
-  nav: { listens: string; accuracy: string; source: string; open: string; continueAs: (n: string) => string };
+  nav: { listens: string; accuracy: string; method: string; source: string; open: string; continueAs: (n: string) => string };
   stageLabel: string;
   read: { onNote: string; sharp: (n: number) => string; flat: (n: number) => string; mandra: string; taar: string };
   title: string;
@@ -83,7 +83,7 @@ const listOf = (names: string[], and: string) =>
 
 const en: Strings = {
   langLabel: "Language",
-  nav: { listens: "How it listens", accuracy: "Accuracy", source: "Source", open: "Open the app", continueAs: n => `Continue as ${n}` },
+  nav: { listens: "How it listens", accuracy: "Accuracy", method: "Method", source: "Source", open: "Open the app", continueAs: n => `Continue as ${n}` },
   stageLabel: "Pitch drawn on the swara lines of Raag Yaman",
   read: { onNote: "on the note", sharp: n => `${n} cents sharp`, flat: n => `${n} cents flat`, mandra: "mandra", taar: "taar" },
   title: "Riyaz with the tanpura, measured swara by swara.",
@@ -213,7 +213,7 @@ const en: Strings = {
 
 const hi: Strings = {
   langLabel: "भाषा",
-  nav: { listens: "यह कैसे सुनता है", accuracy: "सटीकता", source: "सोर्स कोड", open: "ऐप खोलें", continueAs: n => `${n} के रूप में जारी रखें` },
+  nav: { listens: "यह कैसे सुनता है", accuracy: "सटीकता", method: "पद्धति", source: "सोर्स कोड", open: "ऐप खोलें", continueAs: n => `${n} के रूप में जारी रखें` },
   stageLabel: "राग यमन की स्वर-रेखाओं पर आपकी आवाज़ का सुर",
   read: { onNote: "ठीक सुर पर", sharp: n => `${n} सेंट ऊँचा`, flat: n => `${n} सेंट नीचा`, mandra: "मंद्र", taar: "तार" },
   title: "तानपुरे के साथ रियाज़, स्वर-स्वर का माप।",
@@ -295,7 +295,7 @@ const hi: Strings = {
   tabs: { home: "आज", tanpura: "तानपुरा व ताल", analyzer: "विश्लेषण", practice: "रियाज़", journal: "डायरी", progress: "प्रगति", library: "राग-कोश", profile: "प्रोफ़ाइल" },
   streak: n => `लगातार ${n} दिन`,
   switchSinger: "गायक बदलें",
-  englishOnlyNote: "अंदर के कुछ पेज अभी अंग्रेज़ी में हैं।",
+  englishOnlyNote: "कुछ विस्तृत विवरण अभी अंग्रेज़ी में हैं।",
   tp: {
     title: "तानपुरा", play: "तानपुरा बजाएँ", stop: "रोकें", sa: "सा", keyboard: "अपना सा चुनिए", octave: n => `सप्तक ${n}`, fine: c => `बारीक सुर ${c} सेंट`,
     first: "पहला तार", firstHelp: "अधिकतर रागों में प, जिन रागों में प नहीं (मालकौंस) उनमें म, और मारवा जैसे रागों में नि।", volume: "आवाज़",
@@ -343,7 +343,7 @@ const hi: Strings = {
 
 const bn: Strings = {
   langLabel: "ভাষা",
-  nav: { listens: "এটি কীভাবে শোনে", accuracy: "নির্ভুলতা", source: "সোর্স কোড", open: "অ্যাপ খুলুন", continueAs: n => `${n} হিসেবে চালিয়ে যান` },
+  nav: { listens: "এটি কীভাবে শোনে", accuracy: "নির্ভুলতা", method: "পদ্ধতি", source: "সোর্স কোড", open: "অ্যাপ খুলুন", continueAs: n => `${n} হিসেবে চালিয়ে যান` },
   stageLabel: "রাগ ইমনের স্বর-রেখায় আপনার কণ্ঠের সুর",
   read: { onNote: "ঠিক সুরে", sharp: n => `${n} সেন্ট চড়া`, flat: n => `${n} সেন্ট নিচু`, mandra: "মন্দ্র", taar: "তার" },
   title: "তানপুরার সঙ্গে রেওয়াজ, প্রতিটি স্বরের মাপ।",
@@ -425,7 +425,7 @@ const bn: Strings = {
   tabs: { home: "আজ", tanpura: "তানপুরা ও তাল", analyzer: "বিশ্লেষণ", practice: "রেওয়াজ", journal: "ডায়েরি", progress: "অগ্রগতি", library: "রাগ-কোষ", profile: "প্রোফাইল" },
   streak: n => `টানা ${n} দিন`,
   switchSinger: "শিল্পী বদলান",
-  englishOnlyNote: "ভেতরের কিছু পেজ এখনও ইংরেজিতে।",
+  englishOnlyNote: "কিছু বিস্তারিত বিবরণ এখনও ইংরেজিতে।",
   tp: {
     title: "তানপুরা", play: "তানপুরা বাজান", stop: "থামান", sa: "সা", keyboard: "আপনার সা বাছুন", octave: n => `সপ্তক ${n}`, fine: c => `সূক্ষ্ম সুর ${c} সেন্ট`,
     first: "প্রথম তার", firstHelp: "বেশিরভাগ রাগে পা, যে রাগে পা নেই (মালকোষ) সেখানে মা, আর মারোয়ার মতো রাগে নি।", volume: "আওয়াজ",

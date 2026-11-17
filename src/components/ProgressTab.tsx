@@ -5,6 +5,7 @@
  */
 import React, { useEffect, useMemo, useState } from 'react';
 import { SwaraRing, RiyazThread } from './progress/SwaraRing';
+import { useUi } from '../i18n/ui';
 import {
   Bar, BarChart, CartesianGrid, Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis,
 } from 'recharts';
@@ -31,6 +32,7 @@ const Stat: React.FC<{ icon: React.ReactNode; label: string; value: string }> = 
 );
 
 export const ProgressTab: React.FC = () => {
+  const u = useUi();
   const [history, setHistory] = useState<PracticeRecord[]>(() => loadHistory());
   useEffect(() => onHistoryChange(() => setHistory(loadHistory())), []);
 
@@ -87,12 +89,12 @@ export const ProgressTab: React.FC = () => {
   return (
     <div className="space-y-6">
       <header className="pg-head">
-        <h1 className="pg-title">Progress</h1>
+        <h1 className="pg-title">{u("progressTitle")}</h1>
         <p className="pg-figures">
-          <span><b>{totalMinutes >= 60 ? `${(totalMinutes / 60).toFixed(1)} h` : `${Math.round(totalMinutes)} min`}</b> of riyaz</span>
-          <span><b>{streak}</b> {streak === 1 ? "day" : "days"} in a row</span>
-          <span><b>{analyses.length}</b> recordings analysed</span>
-          <span><b>{raags}</b> {raags === 1 ? "raag" : "raags"}</span>
+          <span><b>{totalMinutes >= 60 ? `${(totalMinutes / 60).toFixed(1)} h` : `${Math.round(totalMinutes)} min`}</b> {u("ofRiyaz")}</span>
+          <span><b>{streak}</b> {u("daysInRow", streak)}</span>
+          <span><b>{analyses.length}</b> {u("recordingsAnalysed")}</span>
+          <span><b>{raags}</b> {u("raagsCount", raags)}</span>
         </p>
       </header>
       <section className="pg-hero">

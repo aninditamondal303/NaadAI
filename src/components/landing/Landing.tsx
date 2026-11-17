@@ -270,6 +270,7 @@ export const Landing: React.FC<Props> = ({ returningName, onOpenApp, onDemoAnaly
           <nav className="ln-nav" aria-label="Page">
             <a href="#listens">{t.nav.listens}</a>
             <a href="#accuracy">{t.nav.accuracy}</a>
+            <a href="#how-it-works">{t.nav.method}</a>
             <LangPicker />
             <button type="button" className="ln-open" onClick={onOpenApp}>{openLabel}</button>
           </nav>

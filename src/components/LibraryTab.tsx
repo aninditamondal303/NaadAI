@@ -8,6 +8,7 @@ import { ArrowLeft, Search, ShieldAlert } from 'lucide-react';
 import { RAAG_LIST, type ComprehensiveRaag } from '../data/allRaags';
 import { RAAG_DETAILS } from '../data/raagDetails';
 import { RaagStudy } from './study/RaagStudy';
+import { useUi } from '../i18n/ui';
 import { Phrase } from './study/Swaralipi';
 import { pakadSource } from '../data/pakad';
 import { angPhrases, MUKHYA_ANG, vishrantiSwaras } from '../data/mukhyaAng';
@@ -29,6 +30,7 @@ const Row: React.FC<{ label: string; children: React.ReactNode }> = ({ label, ch
 );
 
 export const LibraryTab: React.FC<{ saHz?: number }> = ({ saHz = 130.81 }) => {
+  const u = useUi();
   const [query, setQuery] = useState("");
   const [thaat, setThaat] = useState("All");
   const [fullOnly, setFullOnly] = useState(false);
@@ -48,7 +50,7 @@ export const LibraryTab: React.FC<{ saHz?: number }> = ({ saHz = 130.81 }) => {
     const varjit = varjitOf(r);
     return (
       <div className="lib">
-        <button type="button" onClick={() => setViewing(null)} className="lib-back">All raags</button>
+        <button type="button" onClick={() => setViewing(null)} className="lib-back">{u("allRaags")}</button>
         <header className="lib-raag-head">
           <h1 className="lib-title">{shortName(r)}</h1>
           <p className="lib-intro">{r.thaat} thaat. Jati: {r.jati}. Samay: {r.time}.</p>
@@ -107,7 +109,7 @@ export const LibraryTab: React.FC<{ saHz?: number }> = ({ saHz = 130.81 }) => {
     <div className="lib">
       <header className="lib-head">
         <div>
-          <h1 className="lib-title">Raag library</h1>
+          <h1 className="lib-title">{u("libraryTitle")}</h1>
           <p className="lib-intro">
             {RAAG_LIST.length} raags with their swaras, aroh, avaroh, vadi and samvadi. {fullCount} also have pakad, chalan,
             alaap, a sargam geet and a bandish to study. All entries await a guru's review.
@@ -115,15 +117,15 @@ export const LibraryTab: React.FC<{ saHz?: number }> = ({ saHz = 130.81 }) => {
         </div>
         <div className="lib-filters">
           <label className="lib-search">
-            <span className="lib-vh">Search raags</span>
-            <input value={query} onChange={e => setQuery(e.target.value)} placeholder="Search by name, thaat or samay" />
+            <span className="lib-vh">{u("searchRaags")}</span>
+            <input value={query} onChange={e => setQuery(e.target.value)} placeholder={u("searchRaags")} />
           </label>
           <select value={thaat} onChange={e => setThaat(e.target.value)} aria-label="Thaat">
-            {THAATS.map(t => <option key={t} value={t}>{t === "All" ? "All thaats" : `${t} thaat`}</option>)}
+            {THAATS.map(t => <option key={t} value={t}>{t === "All" ? u("allThaats") : `${t} thaat`}</option>)}
           </select>
           <label className="lib-check">
             <input type="checkbox" checked={fullOnly} onChange={e => setFullOnly(e.target.checked)} />
-            With study material
+            {u("withStudy")}
           </label>
         </div>
       </header>
@@ -131,7 +133,7 @@ export const LibraryTab: React.FC<{ saHz?: number }> = ({ saHz = 130.81 }) => {
       <SamayChakra raags={list} onOpen={setViewing} />
 
       {list.length === 0 ? (
-        <p className="lib-intro">No raags match your search. Try another word.</p>
+        <p className="lib-intro">{u("noMatch")}</p>
       ) : (
         <section className="lib-index" aria-label="All raags by thaat">
           {byThaat.map(([t, rs]) => (

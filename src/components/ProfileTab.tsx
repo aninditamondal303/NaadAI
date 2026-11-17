@@ -4,7 +4,8 @@
  * With too little data, we say so instead of guessing.
  */
 import React, { useEffect, useMemo, useState } from 'react';
-import { User } from 'lucide-react';
+import { useUi } from '../i18n/ui';
+import { RiyazReminder } from './RiyazReminder';
 import { centsBetween, signedCents, westernNote } from '../analysis/music';
 import { SWARA_NAMES, SWARA_SYMBOLS } from '../analysis/summary';
 import { clearHistory, loadHistory, onHistoryChange, type PracticeRecord } from '../lib/practiceHistory';
@@ -21,6 +22,7 @@ interface ProfileTabProps {
 }
 
 export const ProfileTab: React.FC<ProfileTabProps> = ({ baseTonicHz, vocalistName, profileId, onDeleted }) => {
+  const u = useUi();
   const [history, setHistory] = useState<PracticeRecord[]>(() => loadHistory());
   useEffect(() => onHistoryChange(() => setHistory(loadHistory())), []);
 
@@ -70,57 +72,52 @@ export const ProfileTab: React.FC<ProfileTabProps> = ({ baseTonicHz, vocalistNam
 
   return (
     <div className="space-y-6">
-      <div className="bg-[#0D3A40] p-6 rounded-2xl border border-[#C9A227]/40 shadow-xl">
-        <h2 className="text-xl font-bold text-slate-100 flex items-center gap-2 font-serif">
-          <User className="h-5 w-5 text-[#D9B45F]" />
-          {vocalistName ? `${vocalistName}'s profile` : "Your profile"}
-        </h2>
-        <p className="text-xs text-slate-400 mt-1">
-          Built from {analyses.length} analysed {analyses.length === 1 ? "recording" : "recordings"} and {saChecks.length} Sa {saChecks.length === 1 ? "check" : "checks"} saved in this browser.
-        </p>
-      </div>
+      <header className="az-head">
+        <div>
+          <h1 className="az-title">{vocalistName ? u("profileOf", vocalistName) : u("yourProfile")}</h1>
+          <p className="az-intro">{u("builtFrom", analyses.length, saChecks.length)}</p>
+        </div>
+      </header>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <div className="bg-[#0D3A40] p-5 rounded-2xl border border-slate-800 space-y-1">
-          <span className="text-[9px] font-mono text-slate-500 uppercase tracking-widest block font-bold">Your Sa</span>
+          <span className="text-[9px] font-mono text-slate-500 uppercase tracking-widest block font-bold">{u("yourSa")}</span>
           <span className="text-2xl font-black font-mono text-slate-100 block">{baseTonicHz.toFixed(1)} Hz</span>
           <span className="text-[11px] text-slate-400">{sa.name} {signedCents(sa.cents)} cents</span>
         </div>
         <div className="bg-[#0D3A40] p-5 rounded-2xl border border-slate-800 space-y-1">
-          <span className="text-[9px] font-mono text-slate-500 uppercase tracking-widest block font-bold">Latest Sa check</span>
+          <span className="text-[9px] font-mono text-slate-500 uppercase tracking-widest block font-bold">{u("latestSaCheck")}</span>
           {lastSa ? (
             <>
               <span className="text-2xl font-black font-mono text-slate-100 block">±{lastSa.wobbleCents.toFixed(1)} cents</span>
-              <span className="text-[11px] text-slate-400">wobble while holding {lastSa.saHz.toFixed(1)} Hz for {lastSa.heldSec.toFixed(1)} s</span>
+              <span className="text-[11px] text-slate-400">{u("wobbleHolding", lastSa.saHz.toFixed(1), lastSa.heldSec.toFixed(1))}</span>
             </>
-          ) : <span className="text-xs text-slate-500 block">Use "Find my Sa" in the Analyzer to measure how steadily you hold Sa.</span>}
+          ) : <span className="text-xs text-slate-500 block">{u("saCheckEmpty")}</span>}
         </div>
         <div className="bg-[#0D3A40] p-5 rounded-2xl border border-slate-800 space-y-1">
-          <span className="text-[9px] font-mono text-slate-500 uppercase tracking-widest block font-bold">Range of held notes</span>
+          <span className="text-[9px] font-mono text-slate-500 uppercase tracking-widest block font-bold">{u("rangeHeld")}</span>
           {range ? (
             <>
               <span className="text-2xl font-black font-mono text-slate-100 block">{range.low.label} – {range.high.label}</span>
-              <span className="text-[11px] text-slate-400">{(range.high.semis - range.low.semis).toFixed(0)} semitones across all recordings</span>
+              <span className="text-[11px] text-slate-400">{u("rangeSemis", (range.high.semis - range.low.semis).toFixed(0))}</span>
             </>
-          ) : <span className="text-xs text-slate-500 block">Analyse a recording to measure your range.</span>}
+          ) : <span className="text-xs text-slate-500 block">{u("rangeEmpty")}</span>}
         </div>
       </div>
 
       <div className="bg-[#0D3A40] p-5 rounded-2xl border border-slate-800 space-y-3">
-        <h3 className="text-xs font-mono font-bold text-slate-300 uppercase tracking-widest">Swara tendencies</h3>
+        <h3 className="text-xs font-mono font-bold text-slate-300 uppercase tracking-widest">{u("swaraTendencies")}</h3>
         {enough.length === 0 ? (
-          <p className="text-xs text-slate-500">
-            Not enough data yet. A swara appears here once you have held it for at least {MIN_SWARA_SEC} seconds in total across your analysed recordings.
-          </p>
+          <p className="text-xs text-slate-500">{u("tendEmpty", MIN_SWARA_SEC)}          </p>
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full text-xs font-mono whitespace-nowrap">
               <thead>
                 <tr className="text-[9px] uppercase tracking-widest text-slate-500 text-left">
-                  <th className="py-2 pr-3">Swara</th>
-                  <th className="py-2 pr-3">Held in total</th>
-                  <th className="py-2 pr-3">Typical position</th>
-                  <th className="py-2 pr-3">Typical wobble</th>
+                  <th className="py-2 pr-3">{u("colSwara")}</th>
+                  <th className="py-2 pr-3">{u("colHeld")}</th>
+                  <th className="py-2 pr-3">{u("colPos")}</th>
+                  <th className="py-2 pr-3">{u("colWob")}</th>
                 </tr>
               </thead>
               <tbody>
@@ -136,11 +133,10 @@ export const ProfileTab: React.FC<ProfileTabProps> = ({ baseTonicHz, vocalistNam
             </table>
           </div>
         )}
-        <p className="text-[10px] text-slate-500">
-          Position is measured from the equal-tempered swara position and averaged by time held. Differences over 15 cents are highlighted;
-          some swaras are traditionally sung a little lower or higher, so check with your guru before changing anything.
-        </p>
+        <p className="text-[10px] text-slate-500">{u("tendNote")}        </p>
       </div>
+
+      <RiyazReminder saLabel={`${sa.name}, ${baseTonicHz.toFixed(1)} Hz`} />
 
       <div className="flex flex-wrap justify-end gap-2">
         {profileId && (
@@ -154,22 +150,18 @@ export const ProfileTab: React.FC<ProfileTabProps> = ({ baseTonicHz, vocalistNam
               URL.revokeObjectURL(a.href);
             }}
             className="px-3 py-1.5 rounded-lg border border-slate-700 text-slate-300 hover:bg-slate-800 text-[10px] font-mono font-bold uppercase cursor-pointer">
-            Export my data
+            {u("exportData")}
           </button>
         )}
         {history.length > 0 && (
           <button type="button"
-            onClick={() => { if (window.confirm("Delete all practice history saved for this singer? This can't be undone.")) clearHistory(); }}
-            className="px-3 py-1.5 rounded-lg border border-rose-900 text-rose-300 hover:bg-rose-950/40 text-[10px] font-mono font-bold uppercase cursor-pointer">
-            Clear practice history
-          </button>
+            onClick={() => { if (window.confirm(u("clearConfirm"))) clearHistory(); }}
+            className="px-3 py-1.5 rounded-lg border border-rose-900 text-rose-300 hover:bg-rose-950/40 text-[10px] font-mono font-bold uppercase cursor-pointer">{u("clearHistory")}          </button>
         )}
         {profileId && (
           <button type="button"
-            onClick={() => { if (window.confirm(`Delete the profile "${vocalistName}" and all its history from this browser?`)) { deleteProfile(profileId); onDeleted?.(); } }}
-            className="px-3 py-1.5 rounded-lg border border-rose-900 text-rose-300 hover:bg-rose-950/40 text-[10px] font-mono font-bold uppercase cursor-pointer">
-            Delete profile
-          </button>
+            onClick={() => { if (window.confirm(u("deleteConfirm", vocalistName))) { deleteProfile(profileId); onDeleted?.(); } }}
+            className="px-3 py-1.5 rounded-lg border border-rose-900 text-rose-300 hover:bg-rose-950/40 text-[10px] font-mono font-bold uppercase cursor-pointer">{u("deleteProfile")}          </button>
         )}
       </div>
     </div>

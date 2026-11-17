@@ -1,0 +1,53 @@
+name: Android app
+
+# Builds the Android app (the same web app packaged with Capacitor) as an
+# installable APK. Run it from the Actions tab, or push a tag such as v1.0.0 to
+# also attach the APK to a GitHub release.
+
+on:
+  workflow_dispatch:
+  push:
+    tags: ["v*"]
+
+permissions:
+  contents: write
+
+jobs:
+  apk:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 21
+      - run: npm ci
+      - name: Build the web app for Android
+        run: npx vite build
+        env:
+          VITE_BASE: /
+          VITE_STATIC_SITE: "1"
+      - run: npx cap sync android
+      - name: Build APK
+        working-directory: android
+        run: |
+          chmod +x gradlew
+          ./gradlew assembleDebug --no-daemon
+          cp app/build/outputs/apk/debug/app-debug.apk ../naad-ai.apk
+      - uses: actions/upload-artifact@v4
+        with:
+          name: naad-ai-apk
+          path: naad-ai.apk
+      - name: Attach to release
+        if: startsWith(github.ref, 'refs/tags/v')
+        uses: softprops/action-gh-release@v2
+        with:
+          files: naad-ai.apk
+          body: |
+            Naad AI for Android. Download naad-ai.apk on your phone and open it to install
+            (allow installation from your browser when Android asks). Debug-signed build;
+            for the Play Store a release key is needed.

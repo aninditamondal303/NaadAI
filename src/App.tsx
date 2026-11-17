@@ -8,6 +8,7 @@ import { Music, Award, Sparkles, RefreshCw, Compass, AlertTriangle, FileText, Se
 import { createProfile, currentProfile, loadProfiles, setCurrentProfile, updateProfile, type SingerProfile } from './lib/profiles';
 import { Landing } from './components/landing/Landing';
 import { SharedTakeView } from './components/SharedTakeView';
+import { MethodPage } from './components/landing/MethodPage';
 import { useLang } from './i18n/lang';
 import { LangPicker } from './i18n/LangPicker';
 import './app-shell.css';
@@ -67,6 +68,12 @@ export default function App() {
   // The last singer on this device, offered on the welcome page
   const returning = isAuthenticated ? null : currentProfile();
   // A take shared as a link (#take=...) opens in a read-only view
+  const [showMethod, setShowMethod] = useState(() => window.location.hash === "#how-it-works");
+  useEffect(() => {
+    const on = () => setShowMethod(window.location.hash === "#how-it-works");
+    window.addEventListener("hashchange", on);
+    return () => window.removeEventListener("hashchange", on);
+  }, []);
   const [sharedCode, setSharedCode] = useState<string | null>(() => (window.location.hash.startsWith("#take=") ? window.location.hash.slice(6) : null));
   // Opened from "See the full analysis" on the welcome page
   const [autoDemo, setAutoDemo] = useState(false);
@@ -89,6 +96,10 @@ export default function App() {
   const handleTaalStatsChange = (stats: { layaAccuracy: number; driftMs: number } | any) => {
     // If the metronome has a high-quality run, feed stats into active attempt
   };
+
+  if (showMethod && !isAuthenticated) {
+    return <MethodPage onBack={() => { window.location.hash = ""; setShowMethod(false); }} onOpenApp={() => { window.location.hash = ""; setShowMethod(false); if (returning) enterProfile(returning); else setActivePage("profiles"); }} />;
+  }
 
   if (sharedCode) {
     return <SharedTakeView code={sharedCode} onOpenApp={() => { window.history.replaceState(null, "", window.location.pathname); setSharedCode(null); }} />;
