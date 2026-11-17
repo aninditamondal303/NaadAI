@@ -77,6 +77,8 @@ export interface View {
   /** track: dim the part after `reveal` instead of hiding it. */
   ghostRest: boolean;
   now: number;
+  /** Largest time gap (s) still drawn as one line; default 0.06 for 10 ms readings. */
+  maxGap?: number;
 }
 
 const LIVE_WINDOW = 8;
@@ -143,7 +145,7 @@ export function drawStage(ctx: CanvasRenderingContext2D, w: number, h: number, s
       if (p.t < from) { prev = p; continue; }
       if (p.t > to) break;
       const broken = p.c === null || prev === null || prev.c === null
-        || p.t - prev.t > 0.06 || Math.abs(p.c - prev.c) > 150;
+        || p.t - prev.t > (view.maxGap ?? 0.06) || Math.abs(p.c - prev.c) > 150;
       if (p.c !== null) {
         if (broken || !pen) ctx.moveTo(x(p.t), y(p.c)); else ctx.lineTo(x(p.t), y(p.c));
         pen = true;
