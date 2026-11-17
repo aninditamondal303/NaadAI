@@ -3,7 +3,7 @@
  *   npx tsx eval/make-wav.ts <out.wav> <sa|yaman> [saHz]
  */
 import { writeFileSync } from "node:fs";
-import { oscillating, steady, synthVoice, SWARA_CENTS, type Segment } from "./synth";
+import { glide, oscillating, steady, synthVoice, SWARA_CENTS, type Segment } from "./synth";
 
 const [out, kind = "yaman", saArg = "138.59"] = process.argv.slice(2);
 if (!out) throw new Error("usage: make-wav.ts <out.wav> <sa|yaman> [saHz]");
@@ -21,6 +21,27 @@ if (kind === "yaman-mistakes") {
     { durSec: 1.0, f0: steady(at("G")) }, { durSec: 0.1, f0: null },
     { durSec: 1.0, f0: steady(at("R")) }, { durSec: 0.1, f0: null },
     { durSec: 1.5, f0: steady(sa) }, { durSec: 0.3, f0: null },
+  ];
+} else if (kind === "demo") {
+  // ~20 s Yaman alaap-like phrase for the website demo: mostly in tune, one
+  // swara sung a little flat, an andolan on Ga, a meend, and one held
+  // shuddha Ma (not in Yaman) for the rule checker to find.
+  const flat = (sw: string, cents: number) => sa * Math.pow(2, (SWARA_CENTS[sw] + cents) / 1200);
+  segs = [
+    { durSec: 0.3, f0: null },
+    { durSec: 2.0, f0: steady(sa) }, { durSec: 0.15, f0: null },
+    { durSec: 0.7, f0: steady(at("N", -1)) }, { durSec: 0.1, f0: null },
+    { durSec: 0.8, f0: steady(flat("R", -18)) }, { durSec: 0.1, f0: null },
+    { durSec: 2.5, f0: oscillating(at("G"), 25, 1.8) }, { durSec: 0.5, f0: null },
+    { durSec: 0.8, f0: steady(at("M")) }, { durSec: 0.1, f0: null },
+    { durSec: 1.6, f0: steady(at("P")) }, { durSec: 0.1, f0: null },
+    { durSec: 1.2, f0: glide(at("P"), at("G"), 1.2) },
+    { durSec: 1.0, f0: steady(at("G")) }, { durSec: 0.6, f0: null },
+    { durSec: 1.0, f0: steady(at("m")) }, { durSec: 0.1, f0: null },
+    { durSec: 0.8, f0: steady(at("G")) }, { durSec: 0.1, f0: null },
+    { durSec: 0.8, f0: steady(flat("R", -18)) }, { durSec: 0.1, f0: null },
+    { durSec: 0.6, f0: steady(at("N", -1)) }, { durSec: 0.1, f0: null },
+    { durSec: 2.5, f0: steady(sa) }, { durSec: 0.4, f0: null },
   ];
 } else if (kind === "sa") {
   segs = [{ durSec: 0.5, f0: null }, { durSec: 8, f0: steady(sa) }, { durSec: 0.5, f0: null }];
