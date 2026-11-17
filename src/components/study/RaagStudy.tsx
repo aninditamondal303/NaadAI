@@ -17,6 +17,8 @@ import { TaalPlayer } from "../../audio/tabla";
 import { scheduleSwaras } from "../../audio/swaraVoice";
 import { useLang } from "../../i18n/lang";
 import { Phrase, Swaralipi, type NoteScript } from "./Swaralipi";
+import { UserBandishForm } from "./UserBandishForm";
+import { loadUserBandishes, saveUserBandishes, type UserComposition } from "../../lib/userBandish";
 
 const SYM_NAMES = ["Sa", "komal Re", "Re", "komal Ga", "Ga", "Ma", "tivra Ma", "Pa", "komal Dha", "Dha", "komal Ni", "Ni"];
 
@@ -88,7 +90,14 @@ export const RaagStudy: React.FC<{ raag: ComprehensiveRaag; saHz: number }> = ({
   const [script, setScript] = useState<NoteScript>(lang === "bn" ? "beng" : lang === "en" ? "latin" : "deva");
   const d = RAAG_DETAILS[raag.id];
   const alaap = ALAAP[raag.id];
-  const comps = compositionsForRaag(raag);
+  const [userVersion, setUserVersion] = useState(0);
+  const userComps = useMemo(() => loadUserBandishes().filter(c => c.raagId === raag.id), [raag.id, userVersion]);
+  const comps = [...userComps, ...compositionsForRaag(raag)];
+  const removeUser = (id: string) => {
+    if (!window.confirm("Remove this bandish from this browser?")) return;
+    saveUserBandishes(loadUserBandishes().filter(c => c.id !== id));
+    setUserVersion(v => v + 1);
+  };
   const player = usePlayer(saHz, raag);
   const [sargamSets, setSargamSets] = useState(1);
   const [alaapSets, setAlaapSets] = useState(1);
@@ -159,11 +168,13 @@ export const RaagStudy: React.FC<{ raag: ComprehensiveRaag; saHz: number }> = ({
           <section key={c.id} className="st-sec">
             <div className="st-stage-head">
               <h3 className="st-h">{c.kind === "bandish" ? `Bandish: ${c.title}` : c.id.endsWith("basic-sargam-geet") ? c.title : "Sargam geet"}</h3>
+              {(c as UserComposition).user && <button type="button" className="tp-link" onClick={() => removeUser(c.id)}>Remove</button>}
               <button type="button" className="st-play st-play-main" onClick={() => playComposition(c)}>
                 {player.key === c.id ? "Stop" : "Listen with tanpura and tabla"}
               </button>
             </div>
 
+            {(c as UserComposition).user && <p className="st-muted">Entered by you{(c as UserComposition).source ? `, ${(c as UserComposition).source}` : ""}.</p>}
             <dl className="st-basis">
               <div><dt>Raag</dt><dd>{raag.name.replace(/^Raag\s+/i, "")}, {raag.thaat} thaat; vadi {SYM_NAMES[raag.vadi]}, samvadi {SYM_NAMES[raag.samvadi]}</dd></div>
               <div><dt>Taal</dt><dd>{taal.name}, {taal.matras} matras in {taal.vibhags.length} vibhags of {taal.vibhags.join(" + ")}; taali on {taal.claps.map((x, i) => (x === "0" ? null : `${x === "X" ? "sam" : x}`)).filter(Boolean).join(", ")}, khali on vibhag {taal.claps.map((x, i) => (x === "0" ? i + 1 : null)).filter(Boolean).join(", ")}</dd></div>
@@ -181,11 +192,13 @@ export const RaagStudy: React.FC<{ raag: ComprehensiveRaag; saHz: number }> = ({
             <h4 className="st-part">Antara</h4>
             <Swaralipi taal={taal} lines={c.antara} script={script} playing={playing} offset={c.sthayi.length * taal.matras} />
             <p className="st-muted st-small">
-              Under each matra: the swara, {c.kind === "bandish" ? "the syllable, " : ""}and the taal mark (X sam, 0 khali, numbers taali). ऽ: hold the previous swara{c.kind === "bandish" ? " or syllable" : ""}. Two swaras in one cell share the matra.
+              Under each matra: the swara, {c.kind === "bandish" ? "the syllable, " : ""}and the taal mark (X sam, 0 khali, numbers taali). {script === "latin" ? "–" : "ऽ"}: hold the previous swara{c.kind === "bandish" ? " or syllable" : ""}. Two swaras in one cell share the matra.
             </p>
           </section>
         );
       })}
+
+      <UserBandishForm raag={raag} onSaved={() => setUserVersion(v => v + 1)} />
 
       {/* ---------------------------------------------------------------- more */}
       <section className="st-sec">
