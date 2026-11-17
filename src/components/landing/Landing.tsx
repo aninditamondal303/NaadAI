@@ -352,7 +352,8 @@ export const Landing: React.FC<Props> = ({ returningName, onOpenApp, onDemoAnaly
             </tbody>
           </table>
           <p className="ln-note">
-            {A.tablesPre} <a href={`${REPO}/blob/main/eval/results/pitch-benchmark.md`}>{A.pitch}</a> {A.and}{" "}
+            {A.tablesPre} <a href={`${REPO}/blob/main/eval/results/real-voice-pitch.md`}>{A.real}</a>,{" "}
+            <a href={`${REPO}/blob/main/eval/results/pitch-benchmark.md`}>{A.pitch}</a> {A.and}{" "}
             <a href={`${REPO}/blob/main/eval/results/sa-benchmark.md`}>{A.sa}</a>. {A.helpPre}{" "}
             <a href={`${REPO}/blob/main/docs/recording-guide.md`}>{A.guide}</a>{A.helpPost}
           </p>

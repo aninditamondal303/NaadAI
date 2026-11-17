@@ -44,6 +44,22 @@ patterns for every raag, and Sur milao: hear a swara, sing it, and see how
 close you were. The app can be installed and works offline after the first
 visit.
 
+## Working in VS Code
+
+Open the folder in VS Code and accept the recommended extensions. Tasks
+(*Terminal → Run Task*) start the app, run the tests and run each benchmark;
+*Run and Debug → Debug the app in Chrome* starts the dev server on port 3000
+and opens it with breakpoints. To score pitch on a dataset with reference f0,
+download it into `eval/datasets/` (ignored by git) and run the task
+*Pitch accuracy on a dataset with reference f0*. On Windows PowerShell:
+
+```powershell
+New-Item -ItemType Directory -Force eval/datasets | Out-Null
+Invoke-WebRequest "https://zenodo.org/record/5578807/files/vocadito.zip?download=1" -OutFile eval/datasets/vocadito.zip
+Expand-Archive eval/datasets/vocadito.zip eval/datasets/vocadito
+npm run eval:f0 -- eval/datasets/vocadito --name vocadito
+```
+
 ## Principles
 
 - **Only real measurements.** Every number is measured from your voice. If
@@ -89,11 +105,16 @@ All results are reproducible with one command each.
 |---|---|---|---|
 | Pitch within ±20 cents | 100% of sung frames; 0% false pitch in silence | 20 synthetic clips (Sa sadhana, aroh, kharaj, taar, andolan, gamak, meend, noise) | `npm run eval:pitch` |
 | Sa detection within ±20 cents | 56 of 56 phrases (raag and voice type known) | 56 synthetic 20 s phrases, 4 raags × 14 Sa values | `npm run eval:sa` |
-| Real voices | *Collecting recordings* | see [eval/recordings](eval/recordings/README.md) | `npm run eval:real` |
+| **Pitch on real singing within ±20 cents** | **92.0%** of sung frames (96.6% within ±50; median error 2.8 cents; YIN: 84.3%) | [vocadito](https://zenodo.org/record/5578807): 40 solo singers, 13.6 min, f0 marked by musicians (CC BY 4.0) | `npm run eval:f0 -- <folder>` or the *Real-voice accuracy* workflow |
+| Pitch reported in pauses, real singing | 13.0% of frames marked silent | same | same |
+| Sa detection on Hindustani riyaz | *Collecting recordings* | see [eval/recordings](eval/recordings/README.md) | `npm run eval:real` |
 
-Synthetic clips are much easier than real singing, so these numbers are an
-upper bound. The real-voice report is the one that counts; it uses
-recordings sung over the app's own tanpura, so the true Sa is known exactly.
+Synthetic clips are much easier than real singing, so those numbers are an
+upper bound. The vocadito singers are not Hindustani vocalists; most "pitch in
+pauses" frames are breaths and fading note endings that the annotators marked
+silent, and held-note measurements need a quarter second of steady pitch.
+Full table: [eval/results/real-voice-pitch.md](eval/results/real-voice-pitch.md).
+The dataset is downloaded by the workflow and is not stored in this repository.
 
 Pitch tracking uses the McLeod Pitch Method (implemented in
 `src/analysis/pitch/mpm.ts`), chosen over YIN and plain autocorrelation by

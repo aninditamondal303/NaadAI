@@ -33,7 +33,7 @@ export interface Strings {
   accuracy: {
     h: string; lede: string;
     rows: [string, string, string][];
-    tablesPre: string; pitch: string; and: string; sa: string; helpPre: string; guide: string; helpPost: string;
+    tablesPre: string; real: string; pitch: string; and: string; sa: string; helpPre: string; guide: string; helpPost: string;
   };
   practise: { h: string; items: [string, string][] };
   privacy: { h: string; lede: string };
@@ -123,14 +123,17 @@ const en: Strings = {
   },
   accuracy: {
     h: "How well it measures",
-    lede: "Every number below comes from the test scripts in the repository, run on computer-generated voices whose pitch is known exactly. Real voices are harder. Those results will be published once enough recordings with a reference have been collected.",
+    lede: "The first three rows come from 40 recordings of real singers whose pitch was marked by musicians (the vocadito dataset, CC BY 4.0). The rest use computer-generated voices whose pitch is known exactly. The real singers are not Hindustani vocalists, so tests on riyaz recordings will follow.",
     rows: [
-      ["Pitch readings within 20 cents", "100%", "20 clips, 98 seconds, male and female voices, with gamak, meend and background noise"],
-      ["Pitch heard in silence", "0%", "Readings wrongly reported during breaths and pauses"],
+      ["Real singing: pitch within 20 cents", "92%", "40 solo singers, 13.6 minutes, compared every 10 ms with pitch marked by musicians"],
+      ["Real singing: within 50 cents", "96.6%", "Median error 2.8 cents. The common YIN method scores 84% within 20 cents on the same test"],
+      ["Real singing: pitch reported in pauses", "13%", "Mostly breaths and fading note endings marked silent by the annotators; a held note needs a quarter second of steady pitch"],
+      ["Computer voices: within 20 cents", "100%", "20 clips, 98 seconds, male and female voices, with gamak, meend and background noise"],
+      ["Computer voices: pitch in silence", "0%", "Readings wrongly reported during breaths and pauses"],
       ["Sa found, raag and voice known", "56 / 56", "Yaman, Bhairav, Bhupali and Malkauns, Sa from 110 to 233 Hz"],
       ["Sa found, raag known", "91%", "The same 56 phrases, without being told the voice type"],
     ],
-    tablesPre: "Full tables:", pitch: "pitch", and: "and", sa: "Sa detection",
+    tablesPre: "Full tables:", real: "real singing", pitch: "computer voices", and: "and", sa: "Sa detection",
     helpPre: "To help test it on real singing, see the", guide: "recording guide", helpPost: ".",
   },
   practise: {
@@ -250,14 +253,17 @@ const hi: Strings = {
   },
   accuracy: {
     h: "यह कितना सही मापता है",
-    lede: "नीचे का हर अंक रिपॉज़िटरी की टेस्ट स्क्रिप्ट से आया है, जो कंप्यूटर से बनी ऐसी आवाज़ों पर चलती हैं जिनका सुर ठीक-ठीक पता है। असली आवाज़ें ज़्यादा कठिन होती हैं। संदर्भ के साथ पर्याप्त रिकॉर्डिंग मिलने पर उनके नतीजे भी प्रकाशित होंगे।",
+    lede: "पहली तीन पंक्तियाँ असली गायकों की 40 रिकॉर्डिंग से हैं, जिनका सुर संगीतकारों ने चिह्नित किया है (vocadito डेटासेट, CC BY 4.0)। बाकी कंप्यूटर से बनी आवाज़ों पर हैं जिनका सुर ठीक-ठीक पता है। ये गायक हिंदुस्तानी शास्त्रीय गायक नहीं हैं, इसलिए रियाज़ रिकॉर्डिंग पर परीक्षण आगे होंगे।",
     rows: [
-      ["20 सेंट के भीतर सुर-माप", "100%", "20 क्लिप, 98 सेकंड, पुरुष और महिला आवाज़ें, गमक, मींड और पृष्ठभूमि शोर के साथ"],
-      ["खामोशी में सुना गया सुर", "0%", "साँस और विराम के समय गलती से बताए गए माप"],
+      ["असली गायन: 20 सेंट के भीतर", "92%", "40 गायक, 13.6 मिनट, हर 10 ms पर संगीतकारों के चिह्नित सुर से तुलना"],
+      ["असली गायन: 50 सेंट के भीतर", "96.6%", "माध्य त्रुटि 2.8 सेंट। आम YIN विधि इसी परीक्षण में 20 सेंट के भीतर 84% पर है"],
+      ["असली गायन: विराम में बताया गया सुर", "13%", "ज़्यादातर साँस और स्वर के धीमे अंत, जिन्हें चिह्नकों ने खामोश माना; ठहरे स्वर के लिए चौथाई सेकंड का स्थिर सुर चाहिए"],
+      ["कंप्यूटर आवाज़ें: 20 सेंट के भीतर", "100%", "20 क्लिप, 98 सेकंड, पुरुष और महिला आवाज़ें, गमक, मींड और पृष्ठभूमि शोर के साथ"],
+      ["कंप्यूटर आवाज़ें: खामोशी में सुर", "0%", "साँस और विराम के समय गलती से बताए गए माप"],
       ["सा मिला, राग और आवाज़ का प्रकार ज्ञात", "56 / 56", "यमन, भैरव, भूपाली और मालकौंस, सा 110 से 233 Hz तक"],
       ["सा मिला, केवल राग ज्ञात", "91%", "वही 56 आलाप, आवाज़ का प्रकार बताए बिना"],
     ],
-    tablesPre: "पूरी तालिकाएँ:", pitch: "सुर", and: "और", sa: "सा की पहचान",
+    tablesPre: "पूरी तालिकाएँ:", real: "असली गायन", pitch: "कंप्यूटर आवाज़ें", and: "और", sa: "सा की पहचान",
     helpPre: "असली गायन पर इसे परखने में मदद के लिए देखिए", guide: "रिकॉर्डिंग गाइड", helpPost: "।",
   },
   practise: {
@@ -377,14 +383,17 @@ const bn: Strings = {
   },
   accuracy: {
     h: "এটি কতটা ঠিক মাপে",
-    lede: "নিচের প্রতিটি সংখ্যা রিপোজিটরির টেস্ট স্ক্রিপ্ট থেকে এসেছে, যা কম্পিউটারে তৈরি এমন কণ্ঠে চালানো হয়েছে যার সুর একদম জানা। আসল গলা আরও কঠিন। রেফারেন্সসহ যথেষ্ট রেকর্ডিং জমলে সেই ফলাফলও প্রকাশ করা হবে।",
+    lede: "প্রথম তিনটি সারি আসল শিল্পীদের ৪০টি রেকর্ডিং থেকে, যাদের সুর সংগীতজ্ঞরা চিহ্নিত করেছেন (vocadito ডেটাসেট, CC BY 4.0)। বাকিগুলো কম্পিউটারে তৈরি কণ্ঠে, যার সুর একদম জানা। এই শিল্পীরা হিন্দুস্তানি শাস্ত্রীয় শিল্পী নন, তাই রেওয়াজের রেকর্ডিংয়ে পরীক্ষা পরে হবে।",
     rows: [
-      ["২০ সেন্টের মধ্যে সুর-মাপ", "100%", "২০টি ক্লিপ, ৯৮ সেকেন্ড, পুরুষ ও মহিলা কণ্ঠ, গমক, মীড় আর পিছনের আওয়াজসহ"],
-      ["নীরবতায় শোনা সুর", "0%", "শ্বাস আর বিরতির সময় ভুল করে জানানো মাপ"],
+      ["আসল গান: ২০ সেন্টের মধ্যে", "92%", "৪০ জন শিল্পী, ১৩.৬ মিনিট, প্রতি ১০ ms-এ সংগীতজ্ঞদের চিহ্নিত সুরের সঙ্গে তুলনা"],
+      ["আসল গান: ৫০ সেন্টের মধ্যে", "96.6%", "মধ্যমা ত্রুটি ২.৮ সেন্ট। প্রচলিত YIN পদ্ধতি একই পরীক্ষায় ২০ সেন্টের মধ্যে ৮৪%"],
+      ["আসল গান: বিরতিতে জানানো সুর", "13%", "বেশিরভাগ শ্বাস আর স্বরের মিলিয়ে যাওয়া শেষ, যা চিহ্নকরা নীরব ধরেছেন; টানা স্বরের জন্য সিকি সেকেন্ড স্থির সুর লাগে"],
+      ["কম্পিউটার কণ্ঠ: ২০ সেন্টের মধ্যে", "100%", "২০টি ক্লিপ, ৯৮ সেকেন্ড, পুরুষ ও মহিলা কণ্ঠ, গমক, মীড় আর পিছনের আওয়াজসহ"],
+      ["কম্পিউটার কণ্ঠ: নীরবতায় সুর", "0%", "শ্বাস আর বিরতির সময় ভুল করে জানানো মাপ"],
       ["সা পাওয়া গেছে, রাগ ও কণ্ঠের ধরন জানা", "56 / 56", "ইমন, ভৈরব, ভূপালী আর মালকোষ, সা ১১০ থেকে ২৩৩ Hz"],
       ["সা পাওয়া গেছে, শুধু রাগ জানা", "91%", "একই ৫৬টি আলাপ, কণ্ঠের ধরন না জানিয়ে"],
     ],
-    tablesPre: "পুরো তালিকা:", pitch: "সুর", and: "আর", sa: "সা শনাক্তকরণ",
+    tablesPre: "পুরো তালিকা:", real: "আসল গান", pitch: "কম্পিউটার কণ্ঠ", and: "আর", sa: "সা শনাক্তকরণ",
     helpPre: "আসল গানে এটি যাচাই করতে সাহায্য করতে দেখুন", guide: "রেকর্ডিং গাইড", helpPost: "।",
   },
   practise: {
