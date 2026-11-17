@@ -3,7 +3,7 @@
  * measurements, and the real practice streak.
  */
 import React, { useEffect, useMemo, useState } from 'react';
-import { CheckCircle2, Circle, Flame } from 'lucide-react';
+import { useLang } from '../../i18n/lang';
 import { RAAG_LIST } from '../../data/allRaags';
 import { loadHistory, onHistoryChange, type PracticeRecord } from '../../lib/practiceHistory';
 import { localDay, practiceStreakDays } from '../../lib/stats';
@@ -24,6 +24,8 @@ function loadDone(): Record<string, boolean> {
 }
 
 export const TodayPanel: React.FC<Props> = ({ onGo }) => {
+  const { t } = useLang();
+  const h = t.home;
   const [history, setHistory] = useState<PracticeRecord[]>(() => loadHistory());
   useEffect(() => onHistoryChange(() => setHistory(loadHistory())), []);
   const [hour, setHour] = useState(() => new Date().getHours());
@@ -44,60 +46,59 @@ export const TodayPanel: React.FC<Props> = ({ onGo }) => {
   const hasData = history.length > 0;
 
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-12 gap-5">
-      <div className="lg:col-span-4 bg-[#1A2150] p-5 rounded-2xl border border-slate-800 shadow-lg space-y-3">
-        <span className="text-[9px] font-mono text-slate-500 font-bold uppercase tracking-widest block">Raags for now</span>
-        <p className="text-xs text-[#9FB3E6] font-mono">{prahar.name}</p>
-        {nowRaags.length === 0 ? (
-          <p className="text-xs text-slate-400">No raag in the library is listed for this hour.</p>
-        ) : (
-          <ul className="space-y-2">
-            {nowRaags.slice(0, 6).map(r => (
-              <li key={r.id} className="text-sm">
-                <span className="font-serif font-bold text-slate-100">{r.name.replace(/^Raag\s+/i, "")}</span>
-                <span className="block text-[10px] font-mono text-slate-500">{r.time} · {r.aroha.join(" ")}</span>
-              </li>
-            ))}
-          </ul>
-        )}
-        <p className="text-[10px] text-slate-500">From the times listed in the raag library. Traditions differ on exact hours.</p>
-      </div>
-
-      <div className="lg:col-span-5 bg-[#1A2150] p-5 rounded-2xl border border-slate-800 shadow-lg space-y-3">
-        <div className="flex items-center justify-between gap-2">
-          <span className="text-[9px] font-mono text-slate-500 font-bold uppercase tracking-widest block">Today's riyaz plan</span>
-          <select value={minutes} onChange={e => setMinutes(Number(e.target.value))} className="bg-[#0D1230] border border-slate-800 rounded-md px-2 py-1 text-xs text-slate-200">
-            {[20, 30, 45, 60, 90].map(m => <option key={m} value={m}>{m} min</option>)}
-          </select>
+    <section className="rz-today">
+      <div className="rz-plan">
+        <div className="rz-plan-head">
+          <h2 className="rz-h2">{h.plan}</h2>
+          <label className="rz-inline">
+            <span className="rz-visually-hidden">{h.minutes}</span>
+            <select value={minutes} onChange={e => setMinutes(Number(e.target.value))}>
+              {[20, 30, 45, 60, 90].map(m => <option key={m} value={m}>{m} {h.minUnit}</option>)}
+            </select>
+          </label>
         </div>
-        {!hasData && <p className="text-[11px] text-amber-300/80">No measurements yet, so time is split evenly. The plan adapts as you practise.</p>}
-        <ol className="space-y-2">
+        {!hasData && <p className="rz-muted rz-small">{h.planEmpty}</p>}
+        <ol className="rz-steps">
           {plan.map(step => (
-            <li key={step.id} className={`p-2.5 rounded-lg border ${done[step.id] ? "border-slate-900 opacity-60" : "border-slate-800 bg-[#0D1230]/60"}`}>
-              <div className="flex items-start gap-2">
-                <button type="button" onClick={() => toggle(step.id)} className="mt-0.5 cursor-pointer" aria-label={done[step.id] ? "Mark not done" : "Mark done"}>
-                  {done[step.id] ? <CheckCircle2 className="h-4 w-4 text-emerald-500" /> : <Circle className="h-4 w-4 text-slate-600" />}
-                </button>
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center justify-between gap-2">
-                    <span className={`text-sm font-bold ${done[step.id] ? "line-through text-slate-500" : "text-slate-200"}`}>{step.title}</span>
-                    <span className="text-[11px] font-mono text-slate-400 shrink-0">{step.minutes} min</span>
-                  </div>
-                  <p className="text-[11px] text-slate-400 leading-snug">{step.reason}</p>
-                </div>
-                <button type="button" onClick={() => onGo(step.goTo)} className="text-[10px] font-mono text-[#9FB3E6] hover:underline cursor-pointer shrink-0 mt-0.5">Open</button>
+            <li key={step.id} data-done={done[step.id] ? "true" : "false"}>
+              <label className="rz-check">
+                <input type="checkbox" checked={!!done[step.id]} onChange={() => toggle(step.id)}
+                  aria-label={done[step.id] ? h.markNotDone : h.markDone} />
+              </label>
+              <div className="rz-step-body">
+                <span className="rz-step-title">{step.title}</span>
+                <span className="rz-step-why">{step.reason}</span>
               </div>
+              <span className="rz-step-min">{step.minutes} {h.minUnit}</span>
+              <button type="button" className="rz-link" onClick={() => onGo(step.goTo)}>{h.open}</button>
             </li>
           ))}
         </ol>
       </div>
 
-      <div className="lg:col-span-3 bg-[#1A2150] p-5 rounded-2xl border border-slate-800 shadow-lg flex flex-col items-center justify-center text-center gap-2">
-        <Flame className="h-8 w-8 text-orange-400" />
-        <span className="text-3xl font-black font-mono text-orange-300">{streak} {streak === 1 ? "day" : "days"}</span>
-        <span className="text-[10px] font-mono text-slate-400 uppercase">Practice streak</span>
-        <p className="text-[10px] text-slate-500">Days in a row with practice saved in this browser.</p>
-      </div>
-    </div>
+      <aside className="rz-aside">
+        <div>
+          <h2 className="rz-h2">{h.nowRaags}</h2>
+          <p className="rz-muted rz-small">{t.hour(prahar.number, prahar.name.includes("night"), [])}</p>
+          {nowRaags.length === 0 ? (
+            <p className="rz-muted">{h.noneNow}</p>
+          ) : (
+            <ul className="rz-raags">
+              {nowRaags.slice(0, 6).map(r => (
+                <li key={r.id}>
+                  <span className="rz-raag-name">{r.name.replace(/^Raag\s+/i, "")}</span>
+                  <span className="rz-raag-aroh">{r.aroha.join(" ")}</span>
+                </li>
+              ))}
+            </ul>
+          )}
+          <p className="rz-muted rz-small">{h.timesNote}</p>
+        </div>
+        <div className="rz-streak">
+          <span className="rz-streak-n">{h.streak(streak)}</span>
+          <span className="rz-muted rz-small">{h.streakNote}</span>
+        </div>
+      </aside>
+    </section>
   );
 };

@@ -128,7 +128,7 @@ export default function App() {
       </header>
       {t.englishOnlyNote && <p className="app-note">{t.englishOnlyNote}</p>}
 
-      <main className="relative z-10 flex-grow max-w-7xl w-full mx-auto px-6 py-6 font-sans">
+      <main className="app-main relative z-10 flex-grow max-w-7xl w-full mx-auto px-6 py-6 font-sans">
         {activeTab === "home" && (
           <HomeTab 
             setActiveTab={setActiveTab} 
