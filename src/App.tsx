@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, lazy, Suspense } from 'react';
 import { Music, Award, Sparkles, RefreshCw, Compass, AlertTriangle, FileText, Settings, User, Search, Filter, Check, ChevronDown, X, Sun, Moon, Sunrise, Lock, ShieldCheck, Mail, LogIn, Database, Home, BookOpen, BarChart2, Activity } from 'lucide-react';
 import { createProfile, currentProfile, loadProfiles, setCurrentProfile, updateProfile, type SingerProfile } from './lib/profiles';
 import { Landing } from './components/landing/Landing';
@@ -17,20 +17,37 @@ import { loadHistory, onHistoryChange } from './lib/practiceHistory';
 import { practiceStreakDays } from './lib/stats';
 import { RAAG_LIST } from './data/allRaags';
 
-// Modular Tab components
-import { HomeTab } from './components/HomeTab';
-import { TanpuraTab } from './components/TanpuraTab';
-import { AnalyzerTab, type AnalyzerMode } from './components/AnalyzerTab';
-import { JournalTab } from './components/JournalTab';
-import { ProgressTab } from './components/ProgressTab';
-import { LibraryTab } from './components/LibraryTab';
-import { ProfileTab } from './components/ProfileTab';
-import { PracticeTab } from './components/PracticeTab';
+// Tab screens load on demand, so the welcome page appears quickly on phones.
+// They are fetched in the background soon after, so they are ready (and cached
+// for offline use) before they are opened.
+const loadTabs = {
+  home: () => import('./components/HomeTab').then(m => ({ default: m.HomeTab })),
+  tanpura: () => import('./components/TanpuraTab').then(m => ({ default: m.TanpuraTab })),
+  analyzer: () => import('./components/AnalyzerTab').then(m => ({ default: m.AnalyzerTab })),
+  journal: () => import('./components/JournalTab').then(m => ({ default: m.JournalTab })),
+  progress: () => import('./components/ProgressTab').then(m => ({ default: m.ProgressTab })),
+  library: () => import('./components/LibraryTab').then(m => ({ default: m.LibraryTab })),
+  profile: () => import('./components/ProfileTab').then(m => ({ default: m.ProfileTab })),
+  practice: () => import('./components/PracticeTab').then(m => ({ default: m.PracticeTab })),
+};
+const HomeTab = lazy(loadTabs.home);
+const TanpuraTab = lazy(loadTabs.tanpura);
+const AnalyzerTab = lazy(loadTabs.analyzer);
+const JournalTab = lazy(loadTabs.journal);
+const ProgressTab = lazy(loadTabs.progress);
+const LibraryTab = lazy(loadTabs.library);
+const ProfileTab = lazy(loadTabs.profile);
+const PracticeTab = lazy(loadTabs.practice);
+import type { AnalyzerMode } from './components/AnalyzerTab';
 import type { AppTab } from './types';
 
 const RAAGS = RAAG_LIST;
 
 export default function App() {
+  useEffect(() => {
+    const id = window.setTimeout(() => { for (const load of Object.values(loadTabs)) load().catch(() => {}); }, 2500);
+    return () => window.clearTimeout(id);
+  }, []);
   const { lang, t } = useLang();
   const [baseTonicHz, setBaseTonicHz] = useState<number>(130.81); // default Male standard Sa (C3)
   const [selectedRaagIdx, setSelectedRaagIdx] = useState<number>(0); // default Yaman
@@ -147,6 +164,7 @@ export default function App() {
       {t.englishOnlyNote && <p className="app-note">{t.englishOnlyNote}</p>}
 
       <main className="app-main relative z-10 flex-grow max-w-7xl w-full mx-auto px-6 py-6 font-sans">
+        <Suspense fallback={<p className="text-sm text-slate-400 py-10">…</p>}>
         {activeTab === "home" && (
           <HomeTab 
             setActiveTab={setActiveTab} 
@@ -178,6 +196,7 @@ export default function App() {
         {activeTab === "library" && <LibraryTab saHz={baseTonicHz} />}
         {activeTab === "profile" && <ProfileTab baseTonicHz={baseTonicHz} vocalistName={vocalistName} profileId={profileId}
           onDeleted={() => { setProfileId(null); setIsAuthenticated(false); setActivePage("profiles"); }} />}
+        </Suspense>
       </main>
 
 

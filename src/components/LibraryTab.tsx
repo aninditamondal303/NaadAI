@@ -111,8 +111,7 @@ export const LibraryTab: React.FC<{ saHz?: number }> = ({ saHz = 130.81 }) => {
         <div>
           <h1 className="lib-title">{u("libraryTitle")}</h1>
           <p className="lib-intro">
-            {RAAG_LIST.length} raags with their swaras, aroh, avaroh, vadi and samvadi. {fullCount} also have pakad, chalan,
-            alaap, a sargam geet and a bandish to study. All entries await a guru's review.
+            {u("libIntro", RAAG_LIST.length, fullCount)}
           </p>
         </div>
         <div className="lib-filters">

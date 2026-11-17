@@ -1,3 +1,4 @@
+import { useUi } from "../../i18n/ui";
 /**
  * Samay chakra: the raags placed on a 24-hour clock by the hours listed for
  * them in the raag library. Each raag is an arc over its hours, stacked in
@@ -44,12 +45,13 @@ function arc(h0: number, h1: number, r: number): string {
   return `M ${x0} ${y0} A ${r} ${r} 0 ${large} 1 ${x1} ${y1}`;
 }
 
-const HOUR_LABEL = (h: number) => (h === 0 ? "midnight" : h === 12 ? "noon" : h < 12 ? `${h} am` : `${h - 12} pm`);
 const SKY_BANDS: [number, number, string][] = [
   [4, 8, "rgba(222,150,140,0.10)"], [8, 16, "rgba(175,196,211,0.08)"], [16, 20, "rgba(160,84,106,0.12)"],
 ];
 
 export const SamayChakra: React.FC<{ raags: ComprehensiveRaag[]; onOpen: (r: ComprehensiveRaag) => void }> = ({ raags, onOpen }) => {
+  const u = useUi();
+  const HOUR_LABEL = (h: number) => (h === 0 ? u("clockMidnight") : h === 12 ? u("clockNoon") : h < 12 ? u("clockAm", h) : u("clockPm", h - 12));
   const { placed, lanes } = useMemo(() => place(raags), [raags]);
   const [hover, setHover] = useState<Placed | null>(null);
   const now = new Date();
@@ -94,15 +96,14 @@ export const SamayChakra: React.FC<{ raags: ComprehensiveRaag[]; onOpen: (r: Com
           {shown ? shown.raag.name.replace(/^Raag\s+/i, "").replace(/\s*\(.*\)/, "") : `${nowRaags.length}`}
         </text>
         <text x={CX} y={CY + 10} className="sc-center-small">
-          {shown ? shown.raag.time.replace(/\s*\(.*\)/, "") : nowRaags.length === 1 ? "raag for this hour" : "raags for this hour"}
+          {shown ? shown.raag.time.replace(/\s*\(.*\)/, "") : u("raagsThisHour", nowRaags.length)}
         </text>
         <text x={CX} y={CY + 32} className="sc-center-small sc-center-aroh">
           {shown ? shown.raag.aroha.join(" ") : now.toLocaleTimeString([], { hour: "numeric", minute: "2-digit" })}
         </text>
       </svg>
       <p className="sc-note">
-        Each arc is a raag, over the hours given for it in the raag library; the hand is your time now. Traditions differ on exact hours,
-        and {raags.length - placed.length} raags have no clock time listed, so they are only in the index below.
+        {u("clockNote", raags.length - placed.length)}
       </p>
     </div>
   );
