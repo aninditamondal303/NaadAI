@@ -208,11 +208,15 @@ export class TaalPlayer {
 
   get playing(): boolean { return this.timer !== null; }
 
+  /** Audio-clock time of the first sam after the last start(). */
+  startedAt = 0;
+
   start() {
     if (this.timer !== null) return;
     if (this.ctx.state === "suspended") void this.ctx.resume();
     this.events = bolTimes(this.opts.taal, this.opts.bpm);
     this.cycleStart = this.ctx.currentTime + 0.1;
+    this.startedAt = this.cycleStart;
     this.nextIndex = 0;
     this.out.gain.setValueAtTime(this.opts.volume, this.ctx.currentTime);
     this.timer = window.setInterval(() => this.schedule(), 25);

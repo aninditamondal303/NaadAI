@@ -49,6 +49,14 @@ export interface Strings {
   englishOnlyNote: string;
   home: HomeStrings;
   analyzer: AnalyzerStrings;
+  tp: TanpuraStrings;
+}
+
+export interface TanpuraStrings {
+  title: string; play: string; stop: string; sa: string; keyboard: string; octave: (n: number) => string; fine: (c: string) => string;
+  first: string; firstHelp: string; volume: string; cycle: (s: string) => string; tapHint: string; droneHint: string; findSaTip: string; sound: string;
+  taal: string; playTaal: string; tempo: (bpm: number, laya: string) => string; matras: (n: number) => string;
+  sam: string; khali: string; taali: string; legend: string; laya: Record<"vilambit" | "madhya" | "drut", string>;
 }
 
 export interface HomeStrings {
@@ -155,6 +163,16 @@ const en: Strings = {
   streak: n => `${n}-day streak`,
   switchSinger: "Switch singer",
   englishOnlyNote: "",
+  tp: {
+    title: "Tanpura", play: "Play tanpura", stop: "Stop", sa: "Sa", keyboard: "Choose your Sa", octave: n => `Octave ${n}`, fine: c => `Fine tune ${c} cents`,
+    first: "First string", firstHelp: "Pa for most raags, Ma for raags without Pa (Malkauns), Ni for raags like Marwa.", volume: "Volume",
+    cycle: s => `${s} s for four plucks`, tapHint: "Tap a string to pluck it. Strings are tuned in just intonation, like a real tanpura.",
+    droneHint: "This is a recorded tanpura, so the strings can't be plucked one by one and the speed is the player's own.",
+    findSaTip: "Find my Sa in the Analyzer measures your natural Sa and sets it exactly.", sound: "Sound",
+    taal: "Taal", playTaal: "Play theka", tempo: (b, l) => `${b} matras a minute, ${l}`, matras: n => `${n} matras`,
+    sam: "sam", khali: "khali", taali: "taali", legend: "The circle is one avartan. X is sam, 0 is khali, numbers are taalis. Your guru may teach some bols differently.",
+    laya: { vilambit: "vilambit", madhya: "madhya", drut: "drut" },
+  },
   home: {
     greet: n => `Pranam, ${n}.`,
     yourSa: (note, hz) => `Your Sa is ${note}, ${hz} Hz.`,
@@ -272,6 +290,16 @@ const hi: Strings = {
   streak: n => `लगातार ${n} दिन`,
   switchSinger: "गायक बदलें",
   englishOnlyNote: "अंदर के कुछ पेज अभी अंग्रेज़ी में हैं।",
+  tp: {
+    title: "तानपुरा", play: "तानपुरा बजाएँ", stop: "रोकें", sa: "सा", keyboard: "अपना सा चुनिए", octave: n => `सप्तक ${n}`, fine: c => `बारीक सुर ${c} सेंट`,
+    first: "पहला तार", firstHelp: "अधिकतर रागों में प, जिन रागों में प नहीं (मालकौंस) उनमें म, और मारवा जैसे रागों में नि।", volume: "आवाज़",
+    cycle: s => `चार तारों में ${s} सेकंड`, tapHint: "तार छेड़ने के लिए उसे छुएँ। तार असली तानपुरे की तरह शुद्ध अनुपात में मिले हैं।",
+    droneHint: "यह रिकॉर्ड किया हुआ तानपुरा है, इसलिए तार अलग-अलग नहीं छेड़े जा सकते और गति वादक की अपनी है।",
+    findSaTip: "विश्लेषण में \"मेरा सा खोजें\" आपका स्वाभाविक सा मापकर ठीक-ठीक लगा देता है।", sound: "ध्वनि",
+    taal: "ताल", playTaal: "ठेका बजाएँ", tempo: (b, l) => `प्रति मिनट ${b} मात्रा, ${l}`, matras: n => `${n} मात्रा`,
+    sam: "सम", khali: "खाली", taali: "ताली", legend: "यह वृत्त एक आवर्तन है। X सम है, 0 खाली, अंक ताली हैं। आपके गुरु कुछ बोल अलग सिखा सकते हैं।",
+    laya: { vilambit: "विलंबित", madhya: "मध्य", drut: "द्रुत" },
+  },
   home: {
     greet: n => `प्रणाम, ${n}।`,
     yourSa: (note, hz) => `आपका सा ${note} है, ${hz} Hz।`,
@@ -389,6 +417,16 @@ const bn: Strings = {
   streak: n => `টানা ${n} দিন`,
   switchSinger: "শিল্পী বদলান",
   englishOnlyNote: "ভেতরের কিছু পেজ এখনও ইংরেজিতে।",
+  tp: {
+    title: "তানপুরা", play: "তানপুরা বাজান", stop: "থামান", sa: "সা", keyboard: "আপনার সা বাছুন", octave: n => `সপ্তক ${n}`, fine: c => `সূক্ষ্ম সুর ${c} সেন্ট`,
+    first: "প্রথম তার", firstHelp: "বেশিরভাগ রাগে পা, যে রাগে পা নেই (মালকোষ) সেখানে মা, আর মারোয়ার মতো রাগে নি।", volume: "আওয়াজ",
+    cycle: s => `চার তারে ${s} সেকেন্ড`, tapHint: "তার ছাড়তে ছুঁয়ে দিন। আসল তানপুরার মতো শুদ্ধ অনুপাতে বাঁধা।",
+    droneHint: "এটি রেকর্ড করা তানপুরা, তাই তার আলাদা করে ছাড়া যায় না আর গতি বাদকের নিজের।",
+    findSaTip: "বিশ্লেষণে \"আমার সা খুঁজুন\" আপনার স্বাভাবিক সা মেপে ঠিকঠাক বসিয়ে দেয়।", sound: "আওয়াজ",
+    taal: "তাল", playTaal: "ঠেকা বাজান", tempo: (b, l) => `মিনিটে ${b} মাত্রা, ${l}`, matras: n => `${n} মাত্রা`,
+    sam: "সম", khali: "খালি", taali: "তালি", legend: "বৃত্তটি একটি আবর্তন। X সম, 0 খালি, সংখ্যাগুলো তালি। আপনার গুরু কিছু বোল আলাদা শেখাতে পারেন।",
+    laya: { vilambit: "বিলম্বিত", madhya: "মধ্য", drut: "দ্রুত" },
+  },
   home: {
     greet: n => `প্রণাম, ${n}।`,
     yourSa: (note, hz) => `আপনার সা ${note}, ${hz} Hz।`,

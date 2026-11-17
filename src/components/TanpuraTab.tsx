@@ -1,13 +1,17 @@
 /**
- * Tanpura & Taal: the app plays the drone and the theka itself, so it
- * always knows the exact Sa and beat timing.
+ * Tanpura & taal: one Sa (the scale) for both instruments, chosen on a
+ * harmonium-style keyboard; the tanpura's strings drawn moving with its
+ * sound; and the taal as a circle (one avartan) with its bols, the current
+ * matra lit by the player's own clock. Thekas can be edited, since gharanas
+ * differ, and are saved in this browser.
  */
 import React, { useEffect, useMemo, useRef, useState } from 'react';
-import { Music, Play, Square, Drum } from 'lucide-react';
 import { centsBetween, hzFromCents, signedCents, westernNote } from '../analysis/music';
-import { TanpuraEngine, STRING_ORDER, stringHz, type FirstString, type StringId } from '../audio/tanpura';
-import { TaalPlayer } from '../audio/tabla';
-import { clapAt, layaFor, TAALS } from '../data/taals';
+import { TanpuraEngine, STRING_ORDER, stringHz, type FirstString } from '../audio/tanpura';
+import { sampleFor, TaalPlayer } from '../audio/tabla';
+import { clapAt, layaFor, TAALS, type Taal } from '../data/taals';
+import { TanpuraStrings } from './home/TanpuraStrings';
+import { useLang } from '../i18n/lang';
 
 interface TanpuraTabProps {
   baseTonicHz: number;
@@ -17,39 +21,128 @@ interface TanpuraTabProps {
 }
 
 const NOTES = ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"];
-/** Equal-tempered frequency of a note name in octave 2 or 3. */
 const noteHz = (i: number, octave: number) => 440 * Math.pow(2, (i - 9 + 12 * (octave - 4)) / 12);
+const THEKA_KEY = (id: string) => `naad.theka.${id}`;
 
-const STRING_LABEL: Record<StringId, string> = { first: "1st", sa1: "Sa", sa2: "Sa", kharaj: "Kharaj" };
+/** The tabla's dayan can be tuned to Sa, Pa or Ma of the singer's scale. */
+const TABLA_TUNE = { Sa: 1, Pa: 1.5, Ma: 4 / 3 } as const;
+type TablaTune = keyof typeof TABLA_TUNE;
 
-/** One AudioContext shared by the tanpura and the tabla on this page. */
+function loadTheka(taal: Taal): string[][] {
+  try {
+    const raw = localStorage.getItem(THEKA_KEY(taal.id));
+    if (raw) {
+      const t = JSON.parse(raw) as string[][];
+      if (Array.isArray(t) && t.length === taal.matras) return t;
+    }
+  } catch { /* ignore */ }
+  return taal.theka;
+}
+
+/** Parse one matra's bols ("Dha Ge" or "Dha.Ge"); returns the unknown ones. */
+function parseMatra(text: string): { bols: string[]; unknown: string[] } {
+  const bols = text.trim().split(/[\s.]+/).filter(Boolean);
+  const unknown = bols.filter(b => { try { sampleFor(b); return false; } catch { return true; } });
+  return { bols: bols.length ? bols : ["-"], unknown };
+}
+
 function useAudioContext() {
-  const ref = useRef<AudioContext | null>(null);
+  const ref = useRef<{ ctx: AudioContext; bus: GainNode; analyser: AnalyserNode } | null>(null);
   const get = () => {
     if (!ref.current) {
       const Ctx = window.AudioContext || (window as any).webkitAudioContext;
-      ref.current = new Ctx();
+      const ctx: AudioContext = new Ctx();
+      const bus = ctx.createGain();
+      const analyser = ctx.createAnalyser();
+      analyser.fftSize = 1024;
+      bus.connect(analyser);
+      analyser.connect(ctx.destination);
+      ref.current = { ctx, bus, analyser };
     }
     return ref.current;
   };
-  useEffect(() => () => { void ref.current?.close(); }, []);
+  useEffect(() => () => { void ref.current?.ctx.close(); }, []);
   return get;
 }
 
+// ------------------------------------------------------------ keyboard
+
+const SaKeyboard: React.FC<{ selected: number; onPick: (i: number) => void; label: string }> = ({ selected, onPick, label }) => {
+  const whites = [0, 2, 4, 5, 7, 9, 11];
+  const blacks: [number, number][] = [[1, 0], [3, 1], [6, 3], [8, 4], [10, 5]]; // [note, after white index]
+  return (
+    <div className="tp-keys" role="radiogroup" aria-label={label}>
+      {whites.map(n => (
+        <button key={n} type="button" role="radio" aria-checked={selected === n} className="tp-white" onClick={() => onPick(n)}>
+          <span>{NOTES[n]}</span>
+        </button>
+      ))}
+      {blacks.map(([n, after]) => (
+        <button key={n} type="button" role="radio" aria-checked={selected === n} className="tp-black"
+          style={{ left: `calc(${((after + 1) / 7) * 100}% - 1.15rem)` }} onClick={() => onPick(n)}>
+          <span>{NOTES[n]}</span>
+        </button>
+      ))}
+    </div>
+  );
+};
+
+// ------------------------------------------------------------ taal circle
+
+const TaalCircle: React.FC<{ taal: Taal; theka: string[][]; matra: number | null; labels: { sam: string; khali: string; taali: string }; name: string }> = ({ taal, theka, matra, labels, name }) => {
+  const n = taal.matras;
+  const R = 150, cx = 200, cy = 200;
+  const at = (i: number, r: number) => {
+    const a = -Math.PI / 2 + (2 * Math.PI * (i - 1)) / n;
+    return [cx + r * Math.cos(a), cy + r * Math.sin(a)] as const;
+  };
+  // vibhag starts
+  const starts: number[] = [];
+  let s = 1;
+  for (const v of taal.vibhags) { starts.push(s); s += v; }
+  const clap = matra ? clapAt(taal, matra) : null;
+  const state = matra === null ? "" : matra === 1 ? labels.sam : clap === "0" ? labels.khali : clap !== null ? labels.taali : "";
+  const hand = matra ? at(matra, R - 22) : null;
+
+  return (
+    <svg viewBox="0 0 400 400" className="tp-circle" role="img" aria-label={`${name}: ${n}`}>
+      <circle cx={cx} cy={cy} r={R} className="tp-ring" />
+      {starts.map(st => {
+        const [x1, y1] = at(st - 0.5, R - 14);
+        const [x2, y2] = at(st - 0.5, R + 14);
+        return <line key={st} x1={x1} y1={y1} x2={x2} y2={y2} className="tp-vibhag" />;
+      })}
+      {hand && <line x1={cx} y1={cy} x2={hand[0]} y2={hand[1]} className="tp-hand" />}
+      {Array.from({ length: n }, (_, k) => {
+        const i = k + 1;
+        const c = clapAt(taal, i);
+        const [x, y] = at(i, R);
+        const [bx, by] = at(i, R + 34);
+        const on = matra === i;
+        return (
+          <g key={i} className={on ? "tp-on" : undefined}>
+            {c === "0"
+              ? <circle cx={x} cy={y} r={on ? 11 : 8} className="tp-khali" />
+              : <circle cx={x} cy={y} r={c === "X" ? (on ? 13 : 10) : on ? 9 : c !== null ? 7 : 4.5} className={c === "X" ? "tp-sam" : "tp-dot"} />}
+            {c !== null && <text x={x} y={y + 4} className="tp-mark">{c === "X" ? "X" : c === "0" ? "" : c}</text>}
+            <text x={bx} y={by + 4} className="tp-bol">{theka[k].join(" ")}</text>
+          </g>
+        );
+      })}
+      <text x={cx} y={cy - 6} className="tp-center-n">{matra ?? n}</text>
+      <text x={cx} y={cy + 24} className="tp-center-l">{state || name}</text>
+    </svg>
+  );
+};
+
+// ------------------------------------------------------------ tab
+
 export const TanpuraTab: React.FC<TanpuraTabProps> = ({ baseTonicHz, onTonicChange, selectedTuning = "Pa", onTuningChange }) => {
-  const getCtx = useAudioContext();
+  const { t } = useLang();
+  const T = t.tp;
+  const getAudio = useAudioContext();
 
-  // ---------------- tanpura state
-  const [first, setFirst] = useState<FirstString>(selectedTuning);
-  const [cycleSec, setCycleSec] = useState(4.5);
-  const [tVolume, setTVolume] = useState(0.7);
-  const [tPlaying, setTPlaying] = useState(false);
-  const [lit, setLit] = useState<StringId | null>(null);
-  const [tSource, setTSource] = useState<string>("");
-  const [droneMode, setDroneMode] = useState(false);
-  const tanpura = useRef<TanpuraEngine | null>(null);
-
-  // Sa: nearest equal-tempered note + fine tuning in cents
+  // ---- Sa (scale), shared by tanpura and tabla
   const nearest = useMemo(() => {
     const midi = Math.round(69 + 12 * Math.log2(baseTonicHz / 440));
     const note = ((midi % 12) + 12) % 12;
@@ -57,24 +150,38 @@ export const TanpuraTab: React.FC<TanpuraTabProps> = ({ baseTonicHz, onTonicChan
     return { note, octave, cents: centsBetween(baseTonicHz, noteHz(note, octave)) };
   }, [baseTonicHz]);
   const [octave, setOctave] = useState<2 | 3>(nearest.octave <= 2 ? 2 : 3);
+  const setSa = (noteIdx: number, oct: number, cents: number) => onTonicChange?.(Number(hzFromCents(noteHz(noteIdx, oct), cents).toFixed(2)));
+  const sa = westernNote(baseTonicHz);
 
-  const tanpuraLoading = useRef<Promise<TanpuraEngine> | null>(null);
-  const ensureTanpura = async (): Promise<TanpuraEngine> => {
+  // ---- tanpura
+  const [first, setFirst] = useState<FirstString>(selectedTuning);
+  const [cycleSec, setCycleSec] = useState(4.5);
+  const [tVolume, setTVolume] = useState(0.7);
+  const [tPlaying, setTPlaying] = useState(false);
+  const [droneMode, setDroneMode] = useState(false);
+  const [tSource, setTSource] = useState("");
+  const [pluck, setPluck] = useState<[number, number] | null>(null);
+  const pluckN = useRef(0);
+  const tanpura = useRef<TanpuraEngine | null>(null);
+  const tLoading = useRef<Promise<TanpuraEngine> | null>(null);
+
+  const ensureTanpura = async () => {
     if (tanpura.current) return tanpura.current;
-    if (tanpuraLoading.current) return tanpuraLoading.current;
-    tanpuraLoading.current = (async () => {
-      const ctx = getCtx();
-      const eng = new TanpuraEngine(ctx, ctx.destination, { saHz: baseTonicHz, firstString: first, cycleSec, volume: tVolume });
-      eng.onPluck = s => { setLit(s); window.setTimeout(() => setLit(cur => (cur === s ? null : cur)), 350); };
+    if (tLoading.current) return tLoading.current;
+    tLoading.current = (async () => {
+      const { ctx, bus } = getAudio();
+      const eng = new TanpuraEngine(ctx, bus, { saHz: baseTonicHz, firstString: first, cycleSec, volume: tVolume });
+      eng.onPluck = s => setPluck([STRING_ORDER.indexOf(s), ++pluckN.current]);
       await eng.loadSamples();
       tanpura.current = eng;
       setTSource(eng.describeSource());
       setDroneMode(eng.usesRecordedDrone());
       return eng;
     })();
-    return tanpuraLoading.current;
+    return tLoading.current;
   };
-
+  useEffect(() => { void ensureTanpura(); }, []);
+  useEffect(() => () => { tanpura.current?.disconnect(); }, []);
   useEffect(() => {
     const eng = tanpura.current;
     if (!eng) return;
@@ -83,216 +190,242 @@ export const TanpuraTab: React.FC<TanpuraTabProps> = ({ baseTonicHz, onTonicChan
     setDroneMode(eng.usesRecordedDrone());
   }, [baseTonicHz, first, cycleSec, tVolume]);
 
-  // Load the sounds once when the tab opens, so the source line is accurate before playing
-  useEffect(() => { void ensureTanpura(); }, []);
-  useEffect(() => () => { tanpura.current?.disconnect(); }, []);
-
   const toggleTanpura = async () => {
     const eng = await ensureTanpura();
-    if (eng.playing) { eng.stop(); setTPlaying(false); }
-    else { eng.start(); setTPlaying(true); }
+    if (eng.playing) { eng.stop(); setTPlaying(false); } else { eng.start(); setTPlaying(true); }
+  };
+  const pluckString = async (i: number) => {
+    if (droneMode) return;
+    (await ensureTanpura()).pluckNow(STRING_ORDER[i]);
   };
 
-  const setSa = (noteIdx: number, oct: number, cents: number) => {
-    onTonicChange?.(Number(hzFromCents(noteHz(noteIdx, oct), cents).toFixed(2)));
-  };
-
-  // ---------------- taal state
+  // ---- taal
   const [taalId, setTaalId] = useState("teentaal");
+  const baseTaal = TAALS.find(x => x.id === taalId)!;
+  const [theka, setTheka] = useState<string[][]>(() => loadTheka(baseTaal));
+  useEffect(() => setTheka(loadTheka(baseTaal)), [taalId]);
+  const taal: Taal = useMemo(() => ({ ...baseTaal, theka }), [baseTaal, theka]);
+  const custom = JSON.stringify(theka) !== JSON.stringify(baseTaal.theka);
+  const [editing, setEditing] = useState(false);
+  const [draft, setDraft] = useState<string[]>([]);
   const [bpm, setBpm] = useState(80);
   const [bVolume, setBVolume] = useState(0.7);
+  const [tablaTune, setTablaTune] = useState<TablaTune>("Sa");
   const [bPlaying, setBPlaying] = useState(false);
   const [matra, setMatra] = useState<number | null>(null);
   const [bSource, setBSource] = useState("");
   const player = useRef<TaalPlayer | null>(null);
-  const taal = TAALS.find(t => t.id === taalId)!;
+  const pLoading = useRef<Promise<TaalPlayer> | null>(null);
+  const tablaHz = baseTonicHz * TABLA_TUNE[tablaTune];
 
-  const playerLoading = useRef<Promise<TaalPlayer> | null>(null);
-  const ensurePlayer = async (): Promise<TaalPlayer> => {
+  const ensurePlayer = async () => {
     if (player.current) return player.current;
-    if (playerLoading.current) return playerLoading.current;
-    playerLoading.current = (async () => {
-      const ctx = getCtx();
-      const p = new TaalPlayer(ctx, ctx.destination, { taal, bpm, saHz: baseTonicHz, volume: bVolume });
+    if (pLoading.current) return pLoading.current;
+    pLoading.current = (async () => {
+      const { ctx, bus } = getAudio();
+      const p = new TaalPlayer(ctx, bus, { taal, bpm, saHz: tablaHz, volume: bVolume });
       p.onMatra = m => setMatra(m);
       await p.loadSamples();
       setBSource(p.source === "samples"
-        ? `Real tabla recordings, retuned so the dayan sits on your Sa${p.sourceCredit ? ` (${p.sourceCredit})` : ""}`
-        : "Synthesised tabla (placeholder: real recordings couldn't be loaded)");
+        ? `Recorded tabla, retuned so the dayan sits on your ${tablaTune}${p.sourceCredit ? ` (${p.sourceCredit})` : ""}`
+        : "Synthesised tabla (the recordings couldn't be loaded)");
       player.current = p;
       return p;
     })();
-    return playerLoading.current;
+    return pLoading.current;
   };
-
-  useEffect(() => { player.current?.setOptions({ taal, bpm }); }, [taalId, bpm]);
-  useEffect(() => { player.current?.setOptions({ volume: bVolume, saHz: baseTonicHz }); }, [bVolume, baseTonicHz]);
-  useEffect(() => () => { player.current?.disconnect(); }, []);
   useEffect(() => { void ensurePlayer(); }, []);
+  useEffect(() => () => { player.current?.disconnect(); }, []);
+  useEffect(() => { player.current?.setOptions({ taal, bpm }); }, [taal, bpm]);
+  useEffect(() => { player.current?.setOptions({ volume: bVolume, saHz: tablaHz }); }, [bVolume, tablaHz]);
+  useEffect(() => {
+    if (player.current?.source === "samples") setBSource(cur => cur.replace(/your (Sa|Pa|Ma)/, `your ${tablaTune}`));
+  }, [tablaTune]);
 
   const toggleTaal = async () => {
     const p = await ensurePlayer();
-    if (p.playing) { p.stop(); setBPlaying(false); setMatra(null); }
-    else { p.start(); setBPlaying(true); }
+    if (p.playing) { p.stop(); setBPlaying(false); setMatra(null); } else { p.start(); setBPlaying(true); }
   };
 
-  const sa = westernNote(baseTonicHz);
-  const card = "bg-[#1A2150] p-6 rounded-2xl border border-slate-800 shadow-xl space-y-5";
-  const label = "text-[9px] font-mono text-slate-500 uppercase tracking-widest font-bold block";
+  const startEdit = () => { setDraft(theka.map(m => m.join(" "))); setEditing(true); };
+  const parsed = draft.map(parseMatra);
+  const draftOk = parsed.every(p => p.unknown.length === 0);
+  const saveEdit = () => {
+    if (!draftOk) return;
+    const next = parsed.map(p => p.bols);
+    setTheka(next);
+    try { localStorage.setItem(THEKA_KEY(taalId), JSON.stringify(next)); } catch { /* ignore */ }
+    setEditing(false);
+  };
+  const resetTheka = () => {
+    setTheka(baseTaal.theka);
+    try { localStorage.removeItem(THEKA_KEY(taalId)); } catch { /* ignore */ }
+    setEditing(false);
+  };
+
+  const { analyser } = tPlaying || bPlaying ? getAudio() : { analyser: null };
+  const stringLabels = [first === "Pa" ? "प़" : first === "Ma" ? "म़" : "ऩि", "सा", "सा", "सा़"];
 
   return (
-    <div className="space-y-6">
-      {/* ---------------- Tanpura */}
-      <div className={card}>
-        <div className="flex items-center justify-between gap-3 flex-wrap">
-          <div className="flex items-center gap-3">
-            <div className="h-10 w-10 rounded-xl bg-[#E0A458]/20 border border-[#E0A458] flex items-center justify-center text-[#F4C56A]"><Music className="h-5 w-5" /></div>
-            <div>
-              <h3 className="text-lg font-bold text-slate-100">Tanpura</h3>
-              <p className="text-xs text-slate-400">Sa {baseTonicHz.toFixed(2)} Hz · {sa.name} {signedCents(sa.cents)} cents</p>
-            </div>
-          </div>
-          <button type="button" onClick={toggleTanpura}
-            className={`px-5 py-2.5 rounded-xl font-mono text-xs font-bold uppercase flex items-center gap-2 cursor-pointer ${tPlaying ? "bg-rose-600 text-white" : "bg-[#F4C56A] text-slate-950"}`}>
-            {tPlaying ? <><Square className="h-4 w-4 fill-white" /> Stop</> : <><Play className="h-4 w-4" /> Play tanpura</>}
-          </button>
+    <div className="tp">
+      {/* ---------------- Sa, shared */}
+      <section className="tp-sa" aria-labelledby="tp-sa-h">
+        <div className="tp-sa-read">
+          <h1 id="tp-sa-h" className="tp-h1">{T.sa} <span className="tp-sa-note">{sa.name}</span></h1>
+          <p className="tp-muted">{baseTonicHz.toFixed(2)} Hz, {signedCents(sa.cents)} cents</p>
+          <p className="tp-muted tp-small">{T.findSaTip}</p>
         </div>
-
-        {/* strings */}
-        <div className="grid grid-cols-4 gap-3">
-          {STRING_ORDER.map(s => {
-            const hz = stringHz(s, baseTonicHz, first);
-            const name = s === "first" ? `${first},` : s === "kharaj" ? "S,," : "S";
-            return (
-              <button key={s} type="button" disabled={droneMode} onClick={async () => (await ensureTanpura()).pluckNow(s)}
-                className={`p-3 rounded-xl border text-center cursor-pointer transition-colors ${lit === s ? "border-[#F4C56A] bg-[#F4C56A]/10" : "border-slate-800 bg-[#0D1230]/60 hover:border-slate-600"}`}>
-                <span className="block text-[9px] font-mono text-slate-500 uppercase">{STRING_LABEL[s]} string</span>
-                <span className="block text-lg font-black font-mono text-slate-100">{name}</span>
-                <span className="block text-[10px] font-mono text-slate-400">{hz.toFixed(1)} Hz</span>
-              </button>
-            );
-          })}
-        </div>
-        <p className="text-[10px] text-slate-500 -mt-2">
-          {droneMode
-            ? "Playing a real tanpura recording, so strings can't be plucked one at a time and the cycle speed is the player's own."
-            : "Tap a string to pluck it. Strings are tuned by just intonation, like a real tanpura."}
-        </p>
-
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
-          <div className="space-y-2">
-            <span className={label}>Sa</span>
-            <div className="grid grid-cols-6 gap-1.5">
-              {NOTES.map((n, i) => (
-                <button key={n} type="button" onClick={() => setSa(i, octave, 0)}
-                  className={`py-1.5 rounded-lg text-xs font-mono font-bold cursor-pointer border ${nearest.note === i && nearest.octave === octave ? "bg-[#E0A458] border-[#E0A458] text-white" : "border-slate-800 text-slate-300 hover:border-slate-600"}`}>
-                  {n}{octave}
-                </button>
-              ))}
-            </div>
-            <div className="flex gap-2 text-[10px] font-mono">
+        <div className="tp-sa-set">
+          <SaKeyboard selected={nearest.note} label={T.keyboard} onPick={i => setSa(i, octave, 0)} />
+          <div className="tp-row">
+            <div className="tp-choices" role="radiogroup" aria-label="Octave">
               {([2, 3] as const).map(o => (
-                <button key={o} type="button" onClick={() => { setOctave(o); setSa(nearest.note, o, nearest.cents); }}
-                  className={`px-2.5 py-1 rounded-md border cursor-pointer ${octave === o ? "border-[#9FB3E6] text-[#9FB3E6]" : "border-slate-800 text-slate-400"}`}>
-                  Octave {o}
-                </button>
+                <button key={o} type="button" role="radio" aria-checked={octave === o}
+                  onClick={() => { setOctave(o); setSa(nearest.note, o, nearest.cents); }}>{T.octave(o)}</button>
               ))}
             </div>
-            <label className="block space-y-1 pt-1">
-              <span className={label}>Fine tune: {signedCents(nearest.cents)} cents</span>
-              <input type="range" min={-50} max={50} step={1} value={Math.round(nearest.cents)}
-                onChange={e => setSa(nearest.note, nearest.octave, Number(e.target.value))} className="w-full accent-[#E0A458]" />
-            </label>
-            <p className="text-[10px] text-slate-500">Tip: "Find my Sa" in the Analyzer measures your natural Sa and sets it exactly.</p>
-          </div>
-
-          <div className="space-y-4">
-            <div className="space-y-2">
-              <span className={label}>First string</span>
-              <div className="flex gap-2">
-                {(["Pa", "Ma", "Ni"] as FirstString[]).map(f => (
-                  <button key={f} type="button" onClick={() => { setFirst(f); onTuningChange?.(f); }}
-                    className={`px-3 py-2 rounded-lg border text-xs font-mono font-bold cursor-pointer ${first === f ? "bg-[#E0A458] border-[#E0A458] text-white" : "border-slate-800 text-slate-300"}`}>
-                    {f}
-                  </button>
-                ))}
-              </div>
-              <p className="text-[10px] text-slate-500">Pa for most raags, Ma for raags without Pa (e.g. Malkauns), Ni for raags like Marwa.</p>
-            </div>
-            {!droneMode && (
-              <label className="block space-y-1">
-                <span className={label}>Cycle: {cycleSec.toFixed(1)} s per four plucks</span>
-                <input type="range" min={3} max={8} step={0.1} value={cycleSec} onChange={e => setCycleSec(Number(e.target.value))} className="w-full accent-[#E0A458]" />
-              </label>
-            )}
-            <label className="block space-y-1">
-              <span className={label}>Volume</span>
-              <input type="range" min={0} max={1} step={0.01} value={tVolume} onChange={e => setTVolume(Number(e.target.value))} className="w-full accent-[#E0A458]" />
+            <label className="tp-range">
+              <span>{T.fine(signedCents(nearest.cents))}</span>
+              <input type="range" min={-50} max={50} step={1} value={Math.round(nearest.cents)} onChange={e => setSa(nearest.note, nearest.octave, Number(e.target.value))} />
             </label>
           </div>
         </div>
-        {tSource && <p className="text-[10px] font-mono text-amber-300/80">Sound: {tSource}</p>}
-      </div>
+      </section>
+
+      {/* ---------------- Tanpura */}
+      <section className="tp-inst" aria-labelledby="tp-t-h">
+        <div className="tp-inst-ctl">
+          <div className="tp-head">
+            <h2 id="tp-t-h" className="tp-h2">{T.title}</h2>
+            <button type="button" className={tPlaying ? "tp-btn tp-btn-stop" : "tp-btn"} onClick={() => void toggleTanpura()}>{tPlaying ? T.stop : T.play}</button>
+          </div>
+          <div className="tp-field">
+            <span>{T.first}</span>
+            <div className="tp-choices" role="radiogroup" aria-label={T.first}>
+              {(["Pa", "Ma", "Ni"] as FirstString[]).map(f => (
+                <button key={f} type="button" role="radio" aria-checked={first === f} onClick={() => { setFirst(f); onTuningChange?.(f); }}>
+                  {f === "Pa" ? "प" : f === "Ma" ? "म" : "नि"} <small>{stringHz("first", baseTonicHz, f).toFixed(1)} Hz</small>
+                </button>
+              ))}
+            </div>
+            <p className="tp-muted tp-small">{T.firstHelp}</p>
+          </div>
+          {!droneMode && (
+            <label className="tp-range">
+              <span>{T.cycle(cycleSec.toFixed(1))}</span>
+              <input type="range" min={3} max={8} step={0.1} value={cycleSec} onChange={e => setCycleSec(Number(e.target.value))} />
+            </label>
+          )}
+          <label className="tp-range">
+            <span>{T.volume}</span>
+            <input type="range" min={0} max={1} step={0.01} value={tVolume} onChange={e => setTVolume(Number(e.target.value))} />
+          </label>
+          <p className="tp-muted tp-small">{droneMode ? T.droneHint : T.tapHint}</p>
+          {tSource && <p className="tp-muted tp-small">{T.sound}: {tSource}</p>}
+        </div>
+        <div className="tp-strings-wrap">
+          <TanpuraStrings analyser={analyser} pluck={pluck} labels={stringLabels} label={T.title} />
+          {!droneMode && (
+            <div className="tp-string-hits">
+              {STRING_ORDER.map((s, i) => (
+                <button key={s} type="button" onClick={() => void pluckString(i)} aria-label={`${stringLabels[i]} ${stringHz(s, baseTonicHz, first).toFixed(1)} Hz`} />
+              ))}
+            </div>
+          )}
+        </div>
+      </section>
 
       {/* ---------------- Taal */}
-      <div className={card}>
-        <div className="flex items-center justify-between gap-3 flex-wrap">
-          <div className="flex items-center gap-3">
-            <div className="h-10 w-10 rounded-xl bg-[#9FB3E6]/15 border border-[#9FB3E6]/60 flex items-center justify-center text-[#9FB3E6]"><Drum className="h-5 w-5" /></div>
-            <div>
-              <h3 className="text-lg font-bold text-slate-100">Taal</h3>
-              <p className="text-xs text-slate-400">{taal.name} · {taal.matras} matras · {bpm} matras per minute ({layaFor(bpm)})</p>
+      <section className="tp-inst tp-taal" aria-labelledby="tp-b-h">
+        <div className="tp-circle-wrap">
+          <TaalCircle taal={taal} theka={theka} matra={matra} name={baseTaal.name} labels={{ sam: T.sam, khali: T.khali, taali: T.taali }} />
+        </div>
+        <div className="tp-inst-ctl">
+          <div className="tp-head">
+            <h2 id="tp-b-h" className="tp-h2">{T.taal}</h2>
+            <button type="button" className={bPlaying ? "tp-btn tp-btn-stop" : "tp-btn"} onClick={() => void toggleTaal()}>{bPlaying ? T.stop : T.playTaal}</button>
+          </div>
+          <label className="tp-field">
+            <span>{T.taal}</span>
+            <select value={taalId} onChange={e => { setTaalId(e.target.value); setEditing(false); }}>
+              {TAALS.map(x => <option key={x.id} value={x.id}>{x.name}, {T.matras(x.matras)}</option>)}
+            </select>
+            <span className="tp-muted tp-small">{baseTaal.usage}</span>
+          </label>
+          <label className="tp-range">
+            <span>{T.tempo(bpm, T.laya[layaFor(bpm)])}</span>
+            <input type="range" min={20} max={320} step={1} value={bpm} onChange={e => setBpm(Number(e.target.value))} />
+          </label>
+          <div className="tp-field">
+            <span>Tabla tuned to</span>
+            <div className="tp-choices" role="radiogroup" aria-label="Tabla tuned to">
+              {(Object.keys(TABLA_TUNE) as TablaTune[]).map(k => (
+                <button key={k} type="button" role="radio" aria-checked={tablaTune === k} onClick={() => setTablaTune(k)}>
+                  {k === "Sa" ? "सा" : k === "Pa" ? "प" : "म"} <small>{westernNote(baseTonicHz * TABLA_TUNE[k]).name}</small>
+                </button>
+              ))}
             </div>
           </div>
-          <button type="button" onClick={toggleTaal}
-            className={`px-5 py-2.5 rounded-xl font-mono text-xs font-bold uppercase flex items-center gap-2 cursor-pointer ${bPlaying ? "bg-rose-600 text-white" : "bg-[#F4C56A] text-slate-950"}`}>
-            {bPlaying ? <><Square className="h-4 w-4 fill-white" /> Stop</> : <><Play className="h-4 w-4" /> Play theka</>}
-          </button>
+          <label className="tp-range">
+            <span>{T.volume}</span>
+            <input type="range" min={0} max={1} step={0.01} value={bVolume} onChange={e => setBVolume(Number(e.target.value))} />
+          </label>
+          <p className="tp-muted tp-small">{T.legend}</p>
+          {bSource && <p className="tp-muted tp-small">{T.sound}: {bSource}</p>}
         </div>
+      </section>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
-          <label className="block space-y-1">
-            <span className={label}>Taal</span>
-            <select value={taalId} onChange={e => setTaalId(e.target.value)} className="w-full bg-[#0D1230] border border-slate-800 rounded-lg px-3 py-2 text-sm text-slate-200">
-              {TAALS.map(t => <option key={t.id} value={t.id}>{t.name} ({t.matras})</option>)}
-            </select>
-            <span className="text-[10px] text-slate-500 block">{taal.usage}</span>
-          </label>
-          <label className="block space-y-1">
-            <span className={label}>Tempo: {bpm} matras/min</span>
-            <input type="range" min={20} max={320} step={1} value={bpm} onChange={e => setBpm(Number(e.target.value))} className="w-full accent-[#9FB3E6]" />
-          </label>
-          <label className="block space-y-1">
-            <span className={label}>Volume</span>
-            <input type="range" min={0} max={1} step={0.01} value={bVolume} onChange={e => setBVolume(Number(e.target.value))} className="w-full accent-[#9FB3E6]" />
-          </label>
+      {/* ---------------- Theka (bols), editable */}
+      <section className="tp-theka" aria-labelledby="tp-k-h">
+        <div className="tp-head">
+          <h2 id="tp-k-h" className="tp-h2">Theka of {baseTaal.name}{custom ? " (your version)" : ""}</h2>
+          {!editing ? (
+            <div className="tp-row">
+              <button type="button" className="tp-link" onClick={startEdit}>Edit the bols</button>
+              {custom && <button type="button" className="tp-link" onClick={resetTheka}>Back to the standard theka</button>}
+            </div>
+          ) : (
+            <div className="tp-row">
+              <button type="button" className="tp-btn" disabled={!draftOk} onClick={saveEdit}>Save bols</button>
+              <button type="button" className="tp-link" onClick={() => setEditing(false)}>Cancel</button>
+            </div>
+          )}
         </div>
-
-        {/* theka grid */}
-        <div className="flex flex-wrap gap-3">
+        {editing && (
+          <p className="tp-muted tp-small">
+            Write the bols of each matra, separated by spaces (e.g. "Dha Ge" for two bols in one matra, "-" for a rest).
+            Bols the app can play: Dha, Dhin, Dhi, Na, Ta, Tin, Tu, Ti, Te, Ra, Ge, Ghe, Ga, Ke, Ka, Ki, Kat. Your version is saved in this browser.
+          </p>
+        )}
+        <div className="tp-grid">
           {(() => {
-            let n = 0;
-            return taal.vibhags.map((len, vi) => {
-              const cells = Array.from({ length: len }, () => ++n);
-              return (
-                <div key={vi} className="flex gap-1 border-l-2 border-slate-700 pl-2">
-                  {cells.map(i => {
-                    const clap = clapAt(taal, i);
-                    return (
-                      <div key={i} className={`w-16 p-1.5 rounded-lg text-center border ${matra === i ? "border-[#F4C56A] bg-[#F4C56A]/10" : "border-slate-800 bg-[#0D1230]/60"}`}>
-                        <span className="block text-[9px] font-mono text-slate-500">{i}{clap !== null ? ` · ${clap}` : ""}</span>
-                        <span className="block text-[11px] font-mono font-bold text-slate-200 leading-tight">{taal.theka[i - 1].join(" ")}</span>
-                      </div>
-                    );
-                  })}
-                </div>
-              );
-            });
+            let i = 0;
+            return taal.vibhags.map((len, vi) => (
+              <div key={vi} className="tp-vibhag-row">
+                {Array.from({ length: len }, () => {
+                  const k = i++;
+                  const c = clapAt(taal, k + 1);
+                  return (
+                    <div key={k} className={`tp-cell${matra === k + 1 ? " tp-cell-on" : ""}`}>
+                      <span className="tp-cell-n">{k + 1}</span>
+                      {editing ? (
+                        <input value={draft[k] ?? ""} aria-label={`Matra ${k + 1}`} aria-invalid={parsed[k]?.unknown.length ? true : undefined}
+                          onChange={e => setDraft(d => d.map((x, j) => (j === k ? e.target.value : x)))} />
+                      ) : (
+                        <span className="tp-cell-bol">{theka[k].join(" ")}</span>
+                      )}
+                      <span className="tp-cell-clap">{c === null ? "" : c}</span>
+                    </div>
+                  );
+                })}
+              </div>
+            ));
           })()}
         </div>
-        <p className="text-[10px] text-slate-500">X = sam, 0 = khali, numbers = taali. Thekas are the standard school forms; your guru may teach some bols differently. Taals here are for practice only: the app doesn't score rhythm.</p>
-        {bSource && <p className="text-[10px] font-mono text-amber-300/80">Sound: {bSource}</p>}
-      </div>
+        {editing && !draftOk && (
+          <p className="tp-error">Not a bol the app can play: {[...new Set(parsed.flatMap(p => p.unknown))].join(", ")}</p>
+        )}
+      </section>
     </div>
   );
 };
