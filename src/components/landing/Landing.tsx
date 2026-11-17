@@ -19,7 +19,6 @@ import { LangPicker } from "../../i18n/LangPicker";
 
 const DEMO_URL = `${import.meta.env.BASE_URL}samples/demo/yaman-demo.wav`;
 const DEMO_SA = 130.81;
-const REPO = "https://github.com/aninditamondal303/naadai";
 const SA_CHOICES = [
   { id: "low", label: "Sa C", hz: 130.81, hint: "most men" },
   { id: "high", label: "Sa G", hz: 196.0, hint: "most women" },
@@ -271,7 +270,6 @@ export const Landing: React.FC<Props> = ({ returningName, onOpenApp, onDemoAnaly
           <nav className="ln-nav" aria-label="Page">
             <a href="#listens">{t.nav.listens}</a>
             <a href="#accuracy">{t.nav.accuracy}</a>
-            <a href={REPO}>{t.nav.source}</a>
             <LangPicker />
             <button type="button" className="ln-open" onClick={onOpenApp}>{openLabel}</button>
           </nav>
@@ -351,12 +349,6 @@ export const Landing: React.FC<Props> = ({ returningName, onOpenApp, onDemoAnaly
               {A.rows.map(([th, v, note]) => <tr key={th}><th scope="row">{th}</th><td>{v}</td><td>{note}</td></tr>)}
             </tbody>
           </table>
-          <p className="ln-note">
-            {A.tablesPre} <a href={`${REPO}/blob/main/eval/results/real-voice-pitch.md`}>{A.real}</a>,{" "}
-            <a href={`${REPO}/blob/main/eval/results/pitch-benchmark.md`}>{A.pitch}</a> {A.and}{" "}
-            <a href={`${REPO}/blob/main/eval/results/sa-benchmark.md`}>{A.sa}</a>. {A.helpPre}{" "}
-            <a href={`${REPO}/blob/main/docs/recording-guide.md`}>{A.guide}</a>{A.helpPost}
-          </p>
         </section>
 
         <section className="ln-sec">
@@ -380,7 +372,6 @@ export const Landing: React.FC<Props> = ({ returningName, onOpenApp, onDemoAnaly
         <p>
           {t.credit} <a href="https://github.com/oormicreations/naad">{t.creditLink}</a> {t.creditPost} {t.review}
         </p>
-        <p><a href={REPO}>{t.sourceCode}</a></p>
       </footer>
     </div>
   );

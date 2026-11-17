@@ -31,7 +31,7 @@ export const Note: React.FC<{ n: SargamNote; script: NoteScript }> = ({ n, scrip
 export const Phrase: React.FC<{ text: string; script: NoteScript; active?: boolean }> = ({ text, script, active }) => (
   <span className={`sl-phrase${active ? " sl-active" : ""}`}>
     {text.trim().split(/\s+/).map((tok, i) =>
-      tok === "-" ? <span key={i} className="sl-hold">ऽ</span>
+      tok === "-" ? <span key={i} className="sl-hold">{script === "latin" ? "–" : "ऽ"}</span>
         : tok === "|" ? <span key={i} className="sl-bar">|</span>
           : <Note key={i} n={parseNote(tok)} script={script} />)}
   </span>
@@ -68,7 +68,7 @@ export const Swaralipi: React.FC<Props> = ({ taal, lines, script, playing, offse
                     <div key={k} className={`sl-cell${on ? " sl-on" : ""}`} role="cell">
                       <span className="sl-notes">
                         {m.kind === "notes" ? m.notes.map((n, j) => <Note key={j} n={n} script={script} />)
-                          : m.kind === "hold" ? <span className="sl-hold">ऽ</span> : <span className="sl-empty" />}
+                          : m.kind === "hold" ? <span className="sl-hold">{script === "latin" ? "–" : "ऽ"}</span> : <span className="sl-empty" />}
                       </span>
                       {words && <span className="sl-word" lang="hi">{words[k] === "-" ? "ऽ" : words[k]}</span>}
                       <span className="sl-clap">{clap === null ? "" : clap}</span>

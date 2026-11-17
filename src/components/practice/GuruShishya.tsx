@@ -8,6 +8,7 @@ import React, { useEffect, useMemo, useRef, useState } from "react";
 import type { ComprehensiveRaag } from "../../data/allRaags";
 import { RAAG_DETAILS } from "../../data/raagDetails";
 import { ALAAP } from "../../data/compositions";
+import { pakadFor } from "../../data/pakad";
 import { MicSession } from "../../audio/mic";
 import { TanpuraEngine, firstStringForRaag } from "../../audio/tanpura";
 import { scheduleSwaras } from "../../audio/swaraVoice";
@@ -26,7 +27,8 @@ function phrasesFor(raag: ComprehensiveRaag): { source: string; text: string }[]
   const out: { source: string; text: string }[] = [];
   for (const st of ALAAP[raag.id] ?? []) for (const p of st.phrases) out.push({ source: `Alaap: ${st.name}`, text: p });
   const d = RAAG_DETAILS[raag.id];
-  if (d) for (const p of d.pakad.split("|").map(x => x.trim()).filter(Boolean)) out.push({ source: "Pakad", text: p });
+  const pk = pakadFor(raag.id);
+  if (pk) out.push({ source: "Pakad", text: pk.replace(/\|/g, " ") });
   for (let set = 1; set <= 3; set++) for (const p of moreSargams(raag, set, d?.nyas ?? [], 3)) out.push({ source: "Generated sargam", text: p });
   return out.filter(p => p.text.split(/\s+/).filter(t => t !== "-").length >= 3);
 }

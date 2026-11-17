@@ -100,7 +100,7 @@ export const RiyazThread: React.FC<{ days: { day: string; minutes: number }[] }>
           </span>
         ))}
       </div>
-      <figcaption className="sring-cap">The last eight weeks, one bead per day; bigger beads are longer riyaz. Today is on the right.</figcaption>
+      <figcaption className="sring-cap">The last eight weeks. Each mark is one day; a larger mark indicates a longer riyaz. The most recent day is at the right.</figcaption>
     </figure>
   );
 };

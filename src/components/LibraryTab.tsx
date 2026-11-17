@@ -8,6 +8,9 @@ import { ArrowLeft, Search, ShieldAlert } from 'lucide-react';
 import { RAAG_LIST, type ComprehensiveRaag } from '../data/allRaags';
 import { RAAG_DETAILS } from '../data/raagDetails';
 import { RaagStudy } from './study/RaagStudy';
+import { Phrase } from './study/Swaralipi';
+import { pakadSource } from '../data/pakad';
+import { angPhrases, MUKHYA_ANG, vishrantiSwaras } from '../data/mukhyaAng';
 import { SamayChakra } from './library/SamayChakra';
 
 const SYM = ["S", "r", "R", "g", "G", "m", "M", "P", "d", "D", "n", "N"];
@@ -48,7 +51,7 @@ export const LibraryTab: React.FC<{ saHz?: number }> = ({ saHz = 130.81 }) => {
         <button type="button" onClick={() => setViewing(null)} className="lib-back">All raags</button>
         <header className="lib-raag-head">
           <h1 className="lib-title">{shortName(r)}</h1>
-          <p className="lib-intro">{r.thaat} thaat, {r.jati.toLowerCase()}, {r.time.toLowerCase()}. {r.description}</p>
+          <p className="lib-intro">{r.thaat} thaat. Jati: {r.jati}. Samay: {r.time}.</p>
           <p className="lib-review">
             {d?.review.status === "reviewed" ? `Reviewed by ${d.review.reviewer}` : "Awaiting a guru's review. Please check details with your teacher."}
           </p>
@@ -61,10 +64,10 @@ export const LibraryTab: React.FC<{ saHz?: number }> = ({ saHz = 130.81 }) => {
           <Row label="Avaroh"><span className="font-mono">{r.avaroha.join(" ")}</span></Row>
           <Row label="Vadi / Samvadi">{NAMES[r.vadi]} ({SYM[r.vadi]}) / {NAMES[r.samvadi]} ({SYM[r.samvadi]})</Row>
           <Row label="Time">{r.time}</Row>
-          <Row label="Mood">{r.mood}</Row>
           {d ? (
             <>
-              <Row label="Pakad"><span className="font-mono">{d.pakad}</span></Row>
+              <Row label="Pakad"><Phrase text={d.pakad} script="deva" /></Row>
+              {MUKHYA_ANG[r.id]?.source === "tanarang" && <Row label="Mukhya ang">{angPhrases(r.id).map((ph, i) => <span key={i} className="lib-ang"><Phrase text={ph} script="deva" /></span>)}</Row>}
               <Row label="Chalan"><span className="font-mono space-y-1 block">{d.chalan.map((c, i) => <span key={i} className="block">{c}</span>)}</span></Row>
               <Row label="Nyas swaras"><span className="font-mono">{d.nyas.join(", ")}</span></Row>
               {d.specialNotes && <Row label="Notes">{d.specialNotes}</Row>}
@@ -86,8 +89,11 @@ export const LibraryTab: React.FC<{ saHz?: number }> = ({ saHz = 130.81 }) => {
               </Row>
             </>
           ) : (
-            <Row label="Pakad, chalan, nyas">Not written yet for this raag. Only the basic facts above are available.</Row>
+            <Row label="Mukhya ang">{angPhrases(r.id).map((ph, i) => <span key={i} className="lib-ang"><Phrase text={ph} script="deva" /></span>)}</Row>
           )}
+          {vishrantiSwaras(r.id).length > 0 && <Row label="Vishranti sthan"><Phrase text={vishrantiSwaras(r.id).join(" ")} script="deva" /></Row>}
+          <Row label="Source">{(() => { const src = pakadSource(r.id); const e = MUKHYA_ANG[r.id];
+            return <>{src.label}{e?.source === "tanarang" && e.url && <> (<a href={e.url} target="_blank" rel="noreferrer" className="lib-src">Raag {shortName(r)} on tanarang.com</a>)</>}. Vadi and samvadi have been checked against the same reference where it lists the raag.</>; })()}</Row>
         </div>
 
         <RaagStudy raag={r} saHz={saHz} />
@@ -101,7 +107,7 @@ export const LibraryTab: React.FC<{ saHz?: number }> = ({ saHz = 130.81 }) => {
     <div className="lib">
       <header className="lib-head">
         <div>
-          <h1 className="lib-title">Raags, by the clock</h1>
+          <h1 className="lib-title">Raag library</h1>
           <p className="lib-intro">
             {RAAG_LIST.length} raags with their swaras, aroh, avaroh, vadi and samvadi. {fullCount} also have pakad, chalan,
             alaap, a sargam geet and a bandish to study. All entries await a guru's review.
@@ -110,7 +116,7 @@ export const LibraryTab: React.FC<{ saHz?: number }> = ({ saHz = 130.81 }) => {
         <div className="lib-filters">
           <label className="lib-search">
             <span className="lib-vh">Search raags</span>
-            <input value={query} onChange={e => setQuery(e.target.value)} placeholder="Search by name, thaat, mood or time" />
+            <input value={query} onChange={e => setQuery(e.target.value)} placeholder="Search by name, thaat or samay" />
           </label>
           <select value={thaat} onChange={e => setThaat(e.target.value)} aria-label="Thaat">
             {THAATS.map(t => <option key={t} value={t}>{t === "All" ? "All thaats" : `${t} thaat`}</option>)}

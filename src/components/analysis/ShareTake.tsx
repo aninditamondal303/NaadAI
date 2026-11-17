@@ -21,7 +21,7 @@ export const ShareTake: React.FC<{ m: TakeMeasurements; track: PitchTrack; raagN
   return (
     <section className="rg">
       <div className="lb-head">
-        <h3 className="rg-h">Show your guru</h3>
+        <h3 className="rg-h">Share with your guru</h3>
         <button type="button" className="rz-link" onClick={() => void make()}>Make a share link</button>
       </div>
       <p className="rg-muted">The link holds the measurements and your pitch line, not the recording. Nothing is uploaded: everything is inside the link itself.</p>

@@ -13,6 +13,7 @@ import { signedCents } from '../analysis/music';
 import { TanpuraEngine, firstStringForRaag } from '../audio/tanpura';
 import { RAAG_LIST } from '../data/allRaags';
 import { RAAG_DETAILS } from '../data/raagDetails';
+import { pakadFor } from '../data/pakad';
 import { addRecord, loadHistory, newId, onHistoryChange, type PracticeRecord } from '../lib/practiceHistory';
 import { parseSargam, type SargamToken } from '../practice/notation';
 import { generatePaltas, LAYAS, SHUDDHA_SWARAS, UNLOCK_SCORE } from '../practice/paltas';
@@ -75,10 +76,11 @@ export const PracticeTab: React.FC<Props> = ({ baseTonicHz, initialMode = "palta
 
   const raag = RAAGS.find(r => r.id === raagId)!;
   const details = RAAG_DETAILS[raagId];
+  const pakad = pakadFor(raagId);
 
   const exercises: Exercise[] = useMemo(() => {
     if (kind === "pakad") {
-      return details ? [{ id: "pakad", name: "Pakad", description: details.pakad, tokens: parseSargam(details.pakad) }] : [];
+      return pakad ? [{ id: "pakad", name: "Pakad", description: pakad, tokens: parseSargam(pakad) }] : [];
     }
     const base = generatePaltas(raag).map(p => ({ id: p.id, name: p.name, description: p.description, tokens: p.notes as SargamToken[] }));
     // Paltas focused on the singer's own weak swaras (from their measurements)
@@ -87,7 +89,7 @@ export const PracticeTab: React.FC<Props> = ({ baseTonicHz, initialMode = "palta
       return notes ? [{ id: `weak-${w.semitone}`, name: `Weak swara: ${w.name}`, description: `Your ${w.name} ${w.reason}. ${notes.map(n => n.label).join(" ")}`, tokens: notes as SargamToken[] }] : [];
     });
     return [...weak, ...base];
-  }, [raag, kind, details, history]);
+  }, [raag, kind, pakad, history]);
   const exercise = exercises.find(e => e.id === exerciseId) ?? exercises[0];
 
   useEffect(() => { setExerciseId(kind === "pakad" ? "pakad" : "aroh-avaroh"); }, [kind, raagId]);
@@ -225,13 +227,12 @@ export const PracticeTab: React.FC<Props> = ({ baseTonicHz, initialMode = "palta
             <span className={label}>Exercise type</span>
             <div className="flex gap-2">
               {(["palta", "pakad", "guru", "match", "ear"] as const).map(k => (
-                <button key={k} type="button" disabled={running || (k === "pakad" && !details)} onClick={() => setKind(k)}
+                <button key={k} type="button" disabled={running || (k === "pakad" && !pakad)} onClick={() => setKind(k)}
                   aria-current={kind === k ? "true" : undefined} className="pr-kind">
                   {k === "palta" ? "Paltas" : k === "pakad" ? "Pakad" : k === "ear" ? "Ear training" : k === "guru" ? "Guru-shishya" : "Sur milao"}
                 </button>
               ))}
             </div>
-            {!details && <span className="text-[10px] text-slate-500">Pakad not written yet for this raag.</span>}
           </div>
           {(kind === "palta" || kind === "pakad") && <>
           <label className="space-y-1 block pr-beat">

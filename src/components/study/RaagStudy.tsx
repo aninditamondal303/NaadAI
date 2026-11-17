@@ -8,7 +8,7 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import type { ComprehensiveRaag } from "../../data/allRaags";
 import { RAAG_DETAILS } from "../../data/raagDetails";
-import { ALAAP, compositionsFor, type Composition } from "../../data/compositions";
+import { ALAAP, compositionsForRaag, type Composition } from "../../data/compositions";
 import { clapAt, TAALS } from "../../data/taals";
 import { timeLines, timePhrases, type TimedNote } from "../../practice/swaralipi";
 import { moreAlaap, moreSargams } from "../../practice/generate";
@@ -88,7 +88,7 @@ export const RaagStudy: React.FC<{ raag: ComprehensiveRaag; saHz: number }> = ({
   const [script, setScript] = useState<NoteScript>(lang === "bn" ? "beng" : lang === "en" ? "latin" : "deva");
   const d = RAAG_DETAILS[raag.id];
   const alaap = ALAAP[raag.id];
-  const comps = compositionsFor(raag.id);
+  const comps = compositionsForRaag(raag);
   const player = usePlayer(saHz, raag);
   const [sargamSets, setSargamSets] = useState(1);
   const [alaapSets, setAlaapSets] = useState(1);
@@ -121,8 +121,9 @@ export const RaagStudy: React.FC<{ raag: ComprehensiveRaag; saHz: number }> = ({
     <div className="st">
       <div className="st-bar">
         <p className="st-note">
-          Everything on this page was written for Naad AI to follow the raag's rules; it is not a traditional bandish.
-          The guide voice is synthesised. Please learn traditional compositions from your guru, and check these with them.
+          The compositions on this page have been prepared for study according to the raag's aroh, avaroh and pakad; they are
+          not traditional bandishes. The guide voice is synthesised. Traditional compositions should be learnt from one's guru,
+          and this material should be verified with one's teacher.
         </p>
         {scriptPicker}
       </div>
@@ -131,7 +132,7 @@ export const RaagStudy: React.FC<{ raag: ComprehensiveRaag; saHz: number }> = ({
       {alaap && (
         <section className="st-sec">
           <h3 className="st-h">Alaap</h3>
-          <p className="st-lede">Sung in aakar ("aa"), slowly and without taal. Each stage opens a little more of the raag. ऽ means hold the swara.</p>
+          <p className="st-lede">Alaap is sung in aakar, slowly and without taal. Each stage develops a further region of the raag. The sign ऽ indicates that the swara is sustained.</p>
           {alaap.map((stage, si) => {
             const k = `alaap-${si}`;
             return (
@@ -157,7 +158,7 @@ export const RaagStudy: React.FC<{ raag: ComprehensiveRaag; saHz: number }> = ({
         return (
           <section key={c.id} className="st-sec">
             <div className="st-stage-head">
-              <h3 className="st-h">{c.kind === "bandish" ? `Bandish: ${c.title}` : "Sargam geet"}</h3>
+              <h3 className="st-h">{c.kind === "bandish" ? `Bandish: ${c.title}` : c.id.endsWith("basic-sargam-geet") ? c.title : "Sargam geet"}</h3>
               <button type="button" className="st-play st-play-main" onClick={() => playComposition(c)}>
                 {player.key === c.id ? "Stop" : "Listen with tanpura and tabla"}
               </button>
@@ -167,8 +168,10 @@ export const RaagStudy: React.FC<{ raag: ComprehensiveRaag; saHz: number }> = ({
               <div><dt>Raag</dt><dd>{raag.name.replace(/^Raag\s+/i, "")}, {raag.thaat} thaat; vadi {SYM_NAMES[raag.vadi]}, samvadi {SYM_NAMES[raag.samvadi]}</dd></div>
               <div><dt>Taal</dt><dd>{taal.name}, {taal.matras} matras in {taal.vibhags.length} vibhags of {taal.vibhags.join(" + ")}; taali on {taal.claps.map((x, i) => (x === "0" ? null : `${x === "X" ? "sam" : x}`)).filter(Boolean).join(", ")}, khali on vibhag {taal.claps.map((x, i) => (x === "0" ? i + 1 : null)).filter(Boolean).join(", ")}</dd></div>
               <div><dt>Theka</dt><dd className="st-theka">{(() => { let i = 0; return taal.vibhags.map(v => taal.theka.slice(i, (i += v)).map(m => m.join(" ")).join(" ")).join("  |  "); })()}</dd></div>
-              <div><dt>Laya</dt><dd>{c.laya}, about {c.bpm} matras a minute. It starts on sam (matra 1); the tabla plays one avartan first.</dd></div>
-              <div><dt>Form</dt><dd>Sthayi (lower and middle range, {c.sthayi.length} avartans), then antara (rising to taar Sa, {c.antara.length} avartans), then back to the sthayi.</dd></div>
+              <div><dt>Laya</dt><dd>{c.laya[0].toUpperCase() + c.laya.slice(1)} laya, approximately {c.bpm} matras per minute. The composition begins on sam; in playback the tabla plays one avartan of theka first.</dd></div>
+              <div><dt>Form</dt><dd>{c.id.endsWith("basic-sargam-geet")
+                ? <>The raag's principal phrases (mukhya ang) in their published order, each beginning on a vibhag of Teentaal and sustained to its end. Sthayi: the phrases below taar Sa. Antara: the phrases reaching taar Sa, then the aroh and avaroh.</>
+                : <>Sthayi in the mandra and madhya saptak ({c.sthayi.length} avartans); antara rising to the taar saptak ({c.antara.length} avartans); the sthayi is then repeated.</>}</dd></div>
               {c.roman && <div><dt>Words</dt><dd>{c.roman}</dd></div>}
               {c.meaning && <div><dt>Meaning</dt><dd>{c.meaning}</dd></div>}
             </dl>
@@ -186,10 +189,11 @@ export const RaagStudy: React.FC<{ raag: ComprehensiveRaag; saHz: number }> = ({
 
       {/* ---------------------------------------------------------------- more */}
       <section className="st-sec">
-        <h3 className="st-h">More sargams</h3>
+        <h3 className="st-h">Further sargam exercises</h3>
         <p className="st-lede">
-          Generated from the aroh and avaroh: rising only on aroh swaras, falling only on avaroh swaras, ending on a resting swara.
-          They follow the raag's scale but not every turn of its grammar, so treat them as exercises.
+          These exercises are derived from the aroh and avaroh: ascending movement uses only the swaras of the aroh, descending
+          movement only those of the avaroh, and each phrase ends on a nyas swara. They observe the raag's swaras but not every
+          feature of its chalan, and are therefore offered as exercises, not as phrases of the raag.
         </p>
         {extraSargams.map((set, si) => {
           const k = `sargam-${si}`;
@@ -203,12 +207,12 @@ export const RaagStudy: React.FC<{ raag: ComprehensiveRaag; saHz: number }> = ({
             </div>
           );
         })}
-        <button type="button" className="st-more" onClick={() => setSargamSets(n => n + 1)}>Give me more sargams</button>
+        <button type="button" className="st-more" onClick={() => setSargamSets(n => n + 1)}>Show further sargam exercises</button>
       </section>
 
       <section className="st-sec">
-        <h3 className="st-h">More alaap</h3>
-        <p className="st-lede">Slow phrases with long resting swaras, generated the same way. Sing them in aakar.</p>
+        <h3 className="st-h">Further alaap exercises</h3>
+        <p className="st-lede">Slow phrases with sustained nyas swaras, derived in the same manner. To be sung in aakar.</p>
         {extraAlaap.map((set, si) => {
           const k = `more-alaap-${si}`;
           return (
@@ -221,11 +225,11 @@ export const RaagStudy: React.FC<{ raag: ComprehensiveRaag; saHz: number }> = ({
             </div>
           );
         })}
-        <button type="button" className="st-more" onClick={() => setAlaapSets(n => n + 1)}>Give me more alaap</button>
+        <button type="button" className="st-more" onClick={() => setAlaapSets(n => n + 1)}>Show further alaap exercises</button>
       </section>
 
       {!alaap && (
-        <p className="st-muted">Written alaap, a sargam geet and a bandish are available for Yaman, Bhupali, Bhairav, Malkauns, Bhimpalasi, Bageshree, Marwa, Puriya and Todi. The generated sargams above work for every raag.</p>
+        <p className="st-muted">Written alaap and a bandish are at present available for Yaman, Bhupali, Bhairav, Malkauns, Bhimpalasi, Bageshree, Marwa, Puriya and Todi. For this raag, the sargam above is arranged from its mukhya ang, aroh and avaroh; it is an exercise, not a traditional composition.</p>
       )}
     </div>
   );

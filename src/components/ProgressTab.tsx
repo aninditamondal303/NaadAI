@@ -87,7 +87,7 @@ export const ProgressTab: React.FC = () => {
   return (
     <div className="space-y-6">
       <header className="pg-head">
-        <h1 className="pg-title">Your journey</h1>
+        <h1 className="pg-title">Progress</h1>
         <p className="pg-figures">
           <span><b>{totalMinutes >= 60 ? `${(totalMinutes / 60).toFixed(1)} h` : `${Math.round(totalMinutes)} min`}</b> of riyaz</span>
           <span><b>{streak}</b> {streak === 1 ? "day" : "days"} in a row</span>

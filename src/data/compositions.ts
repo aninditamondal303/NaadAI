@@ -257,3 +257,124 @@ export const COMPOSITIONS: Composition[] = [
 export function compositionsFor(raagId: string): Composition[] {
   return COMPOSITIONS.filter(c => c.raagId === raagId);
 }
+
+// ---------------------------------------------------------------------------
+// Basic sargam geet for every other raag, built from its own pakad, aroh and
+// avaroh, so it can only use the raag's swaras in the raag's own order:
+//   sthayi 1: the pakad          sthayi 2: the avaroh from Pa down to Sa
+//   antara 1: the aroh up to taar Sa    antara 2: the avaroh from taar Sa
+// ---------------------------------------------------------------------------
+import type { ComprehensiveRaag } from "./allRaags";
+import { pakadFor } from "./pakad";
+import { angPhrases } from "./mukhyaAng";
+import { parseNote } from "../practice/notation";
+
+/** Fit a phrase into one avartan: one swara per matra, holds after phrase ends; two per matra if too long. */
+export function fitToAvartan(phrase: string, matras = 16): string {
+  const groups = phrase.split("|").map(g => g.trim().split(/\s+/).filter(t => t && t !== "-")).filter(g => g.length);
+  let notes = groups.flat();
+  const breaks = new Set<number>();
+  let k = 0;
+  for (const g of groups) { k += g.length; breaks.add(k - 1); }
+  if (notes.length > matras * 2) notes = notes.slice(0, matras * 2);
+  if (notes.length > matras) {
+    // pair up swaras from the start until it fits
+    const out: string[] = [];
+    let extra = notes.length - matras, i = 0;
+    while (i < notes.length) {
+      if (extra > 0 && i + 1 < notes.length) { out.push(`${notes[i]}.${notes[i + 1]}`); i += 2; extra--; }
+      else { out.push(notes[i]); i++; }
+    }
+    return out.join(" ");
+  }
+  // short phrases: two matras per swara; otherwise holds after phrase ends; the rest on the last swara
+  let spare = matras - notes.length;
+  const out: string[] = [];
+  const doubled = notes.length * 2 <= matras;
+  notes.forEach((n, i) => {
+    out.push(n);
+    if (i === notes.length - 1) return;
+    if ((doubled || breaks.has(i)) && spare > 1) { out.push("-"); spare--; }
+  });
+  while (spare-- > 0) out.push("-");
+  return out.join(" ");
+}
+
+/**
+ * Fit short phrases into avartans so that every phrase begins on a vibhag
+ * (matras 1, 5, 9, 13 of Teentaal) and its last swara is held to the end of
+ * that vibhag; a phrase longer than a vibhag takes two (or more) vibhags.
+ */
+export function fitPhrasesToVibhags(phrases: string[], matras = 16, vibhag = 4): string[] {
+  const cells: string[] = [];
+  for (const ph of phrases) {
+    let notes = ph.trim().split(/\s+/).filter(t => t && t !== "-" && t !== "|");
+    if (!notes.length) continue;
+    // more than two swaras per matra would be a taan, not a sargam: cap at two per matra over two vibhags
+    if (notes.length > vibhag * 4) notes = notes.slice(0, vibhag * 4);
+    const span = Math.ceil(notes.length / vibhag) * vibhag;
+    const slots = Math.min(span, vibhag * 2);
+    const block: string[] = [];
+    if (notes.length <= slots) {
+      block.push(...notes);
+      while (block.length < slots) block.push("-");
+    } else {
+      let extra = notes.length - slots, i = 0;
+      while (i < notes.length) {
+        if (extra > 0 && i + 1 < notes.length) { block.push(`${notes[i]}.${notes[i + 1]}`); i += 2; extra--; }
+        else { block.push(notes[i]); i++; }
+      }
+    }
+    // keep a phrase inside one avartan
+    const used = cells.length % matras;
+    if (used + block.length > matras) while (cells.length % matras) cells.push("-");
+    cells.push(...block);
+  }
+  while (cells.length % matras) cells.push("-");
+  const lines: string[] = [];
+  for (let i = 0; i < cells.length; i += matras) lines.push(cells.slice(i, i + matras).join(" "));
+  return lines;
+}
+
+export function basicSargamGeet(raag: ComprehensiveRaag): Composition {
+  const ang = angPhrases(raag.id);
+  if (ang.length >= 2) {
+    // phrases of the mukhya ang in their order; the sthayi takes the phrases that stay below taar Sa,
+    // the antara those that reach it, followed by the aroh to taar Sa and the avaroh
+    const reachesTaar = (ph: string) => ph.split(" ").some(t => parseNote(t).semitones >= 12);
+    const low = ang.filter(p => !reachesTaar(p)), high = ang.filter(reachesTaar);
+    const sthayi = fitPhrasesToVibhags(low.length ? low : ang).slice(0, 3);
+    const antara = fitPhrasesToVibhags([...(low.length ? high : []), raag.aroha.join(" "), raag.avaroha.join(" ")]).slice(0, 3);
+    return {
+      id: `${raag.id}-basic-sargam-geet`, raagId: raag.id, kind: "sargam-geet", title: "Sargam from the mukhya ang",
+      taalId: "teentaal", laya: "madhya", bpm: 80,
+      sthayi: sthayi.map(notes => ({ notes })), antara: antara.map(notes => ({ notes })),
+    };
+  }
+  const pakad = pakadFor(raag.id) ?? raag.aroha.join(" ");
+  const semi = (t: string) => parseNote(t).semitones;
+  const up = raag.aroha, down = raag.avaroha;
+  // sthayi 2: up the aroh to around Pa, then down the avaroh to Sa
+  const lowUp = up.filter(t => semi(t) >= 0 && semi(t) <= 7);
+  const top = lowUp.length ? semi(lowUp[lowUp.length - 1]) : 7;
+  const lowDown = down.filter(t => semi(t) < top && semi(t) >= 0);
+  const fromPa = `${lowUp.join(" ")} | ${lowDown.join(" ")}`;
+  // antara 1: up the aroh from Ga/Ma to taar Sa, a turn down the avaroh, and back to taar Sa
+  const gaIdx = up.findIndex(t => semi(t) >= 4);
+  const upper = up.slice(Math.max(0, gaIdx));
+  const turn = down.slice(1, 3);
+  const back = upper.filter(t => semi(t) > semi(turn[turn.length - 1] ?? "S'"));
+  const upToTaar = `${upper.join(" ")} | ${turn.join(" ")} ${back.join(" ")}`;
+  return {
+    id: `${raag.id}-basic-sargam-geet`, raagId: raag.id, kind: "sargam-geet", title: "Basic sargam geet",
+    taalId: "teentaal", laya: "madhya", bpm: 80,
+    sthayi: [{ notes: fitToAvartan(pakad) }, { notes: fitToAvartan(fromPa) }],
+    antara: [{ notes: fitToAvartan(upToTaar) }, { notes: fitToAvartan(down.join(" ")) }],
+  };
+}
+
+/** Written compositions where they exist, otherwise the basic sargam geet. */
+export function compositionsForRaag(raag: ComprehensiveRaag): Composition[] {
+  const written = compositionsFor(raag.id);
+  return written.length ? written : [basicSargamGeet(raag)];
+}

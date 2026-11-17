@@ -413,3 +413,5 @@
 .pr-controls { display: flex; flex-wrap: wrap; align-items: flex-end; gap: 1.25rem 2.5rem; }
 .pr-controls > :first-child { min-width: 16rem; }
 .pr-beat { min-width: 14rem; }
+.lib-ang { display: inline-block; margin: 0 1.25rem 0.25rem 0; }
+.lib-src { color: #D9B45F; }

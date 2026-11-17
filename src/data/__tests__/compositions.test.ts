@@ -59,3 +59,21 @@ describe("timing", () => {
     expect(notes.map(n => [n.start, n.dur])).toEqual([[0, 2], [2, 0.5], [2.5, 0.5]]);
   });
 });
+
+describe("basic sargam geet for every raag", async () => {
+  const { compositionsForRaag, fitToAvartan } = await import("../compositions");
+  it("fits phrases into 16 matras", () => {
+    expect(fitToAvartan("S R G | R S").split(" ")).toHaveLength(16);
+    expect(fitToAvartan(Array(20).fill("S").join(" ")).split(" ")).toHaveLength(16);
+  });
+  for (const r of RAAG_LIST) {
+    it(`${r.id}: has a composition using only its swaras, one avartan per line`, () => {
+      const cs = compositionsForRaag(r);
+      expect(cs.length).toBeGreaterThan(0);
+      for (const c of cs) for (const l of [...c.sthayi, ...c.antara]) {
+        expect(parseLine(l.notes)).toHaveLength(16);
+        expect(outsideRaag(l.notes, r.allowedSwaras)).toEqual([]);
+      }
+    });
+  }
+});
