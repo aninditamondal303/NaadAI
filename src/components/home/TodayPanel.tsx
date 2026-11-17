@@ -45,9 +45,9 @@ export const TodayPanel: React.FC<Props> = ({ onGo }) => {
 
   return (
     <div className="grid grid-cols-1 lg:grid-cols-12 gap-5">
-      <div className="lg:col-span-4 bg-[#151A2E] p-5 rounded-2xl border border-slate-800 shadow-lg space-y-3">
+      <div className="lg:col-span-4 bg-[#1A2150] p-5 rounded-2xl border border-slate-800 shadow-lg space-y-3">
         <span className="text-[9px] font-mono text-slate-500 font-bold uppercase tracking-widest block">Raags for now</span>
-        <p className="text-xs text-[#38BDF8] font-mono">{prahar.name}</p>
+        <p className="text-xs text-[#9FB3E6] font-mono">{prahar.name}</p>
         {nowRaags.length === 0 ? (
           <p className="text-xs text-slate-400">No raag in the library is listed for this hour.</p>
         ) : (
@@ -63,17 +63,17 @@ export const TodayPanel: React.FC<Props> = ({ onGo }) => {
         <p className="text-[10px] text-slate-500">From the times listed in the raag library. Traditions differ on exact hours.</p>
       </div>
 
-      <div className="lg:col-span-5 bg-[#151A2E] p-5 rounded-2xl border border-slate-800 shadow-lg space-y-3">
+      <div className="lg:col-span-5 bg-[#1A2150] p-5 rounded-2xl border border-slate-800 shadow-lg space-y-3">
         <div className="flex items-center justify-between gap-2">
           <span className="text-[9px] font-mono text-slate-500 font-bold uppercase tracking-widest block">Today's riyaz plan</span>
-          <select value={minutes} onChange={e => setMinutes(Number(e.target.value))} className="bg-[#0F1115] border border-slate-800 rounded-md px-2 py-1 text-xs text-slate-200">
+          <select value={minutes} onChange={e => setMinutes(Number(e.target.value))} className="bg-[#0D1230] border border-slate-800 rounded-md px-2 py-1 text-xs text-slate-200">
             {[20, 30, 45, 60, 90].map(m => <option key={m} value={m}>{m} min</option>)}
           </select>
         </div>
         {!hasData && <p className="text-[11px] text-amber-300/80">No measurements yet, so time is split evenly. The plan adapts as you practise.</p>}
         <ol className="space-y-2">
           {plan.map(step => (
-            <li key={step.id} className={`p-2.5 rounded-lg border ${done[step.id] ? "border-slate-900 opacity-60" : "border-slate-800 bg-[#0F1115]/60"}`}>
+            <li key={step.id} className={`p-2.5 rounded-lg border ${done[step.id] ? "border-slate-900 opacity-60" : "border-slate-800 bg-[#0D1230]/60"}`}>
               <div className="flex items-start gap-2">
                 <button type="button" onClick={() => toggle(step.id)} className="mt-0.5 cursor-pointer" aria-label={done[step.id] ? "Mark not done" : "Mark done"}>
                   {done[step.id] ? <CheckCircle2 className="h-4 w-4 text-emerald-500" /> : <Circle className="h-4 w-4 text-slate-600" />}
@@ -85,14 +85,14 @@ export const TodayPanel: React.FC<Props> = ({ onGo }) => {
                   </div>
                   <p className="text-[11px] text-slate-400 leading-snug">{step.reason}</p>
                 </div>
-                <button type="button" onClick={() => onGo(step.goTo)} className="text-[10px] font-mono text-[#38BDF8] hover:underline cursor-pointer shrink-0 mt-0.5">Open</button>
+                <button type="button" onClick={() => onGo(step.goTo)} className="text-[10px] font-mono text-[#9FB3E6] hover:underline cursor-pointer shrink-0 mt-0.5">Open</button>
               </div>
             </li>
           ))}
         </ol>
       </div>
 
-      <div className="lg:col-span-3 bg-[#151A2E] p-5 rounded-2xl border border-slate-800 shadow-lg flex flex-col items-center justify-center text-center gap-2">
+      <div className="lg:col-span-3 bg-[#1A2150] p-5 rounded-2xl border border-slate-800 shadow-lg flex flex-col items-center justify-center text-center gap-2">
         <Flame className="h-8 w-8 text-orange-400" />
         <span className="text-3xl font-black font-mono text-orange-300">{streak} {streak === 1 ? "day" : "days"}</span>
         <span className="text-[10px] font-mono text-slate-400 uppercase">Practice streak</span>

@@ -236,27 +236,27 @@ export const HomeTab: React.FC<HomeTabProps> = ({
         <div className="space-y-6 animate-in fade-in zoom-in-95 duration-500" id="riyaz-practice-dashboard">
           
           {/* Active Status header panel */}
-          <div className="bg-gradient-to-r from-[#171424] to-[#111827] border-2 border-[#7C3AED]/70 p-6 rounded-3xl shadow-2xl relative overflow-hidden flex flex-col md:flex-row items-center justify-between gap-6">
-            <div className="absolute top-0 right-0 h-48 w-48 bg-[#7C3AED]/10 rounded-full blur-3xl pointer-events-none" />
+          <div className="bg-gradient-to-r from-[#171424] to-[#111827] border-2 border-[#E0A458]/70 p-6 rounded-3xl shadow-2xl relative overflow-hidden flex flex-col md:flex-row items-center justify-between gap-6">
+            <div className="absolute top-0 right-0 h-48 w-48 bg-[#E0A458]/10 rounded-full blur-3xl pointer-events-none" />
             
             <div className="space-y-2 text-center md:text-left z-10">
-              <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#7C3AED]/20 border border-[#7C3AED]/50 text-purple-300 text-[10px] font-mono font-bold uppercase tracking-widest animate-pulse">
-                <Music className="h-3.5 w-3.5 text-[#FBBF24]" />
+              <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#E0A458]/20 border border-[#E0A458]/50 text-purple-300 text-[10px] font-mono font-bold uppercase tracking-widest animate-pulse">
+                <Music className="h-3.5 w-3.5 text-[#F4C56A]" />
                 Live Riyāz Session Active
               </div>
               <h1 className="text-3xl font-serif font-black text-slate-100 tracking-wide">
                 Practice: {activePractice.raagName}
               </h1>
               <p className="text-xs text-slate-400 font-mono">
-                Anchored to Scale: <span className="text-[#38BDF8] font-bold">{activePractice.scaleLabel} ({activePractice.baseHz.toFixed(1)} Hz)</span> • 
-                Plucking Drone Tuning: <span className="text-[#FBBF24] font-bold">Shaddaj + {activePractice.isSelectedTuning}</span>
+                Anchored to Scale: <span className="text-[#9FB3E6] font-bold">{activePractice.scaleLabel} ({activePractice.baseHz.toFixed(1)} Hz)</span> • 
+                Plucking Drone Tuning: <span className="text-[#F4C56A] font-bold">Shaddaj + {activePractice.isSelectedTuning}</span>
               </p>
             </div>
 
             {/* Countdown Clock Panel */}
-            <div className="flex flex-col items-center bg-[#0F1115]/80 border border-slate-800 p-4 rounded-2xl min-w-[150px] shadow-inner shrink-0 relative">
+            <div className="flex flex-col items-center bg-[#0D1230]/80 border border-slate-800 p-4 rounded-2xl min-w-[150px] shadow-inner shrink-0 relative">
               <span className="text-[9px] font-mono text-slate-500 uppercase tracking-widest font-bold">Riyāz Timer</span>
-              <div className="text-3xl font-black font-mono text-[#FBBF24] py-1 tracking-wider leading-none">
+              <div className="text-3xl font-black font-mono text-[#F4C56A] py-1 tracking-wider leading-none">
                 {renderFormattedSeconds(activePractice.secondsRemaining)}
               </div>
               <span className="text-[8px] font-mono text-slate-400">Total duration: {activePractice.durationMins} mins</span>
@@ -266,7 +266,7 @@ export const HomeTab: React.FC<HomeTabProps> = ({
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
             
             {/* LEFT COLUMN: Physical Tanpura PLUCK engine controllers */}
-            <div className="lg:col-span-4 bg-[#151A2E] p-5 rounded-2xl border border-slate-850 shadow-xl flex flex-col justify-between space-y-6">
+            <div className="lg:col-span-4 bg-[#1A2150] p-5 rounded-2xl border border-slate-850 shadow-xl flex flex-col justify-between space-y-6">
               
               <div className="space-y-4">
                 <div className="border-b border-slate-850 pb-2">
@@ -274,7 +274,7 @@ export const HomeTab: React.FC<HomeTabProps> = ({
                 </div>
 
                 {/* Simulated 4-string Pluck Bridge Wave representation */}
-                <div className="bg-[#0F1115] border border-slate-900 rounded-xl p-4 flex flex-col justify-center items-center min-h-[140px] relative">
+                <div className="bg-[#0D1230] border border-slate-900 rounded-xl p-4 flex flex-col justify-center items-center min-h-[140px] relative">
                   <span className="text-[8px] font-mono text-slate-600 uppercase tracking-wider absolute top-2 block">Tanpura Plucking Bridge Signals</span>
                   
                   <div className="flex justify-around items-center w-full h-16 max-w-xs mt-3">
@@ -287,14 +287,14 @@ export const HomeTab: React.FC<HomeTabProps> = ({
                           <div className="h-20 w-3 bg-slate-900 rounded-full relative flex justify-center">
                             {/* The vibrating inner string wire line */}
                             <div className={`w-[1px] h-full transition-all bg-slate-600 ${
-                              isPlucking ? "bg-purple-500 shadow-[0_0_15px_#7C3AED] scale-x-[3] animate-pulse" : ""
+                              isPlucking ? "bg-purple-500 shadow-[0_0_15px_#E0A458] scale-x-[3] animate-pulse" : ""
                             }`} />
                             {/* Plucking node dot indicator */}
                             <div className={`absolute top-1/2 -transform-y-1/2 h-3.5 w-3.5 rounded-full border border-slate-800 transition-all duration-150 ${
-                              isPlucking ? "bg-[#FBBF24] scale-125 border-orange-500 shadow-[0_0_8px_#FBBF24]" : "bg-slate-800"
+                              isPlucking ? "bg-[#F4C56A] scale-125 border-orange-500 shadow-[0_0_8px_#F4C56A]" : "bg-slate-800"
                             }`} />
                           </div>
-                          <span className={`text-[9px] font-mono font-bold ${isPlucking ? "text-[#FBBF24]" : "text-slate-500"}`}>
+                          <span className={`text-[9px] font-mono font-bold ${isPlucking ? "text-[#F4C56A]" : "text-slate-500"}`}>
                             {labels[strIdx]}
                           </span>
                         </div>
@@ -318,8 +318,8 @@ export const HomeTab: React.FC<HomeTabProps> = ({
                             onClick={() => togglePracticeTuning(opt as any)}
                             className={`py-1.5 rounded-lg text-[10px] font-mono font-bold uppercase border transition-all cursor-pointer ${
                               isSel 
-                                ? "bg-[#7C3AED] border-purple-500 text-white shadow-md shadow-purple-950/20" 
-                                : "bg-[#0F1115] border-slate-850 hover:border-slate-800 text-slate-400"
+                                ? "bg-[#E0A458] border-purple-500 text-white shadow-md shadow-purple-950/20" 
+                                : "bg-[#0D1230] border-slate-850 hover:border-slate-800 text-slate-400"
                             }`}
                           >
                             {opt}
@@ -341,7 +341,7 @@ export const HomeTab: React.FC<HomeTabProps> = ({
                       max="110" 
                       value={activePractice.tempoBpm}
                       onChange={(e) => handleTempoChange(parseInt(e.target.value))}
-                      className="w-full accent-[#7C3AED] bg-slate-900 rounded-lg appearance-none h-1.5 cursor-pointer"
+                      className="w-full accent-[#E0A458] bg-slate-900 rounded-lg appearance-none h-1.5 cursor-pointer"
                     />
                   </div>
 
@@ -399,11 +399,11 @@ export const HomeTab: React.FC<HomeTabProps> = ({
                 const SYM = ["S", "r", "R", "g", "G", "m", "M", "P", "d", "D", "n", "N"];
                 const paltas = generatePaltas(r).slice(0, 3);
                 return (
-                  <div className="bg-[#151A2E] p-6 rounded-2xl border border-slate-800 shadow-xl space-y-4">
+                  <div className="bg-[#1A2150] p-6 rounded-2xl border border-slate-800 shadow-xl space-y-4">
                     <h3 className="text-xs font-mono font-bold text-slate-400 uppercase tracking-widest border-b border-slate-800 pb-2">{r.name.replace(/^Raag\s+/i, "")}</h3>
                     <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs font-mono">
                       {[["Thaat", r.thaat], ["Vadi", SYM[r.vadi]], ["Samvadi", SYM[r.samvadi]], ["Time", r.time]].map(([k, v]) => (
-                        <div key={k} className="bg-[#0F1115] p-3 rounded-xl border border-slate-800">
+                        <div key={k} className="bg-[#0D1230] p-3 rounded-xl border border-slate-800">
                           <span className="text-[8px] text-slate-500 block uppercase font-bold">{k}</span>
                           <span className="text-slate-200 font-bold block mt-0.5">{v}</span>
                         </div>
@@ -411,7 +411,7 @@ export const HomeTab: React.FC<HomeTabProps> = ({
                     </div>
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-3 font-mono text-center">
                       {[["Aroh", r.aroha.join(" ")], ["Avaroh", r.avaroha.join(" ")], ["Pakad", d ? d.pakad : "Not written yet"]].map(([k, v]) => (
-                        <div key={k} className="bg-[#0F1115]/80 p-3 rounded-xl border border-slate-900">
+                        <div key={k} className="bg-[#0D1230]/80 p-3 rounded-xl border border-slate-900">
                           <span className="text-[8px] text-slate-500 block uppercase font-bold">{k}</span>
                           <span className="text-sm font-bold text-slate-300 block mt-1">{v}</span>
                         </div>
@@ -439,15 +439,15 @@ export const HomeTab: React.FC<HomeTabProps> = ({
         <div className="space-y-6">
           
           {/* 1. Hero Welcoming Section with classic motifs */}
-          <div className="bg-[#151A2E] border-2 border-[#7C3AED]/40 p-8 rounded-3xl shadow-2xl relative overflow-hidden flex flex-col lg:flex-row items-center justify-between gap-6">
+          <div className="bg-[#1A2150] border-2 border-[#E0A458]/40 p-8 rounded-3xl shadow-2xl relative overflow-hidden flex flex-col lg:flex-row items-center justify-between gap-6">
             {/* Background Mandala Vector effect */}
-            <div className="absolute top-0 right-0 h-64 w-64 bg-[#7C3AED]/10 rounded-full blur-3xl pointer-events-none" />
-            <div className="absolute -bottom-10 -left-10 h-48 w-48 bg-[#38BDF8]/5 rounded-full blur-2xl pointer-events-none" />
+            <div className="absolute top-0 right-0 h-64 w-64 bg-[#E0A458]/10 rounded-full blur-3xl pointer-events-none" />
+            <div className="absolute -bottom-10 -left-10 h-48 w-48 bg-[#9FB3E6]/5 rounded-full blur-2xl pointer-events-none" />
             
             {/* Texts */}
             <div className="space-y-4 max-w-xl text-center lg:text-left relative z-10 font-sans">
-              <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#7C3AED]/20 border border-[#7C3AED]/50 text-purple-300 text-[10px] font-mono font-bold uppercase tracking-widest">
-                <Sparkles className="h-3.5 w-3.5 text-[#FBBF24]" />
+              <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#E0A458]/20 border border-[#E0A458]/50 text-purple-300 text-[10px] font-mono font-bold uppercase tracking-widest">
+                <Sparkles className="h-3.5 w-3.5 text-[#F4C56A]" />
                 Classical Music Learning Companion
               </div>
               
@@ -460,18 +460,18 @@ export const HomeTab: React.FC<HomeTabProps> = ({
               </p>
 
               <div className="pt-2 flex flex-wrap justify-center lg:justify-start gap-2 text-xs font-mono">
-                <span className="bg-[#0F1115] border border-slate-800 text-slate-400 px-3 py-1.5 rounded-lg font-bold">Your Sa: {baseTonicHz.toFixed(1)} Hz ({westernNote(baseTonicHz).name})</span>
+                <span className="bg-[#0D1230] border border-slate-800 text-slate-400 px-3 py-1.5 rounded-lg font-bold">Your Sa: {baseTonicHz.toFixed(1)} Hz ({westernNote(baseTonicHz).name})</span>
               </div>
             </div>
 
             {/* Traditional Tanpura Neck design visual badge */}
-            <div className="hidden lg:flex h-44 w-44 shrink-0 rounded-2xl bg-[#0F1115]/90 border border-slate-800 p-4 flex-col items-center justify-between relative shadow-inner">
+            <div className="hidden lg:flex h-44 w-44 shrink-0 rounded-2xl bg-[#0D1230]/90 border border-slate-800 p-4 flex-col items-center justify-between relative shadow-inner">
               <span className="text-[8px] font-mono text-slate-500 uppercase tracking-wider">Naad AI</span>
               <div className="flex flex-col items-center flex-grow justify-center gap-1.5">
                 <div className="relative">
                   {/* Diya Oil Lamp symbol */}
-                  <div className="h-10 w-10 rounded-full bg-[#7C3AED]/20 border border-[#7C3AED]/50 flex items-center justify-center relative">
-                    <span className="text-lg text-[#FBBF24] leading-none select-none">ॐ</span>
+                  <div className="h-10 w-10 rounded-full bg-[#E0A458]/20 border border-[#E0A458]/50 flex items-center justify-center relative">
+                    <span className="text-lg text-[#F4C56A] leading-none select-none">ॐ</span>
                     <div className="absolute -top-1.5 h-3 w-1.5 bg-orange-500 rounded-full blur-[0.5px] animate-pulse" />
                   </div>
                 </div>
@@ -482,10 +482,10 @@ export const HomeTab: React.FC<HomeTabProps> = ({
           </div>
 
           {/* NEW INTERACTIVE PRACTICE LAUNCH ALTAR */}
-          <div className="bg-[#151A2E] border border-slate-850 p-6 rounded-3xl shadow-xl space-y-6 relative overflow-hidden" id="practice-setup-card">
+          <div className="bg-[#1A2150] border border-slate-850 p-6 rounded-3xl shadow-xl space-y-6 relative overflow-hidden" id="practice-setup-card">
             
             <div className="flex items-center gap-2 border-b border-slate-850 pb-3">
-              <div className="h-8 w-8 rounded-lg bg-purple-500/10 border border-purple-500/20 flex items-center justify-center text-[#7C3AED]">
+              <div className="h-8 w-8 rounded-lg bg-purple-500/10 border border-purple-500/20 flex items-center justify-center text-[#E0A458]">
                 <Flame className="h-5 w-5 text-amber-500 fill-amber-500/20" />
               </div>
               <div>
@@ -503,7 +503,7 @@ export const HomeTab: React.FC<HomeTabProps> = ({
                   <select 
                     value={selectedPracticeRaag}
                     onChange={(e) => setSelectedPracticeRaag(e.target.value)}
-                    className="w-full bg-[#0F1115] border border-slate-800 text-slate-300 font-bold p-3 rounded-xl appearance-none cursor-pointer hover:border-purple-500/50 focus:border-[#7C3AED] focus:outline-none"
+                    className="w-full bg-[#0D1230] border border-slate-800 text-slate-300 font-bold p-3 rounded-xl appearance-none cursor-pointer hover:border-purple-500/50 focus:border-[#E0A458] focus:outline-none"
                   >
                     <option value="yaman">Raag Yaman (Evening - Kalyan)</option>
                     <option value="bhairav">Raag Bhairav (Dawn - Meditative)</option>
@@ -517,7 +517,7 @@ export const HomeTab: React.FC<HomeTabProps> = ({
               {/* Sa: always the singer's own */}
               <div className="space-y-1.5">
                 <label className="text-[10px] font-mono text-slate-500 uppercase block font-bold">Sa</label>
-                <div className="w-full bg-[#0F1115] border border-slate-800 text-slate-300 font-bold p-3 rounded-xl">
+                <div className="w-full bg-[#0D1230] border border-slate-800 text-slate-300 font-bold p-3 rounded-xl">
                   {(baseTonicHz ?? 130.81).toFixed(1)} Hz ({westernNote(baseTonicHz ?? 130.81).name}) · change it in the Tanpura tab or with "Find my Sa"
                 </div>
               </div>
@@ -529,7 +529,7 @@ export const HomeTab: React.FC<HomeTabProps> = ({
                   <select 
                     value={selectedPracticeDuration}
                     onChange={(e) => setSelectedPracticeScaleDuration(parseInt(e.target.value))}
-                    className="w-full bg-[#0F1115] border border-slate-800 text-slate-300 font-bold p-3 rounded-xl appearance-none cursor-pointer hover:border-purple-500/50 focus:border-[#7C3AED] focus:outline-none"
+                    className="w-full bg-[#0D1230] border border-slate-800 text-slate-300 font-bold p-3 rounded-xl appearance-none cursor-pointer hover:border-purple-500/50 focus:border-[#E0A458] focus:outline-none"
                   >
                     <option value="5">5 minutes</option>
                     <option value="15">15 minutes</option>
@@ -547,7 +547,7 @@ export const HomeTab: React.FC<HomeTabProps> = ({
               <button
                 type="button"
                 onClick={handleStartPracticeSession}
-                className="w-full py-4 rounded-xl bg-gradient-to-r from-[#7C3AED] to-[#38BDF8] hover:opacity-95 text-slate-950 font-mono text-xs font-black uppercase tracking-widest shadow-xl transform active:translate-y-0.5 transition duration-200 cursor-pointer flex justify-center items-center gap-2"
+                className="w-full py-4 rounded-xl bg-[#F4C56A] hover:opacity-95 text-slate-950 font-mono text-xs font-black uppercase tracking-widest shadow-xl transform active:translate-y-0.5 transition duration-200 cursor-pointer flex justify-center items-center gap-2"
               >
                 <Play className="h-4 w-4 fill-slate-950" />
                 Start timed riyaz
@@ -561,9 +561,9 @@ export const HomeTab: React.FC<HomeTabProps> = ({
             
             <button
               onClick={() => handleAction("analyzer", "scale")}
-              className="p-4 bg-[#151A2E] hover:border-[#38BDF8]/65 border border-slate-805 rounded-2xl flex flex-col items-start gap-4 transition-all text-left shadow-lg cursor-pointer group"
+              className="p-4 bg-[#1A2150] hover:border-[#9FB3E6]/65 border border-slate-805 rounded-2xl flex flex-col items-start gap-4 transition-all text-left shadow-lg cursor-pointer group"
             >
-              <div className="h-10 w-10 rounded-xl bg-[#38BDF8]/10 border border-[#38BDF8]/35 flex items-center justify-center text-[#38BDF8]">
+              <div className="h-10 w-10 rounded-xl bg-[#9FB3E6]/10 border border-[#9FB3E6]/35 flex items-center justify-center text-[#9FB3E6]">
                 <Activity className="h-5 w-5" />
               </div>
               <div>
@@ -577,9 +577,9 @@ export const HomeTab: React.FC<HomeTabProps> = ({
 
             <button
               onClick={() => handleAction("analyzer", "singing")}
-              className="p-4 bg-[#151A2E] hover:border-[#7C3AED]/65 border border-slate-805 rounded-2xl flex flex-col items-start gap-4 transition-all text-left shadow-lg cursor-pointer group"
+              className="p-4 bg-[#1A2150] hover:border-[#E0A458]/65 border border-slate-805 rounded-2xl flex flex-col items-start gap-4 transition-all text-left shadow-lg cursor-pointer group"
             >
-              <div className="h-10 w-10 rounded-xl bg-[#7C3AED]/10 border border-[#7C3AED]/35 flex items-center justify-center text-[#7C3AED]">
+              <div className="h-10 w-10 rounded-xl bg-[#E0A458]/10 border border-[#E0A458]/35 flex items-center justify-center text-[#E0A458]">
                 <Sparkles className="h-5 w-5" />
               </div>
               <div>
@@ -593,9 +593,9 @@ export const HomeTab: React.FC<HomeTabProps> = ({
 
             <button
               onClick={() => handleAction("tanpura")}
-              className="p-4 bg-[#151A2E] hover:border-[#FBBF24]/65 border border-slate-805 rounded-2xl flex flex-col items-start gap-4 transition-all text-left shadow-lg cursor-pointer group"
+              className="p-4 bg-[#1A2150] hover:border-[#F4C56A]/65 border border-slate-805 rounded-2xl flex flex-col items-start gap-4 transition-all text-left shadow-lg cursor-pointer group"
             >
-              <div className="h-10 w-10 rounded-xl bg-[#FBBF24]/10 border border-[#FBBF24]/35 flex items-center justify-center text-[#FBBF24]">
+              <div className="h-10 w-10 rounded-xl bg-[#F4C56A]/10 border border-[#F4C56A]/35 flex items-center justify-center text-[#F4C56A]">
                 <Music className="h-5 w-5" />
               </div>
               <div>
@@ -609,7 +609,7 @@ export const HomeTab: React.FC<HomeTabProps> = ({
 
             <button
               onClick={() => handleAction("library")}
-              className="p-4 bg-[#151A2E] hover:border-[#38BDF8]/50 border border-slate-805 rounded-2xl flex flex-col items-start gap-4 transition-all text-left shadow-lg cursor-pointer group"
+              className="p-4 bg-[#1A2150] hover:border-[#9FB3E6]/50 border border-slate-805 rounded-2xl flex flex-col items-start gap-4 transition-all text-left shadow-lg cursor-pointer group"
             >
               <div className="h-10 w-10 rounded-xl bg-indigo-950/20 border border-slate-750 flex items-center justify-center text-indigo-400">
                 <Compass className="h-5 w-5" />
