@@ -16,6 +16,8 @@ import { TanpuraStrings } from './home/TanpuraStrings';
 import { useLang } from '../i18n/lang';
 
 interface TanpuraTabProps {
+  /** Taal to show first (from the taal reference in the library). */
+  initialTaalId?: string | null;
   baseTonicHz: number;
   onTonicChange?: (hz: number) => void;
   selectedTuning?: FirstString;
@@ -139,7 +141,7 @@ const TaalCircle: React.FC<{ taal: Taal; theka: string[][]; matra: number | null
 
 // ------------------------------------------------------------ tab
 
-export const TanpuraTab: React.FC<TanpuraTabProps> = ({ baseTonicHz, onTonicChange, selectedTuning = "Pa", onTuningChange }) => {
+export const TanpuraTab: React.FC<TanpuraTabProps> = ({ baseTonicHz, onTonicChange, selectedTuning = "Pa", onTuningChange, initialTaalId = null }) => {
   const { t } = useLang();
   const T = t.tp;
   const getAudio = useAudioContext();
@@ -216,7 +218,7 @@ export const TanpuraTab: React.FC<TanpuraTabProps> = ({ baseTonicHz, onTonicChan
   };
 
   // ---- taal
-  const [taalId, setTaalId] = useState("teentaal");
+  const [taalId, setTaalId] = useState(() => (initialTaalId && TAALS.some(x => x.id === initialTaalId) ? initialTaalId : "teentaal"));
   const baseTaal = TAALS.find(x => x.id === taalId)!;
   const [theka, setTheka] = useState<string[][]>(() => loadTheka(baseTaal));
   useEffect(() => setTheka(loadTheka(baseTaal)), [taalId]);

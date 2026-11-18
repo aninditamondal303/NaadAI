@@ -4,6 +4,7 @@
  */
 
 import { Raag } from '../types';
+import { TANARANG_RAAGS } from './raagsTanarang';
 
 export interface ComprehensiveRaag extends Raag {
   jati: string;
@@ -18,7 +19,7 @@ export interface ComprehensiveRaag extends Raag {
  * raagDetails.ts for the raags where it has been written. All entries are
  * awaiting review by a guru; see docs/raag-review.md.
  */
-export const RAAG_LIST: ComprehensiveRaag[] = [
+const CORE_RAAGS: ComprehensiveRaag[] = [
   // --- KALYAN THAAT ---
   {
     id: "yaman",
@@ -669,3 +670,6 @@ export const RAAG_LIST: ComprehensiveRaag[] = [
     description: "An incredibly popular evening scale of deep sweetness, blending Kalyan and Bhairav notes."
   }
 ];
+
+/** Every raag in the library: the original set followed by those added from tanarang.com. */
+export const RAAG_LIST: ComprehensiveRaag[] = [...CORE_RAAGS, ...TANARANG_RAAGS];

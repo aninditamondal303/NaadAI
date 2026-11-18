@@ -20,10 +20,10 @@ Available in **English, हिन्दी and বাংলা**.
 
 ### What a singer can do
 
-- **Riyaz with the tanpura**, with lock-screen controls so it keeps playing when the phone sleeps; ten taals with editable thekas.
+- **Riyaz with the tanpura**, with lock-screen controls so it keeps playing when the phone sleeps; 23 taals with editable thekas, from Teentaal to Dhamar and Sultaal.
 - **Analyse a take**: a summary of held-in-tune time, the raag rule check, range and breath, then the pitch line, each swara's position and wobble, the shruti view, andolan and gamak, and which raag it sounds like. While recording, the raag is recognised live.
 - **Paltas and pakad** graded note by note across four layas; **Guru-shishya**, where the phrase can come from the app or from your own guru (the guru records once and sends a link; the guide follows the guru's own pitch line, meends included).
-- **Learn a raag**: 45 raags with thaat, aroh, avaroh, vadi, samvadi, mukhya ang and vishranti sthan (sourced), alaap, sargam geet and bandish in swaralipi with **sing-along** at any laya, and **side-by-side comparison** of close raags.
+- **Learn a raag**: 125 raags (the full tanarang.com index) with thaat, aroh, avaroh, vadi, samvadi, mukhya ang and vishranti sthan (sourced), alaap, sargam geet and bandish in swaralipi with **sing-along** at any laya, and **side-by-side comparison** of close raags.
 - **Progress**: a weekly report (this week against last), swara tuning ring, streaks, journal, and a daily riyaz reminder (a notification in the Android app).
 - **Quick find** (Ctrl/⌘ K) to reach any screen or raag.
 
@@ -78,8 +78,8 @@ npm run eval:f0 -- eval/datasets/vocadito --name vocadito
 | **Ear training** | Name the swara, or name the raag from a phrase (similar raags as distractors) |
 | **Daily riyaz planner** | Aakar → Sa sadhana → kharaj → paltas → raag → taans → ear training; time adapts to your measurements and each step cites them |
 | **Raags for now** | From the time of day (prahar) |
-| **Tanpura and 10 taals** | Real tanpura and tabla recordings retuned to your Sa; Pa/Ma/Ni first string, fine tuning; Teentaal, Ektaal, Jhaptaal, Rupak, Dadra, Keherwa, Jhoomra, Tilwada, Chautaal, Deepchandi |
-| **Raag library** | 45 raags; 9 with pakad, chalan, nyas swaras and comparisons with similar raags |
+| **Tanpura and 23 taals** | Real tanpura and tabla recordings retuned to your Sa; Pa/Ma/Ni first string, fine tuning; Teentaal, Ektaal, Jhaptaal, Rupak, Dadra, Keherwa, Jhoomra, Tilwada, Chautaal, Deepchandi |
+| **Raag library** | 125 raags with mukhya ang, vishranti sthan, notes and the bandishen published for each on tanarang.com; 9 with written pakad, chalan and bandish; taal reference (23 taals), vocal forms from dhrupad to bhajan, and the principal gharanas |
 | **Profiles** | Several singers per device, no passwords, data stays in the browser; export/import |
 | **Written feedback (optional)** | An AI model comments only on the measured numbers, through gharana-style lenses; never invents numbers or quotes real musicians |
 

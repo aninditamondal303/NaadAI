@@ -78,7 +78,7 @@ export function differenceSummary(a: ComprehensiveRaag, b: ComprehensiveRaag, c:
     if (c.onlyA.length) out.push(`${n(a)} uses ${list(c.onlyA)}, which ${n(b)} does not.`);
     if (c.onlyB.length) out.push(`${n(b)} uses ${list(c.onlyB)}, which ${n(a)} does not.`);
   }
-  if (!c.sameVadi || !c.sameSamvadi) out.push(`Vadi and samvadi: ${n(a)} ${SWARA_NAMES[a.vadi]} and ${SWARA_NAMES[a.samvadi]}; ${n(b)} ${SWARA_NAMES[b.vadi]} and ${SWARA_NAMES[b.samvadi]}.`);
+  if (a.vadiGiven !== false && b.vadiGiven !== false && (!c.sameVadi || !c.sameSamvadi)) out.push(`Vadi and samvadi: ${n(a)} ${SWARA_NAMES[a.vadi]} and ${SWARA_NAMES[a.samvadi]}; ${n(b)} ${SWARA_NAMES[b.vadi]} and ${SWARA_NAMES[b.samvadi]}.`);
   if (!c.sameAroh || !c.sameAvaroh) out.push(`Their aroh and avaroh differ; compare the lines below.`);
   if (!c.sameTime) out.push(`They belong to different times: ${n(a)} ${timeOf(a)}, ${n(b)} ${timeOf(b)}.`);
   return out;

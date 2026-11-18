@@ -22,6 +22,8 @@ export interface Raag {
   avaroha: string[];       // Notes in descent
   vadi: number;            // Vadi swara index
   samvadi: number;         // Samvadi swara index
+  /** false when the source gives no vadi/samvadi (the numbers are then placeholders). */
+  vadiGiven?: boolean;
   time: string;            // Traditional time of singing
   mood: string;            // Mood / emotional energy
   description: string;

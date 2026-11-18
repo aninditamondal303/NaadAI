@@ -139,7 +139,7 @@ const en: Strings = {
   practise: {
     h: "What you can practise",
     items: [
-      ["Tanpura and taal", "A recorded tanpura tuned to your Sa, and ten taals played with recorded tabla bols."],
+      ["Tanpura and taal", "A recorded tanpura tuned to your Sa, and 23 taals played with recorded tabla bols."],
       ["Paltas", "Exercises built from each raag's aroh and avaroh, scored note by note, with a faster laya unlocked at 85."],
       ["Sa sadhana", "Hold Sa as long and as steadily as you can; it keeps your best."],
       ["Ear training", "After a Sa, hear a swara and name it; later, hear a phrase and name the raag."],
@@ -194,12 +194,12 @@ const en: Strings = {
     streak: n => (n === 1 ? "1 day" : `${n} days`), streakNote: "in a row with practice saved in this browser",
     index: "Everything in the app",
     items: {
-      tanpura: "Tanpura tuned to your Sa, and ten taals with recorded tabla.",
+      tanpura: "Tanpura tuned to your Sa, and 23 taals with recorded tabla.",
       analyzer: "Record or upload singing and see every swara measured.",
       practice: "Paltas and pakad, scored note by note, and ear training.",
       journal: "Every saved take, with notes.",
       progress: "How your swaras and breath change over weeks.",
-      library: "45 raags: aroh, avaroh, vadi, samvadi, time.",
+      library: "125 raags, 23 taals, the vocal forms and gharanas.",
     },
   },
   analyzer: {
@@ -269,7 +269,7 @@ const hi: Strings = {
   practise: {
     h: "आप क्या अभ्यास कर सकते हैं",
     items: [
-      ["तानपुरा और ताल", "आपके सा पर मिला रिकॉर्ड किया हुआ तानपुरा, और रिकॉर्ड किए तबला बोलों के साथ दस ताल।"],
+      ["तानपुरा और ताल", "आपके सा पर मिला रिकॉर्ड किया हुआ तानपुरा, और रिकॉर्ड किए तबला बोलों के साथ 23 ताल।"],
       ["पलटे", "हर राग के आरोह-अवरोह से बने अभ्यास, हर स्वर पर अंक, और 85 पर तेज़ लय खुलती है।"],
       ["सा साधना", "सा को जितना लंबा और स्थिर हो सके, लगाइए; आपका सबसे अच्छा रिकॉर्ड रखा जाता है।"],
       ["कान की तालीम", "सा के बाद एक स्वर सुनकर उसे पहचानिए; आगे चलकर एक वाक्य सुनकर राग पहचानिए।"],
@@ -324,12 +324,12 @@ const hi: Strings = {
     streak: n => `${n} दिन`, streakNote: "लगातार, इस ब्राउज़र में सहेजे अभ्यास के साथ",
     index: "ऐप में सब कुछ",
     items: {
-      tanpura: "आपके सा पर मिला तानपुरा, और रिकॉर्ड किए तबले के साथ दस ताल।",
+      tanpura: "आपके सा पर मिला तानपुरा, और रिकॉर्ड किए तबले के साथ 23 ताल।",
       analyzer: "गायन रिकॉर्ड या अपलोड कीजिए और हर स्वर का माप देखिए।",
       practice: "पलटे और पकड़, हर स्वर पर अंक, और कान की तालीम।",
       journal: "सहेजी गई हर रिकॉर्डिंग, नोट्स के साथ।",
       progress: "हफ़्तों में आपके स्वर और साँस कैसे बदलते हैं।",
-      library: "45 राग: आरोह, अवरोह, वादी, संवादी, समय।",
+      library: "125 राग, 23 ताल, गायन शैलियाँ और घराने।",
     },
   },
   analyzer: {
@@ -399,7 +399,7 @@ const bn: Strings = {
   practise: {
     h: "আপনি কী অনুশীলন করতে পারেন",
     items: [
-      ["তানপুরা আর তাল", "আপনার সা-তে বাঁধা রেকর্ড করা তানপুরা, আর রেকর্ড করা তবলার বোলে দশটি তাল।"],
+      ["তানপুরা আর তাল", "আপনার সা-তে বাঁধা রেকর্ড করা তানপুরা, আর রেকর্ড করা তবলার বোলে ২৩টি তাল।"],
       ["পাল্টা", "প্রতিটি রাগের আরোহ-অবরোহ থেকে তৈরি অনুশীলন, প্রতি স্বরে নম্বর, আর ৮৫ পেলে দ্রুত লয় খোলে।"],
       ["সা সাধনা", "সা যতটা লম্বা আর স্থির পারেন ধরে রাখুন; আপনার সেরা রেকর্ড রাখা হয়।"],
       ["কানের তালিম", "সা-এর পরে একটি স্বর শুনে চিনুন; পরে একটি বাক্য শুনে রাগ চিনুন।"],
@@ -454,12 +454,12 @@ const bn: Strings = {
     streak: n => `${n} দিন`, streakNote: "টানা, এই ব্রাউজারে সংরক্ষিত অনুশীলনসহ",
     index: "অ্যাপে যা আছে",
     items: {
-      tanpura: "আপনার সা-তে বাঁধা তানপুরা, আর রেকর্ড করা তবলায় দশটি তাল।",
+      tanpura: "আপনার সা-তে বাঁধা তানপুরা, আর রেকর্ড করা তবলায় ২৩টি তাল।",
       analyzer: "গান রেকর্ড বা আপলোড করুন, প্রতিটি স্বরের মাপ দেখুন।",
       practice: "পাল্টা আর পকড়, প্রতি স্বরে নম্বর, আর কানের তালিম।",
       journal: "সংরক্ষিত প্রতিটি রেকর্ডিং, নোটসহ।",
       progress: "সপ্তাহে সপ্তাহে আপনার স্বর আর শ্বাস কীভাবে বদলায়।",
-      library: "৪৫টি রাগ: আরোহ, অবরোহ, বাদী, সমবাদী, সময়।",
+      library: "১২৫টি রাগ, ২৩টি তাল, গায়নরীতি ও ঘরানা।",
     },
   },
   analyzer: {

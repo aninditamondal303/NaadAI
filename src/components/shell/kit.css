@@ -343,3 +343,52 @@
 .wk-swaras { list-style: none; margin: 1rem 0 0; padding: 0.85rem 0 0; border-top: 1px solid var(--nv-line); display: grid; gap: 0.35rem; font-size: 0.92rem; }
 .wk-swaras li { display: flex; align-items: center; gap: 0.45rem; }
 @media (max-width: 640px) { .wk-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+
+/* raag page: notes and published bandishen */
+.lib-notes { margin: 0; padding-left: 1.1rem; display: grid; gap: 0.35rem; }
+.lib-bandishen ul { list-style: none; margin: 0 0 0.75rem; padding: 0; display: grid; gap: 0.1rem; }
+.lib-bandishen li { display: flex; flex-wrap: wrap; align-items: baseline; gap: 0.2rem 0.75rem; padding: 0.45rem 0; border-bottom: 1px solid var(--nv-line); }
+.lib-b-title { font-family: var(--font-serif); font-size: 1.05rem; }
+.lib-b-meta { font-size: 0.85rem; color: var(--nv-muted); }
+.lib-b-video { font-size: 0.9rem; margin: 0 0 0.75rem; }
+.lib-b-link { margin-bottom: 0.6rem; }
+.lib-b-note { font-size: 0.82rem; color: var(--nv-muted); margin: 0; max-width: 70ch; }
+
+/* ---- library reference: taals, forms, gharanas ---- */
+.lib-sections { margin: 0.6rem 0 0.4rem; }
+.rf { display: flex; flex-direction: column; gap: 1.5rem; margin-top: 0.5rem; }
+.rf-group { display: flex; flex-direction: column; gap: 0.85rem; }
+.rf-list { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 30rem), 1fr)); gap: 0.85rem; }
+.rf-list-forms { grid-template-columns: repeat(auto-fill, minmax(min(100%, 26rem), 1fr)); }
+.rf-card { display: flex; flex-direction: column; gap: 0.75rem; padding: 1.1rem 1.2rem; border-radius: 16px; border: 1px solid var(--nv-line); background: rgba(10, 45, 50, 0.5); scroll-margin-top: 5rem; transition: border-color 0.2s; }
+.rf-card:hover { border-color: rgba(243, 236, 223, 0.18); }
+.rf-card-head { display: flex; justify-content: space-between; gap: 0.75rem; align-items: flex-start; flex-wrap: wrap; }
+.rf-card-head h3 { margin: 0; font-family: var(--font-serif); font-size: 1.45rem; font-weight: 400; }
+.rf-card-head p { margin: 0.2rem 0 0; color: var(--nv-muted); font-size: 0.92rem; max-width: 60ch; }
+.rf-deva { font-size: 1.1rem; color: var(--nv-gold); margin-left: 0.35rem; }
+.rf-theka { display: flex; flex-wrap: wrap; gap: 0.35rem; }
+.rf-vibhag { display: flex; border-left: 2px solid rgba(217, 180, 95, 0.55); padding-left: 0.2rem; }
+.rf-matra { position: relative; display: flex; flex-direction: column; align-items: center; min-width: 3.1rem; padding: 0.95rem 0.35rem 0.3rem; }
+.rf-bol { font-size: 0.9rem; white-space: nowrap; }
+.rf-num { font-size: 0.68rem; color: var(--nv-muted); font-variant-numeric: tabular-nums; }
+.rf-clap { position: absolute; top: 0; left: 0.35rem; font-size: 0.78rem; font-weight: 700; color: var(--nv-ink); }
+.rf-sam { color: var(--nv-gold); font-size: 0.95rem; top: -0.1rem; }
+.rf-khali { color: #8CC7BD; }
+.rf-usage { margin: 0; font-size: 0.88rem; color: var(--nv-muted); }
+.rf-points { margin: 0; padding-left: 1.1rem; display: grid; gap: 0.35rem; font-size: 0.95rem; }
+.rf-meta { margin: 0; display: grid; gap: 0.6rem; }
+.rf-meta dt { font-size: 0.8rem; color: var(--nv-muted); margin-bottom: 0.25rem; }
+.rf-meta dd { margin: 0; display: flex; flex-wrap: wrap; gap: 0.35rem; align-items: center; }
+.rf-chip { font: inherit; font-size: 0.82rem; color: var(--nv-ink); background: rgba(243, 236, 223, 0.05); border: 1px solid var(--nv-line); border-radius: 999px; padding: 0.15rem 0.6rem; cursor: pointer; transition: all 0.15s; }
+.rf-chip:hover { border-color: var(--nv-gold); color: var(--nv-gold); }
+.rf-chip-raag { font-family: var(--font-serif); font-size: 0.9rem; }
+.rf-more { font-size: 0.8rem; color: var(--nv-muted); }
+.rf-source { margin: 0; font-size: 0.82rem; color: var(--nv-muted); }
+.rf-source a { color: #8CC7BD; display: inline-flex; align-items: center; gap: 0.2rem; margin-right: 0.6rem; }
+.rf-note { margin: 0; padding: 0.55rem 0.8rem; border-radius: 10px; background: rgba(217, 180, 95, 0.08); border: 1px solid rgba(217, 180, 95, 0.25); font-size: 0.88rem; }
+.rf-table-wrap { overflow-x: auto; }
+.rf-table { width: 100%; border-collapse: collapse; font-size: 0.93rem; }
+.rf-table th { text-align: left; font-weight: 500; font-size: 0.8rem; color: var(--nv-muted); padding: 0.4rem 0.8rem 0.4rem 0; }
+.rf-table td { padding: 0.65rem 0.8rem 0.65rem 0; border-top: 1px solid var(--nv-line); vertical-align: top; }
+.rf-table td:first-child a { font-family: var(--font-serif); font-size: 1.05rem; color: var(--nv-gold); text-decoration: none; }
+@media (max-width: 640px) { .rf-matra { min-width: 2.6rem; } .rf-table { font-size: 0.85rem; } }

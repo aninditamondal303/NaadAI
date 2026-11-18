@@ -93,7 +93,7 @@ export const RaagCompare: React.FC<{ initial: [string, string]; onBack: () => vo
         {row(u("rcJati"), a.jati, b.jati)}
         {row(u("rcAroh"), <Phrase text={a.aroha.join(" ")} script="deva" />, <Phrase text={b.aroha.join(" ")} script="deva" />, c.sameAroh)}
         {row(u("rcAvaroh"), <Phrase text={a.avaroha.join(" ")} script="deva" />, <Phrase text={b.avaroha.join(" ")} script="deva" />, c.sameAvaroh)}
-        {row(u("rcVadi"), `${SWARA_NAMES[a.vadi]} / ${SWARA_NAMES[a.samvadi]}`, `${SWARA_NAMES[b.vadi]} / ${SWARA_NAMES[b.samvadi]}`, c.sameVadi && c.sameSamvadi)}
+        {row(u("rcVadi"), a.vadiGiven === false ? u("rdVadiNone") : `${SWARA_NAMES[a.vadi]} / ${SWARA_NAMES[a.samvadi]}`, b.vadiGiven === false ? u("rdVadiNone") : `${SWARA_NAMES[b.vadi]} / ${SWARA_NAMES[b.samvadi]}`, a.vadiGiven !== false && b.vadiGiven !== false ? c.sameVadi && c.sameSamvadi : undefined)}
         {row(u("rcAng"),
           angPhrases(a.id).map((p, i) => <span key={i} className="lib-ang"><Phrase text={p} script="deva" /></span>),
           angPhrases(b.id).map((p, i) => <span key={i} className="lib-ang"><Phrase text={p} script="deva" /></span>))}

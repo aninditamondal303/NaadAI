@@ -10,11 +10,13 @@
  * Asavari; Dhanashree is listed there only in its Bhairavi-ang form): their
  * phrases come from the app's own notes and are marked as such.
  */
-export interface AngEntry { ang: string; vishranti: string; source: "tanarang" | "app"; url?: string }
+import { TANARANG_ANG } from "./raagsTanarang";
+
+export interface AngEntry { ang: string; vishranti: string; source: "tanarang" | "app" | "other"; url?: string }
 
 const T = (slug: string) => `https://tanarang.com/wordpress/${slug}/`;
 
-export const MUKHYA_ANG: Record<string, AngEntry> = {
+const CORE_ANG: Record<string, AngEntry> = {
   yaman: { ang: ",N R G ; ,N R M G ; M P ; M D P N D P M R G R ; ,N R ,D ,N S;", vishranti: "S; G; N; - S'; N; P; G;", source: "tanarang", url: T("raag-yaman") },
   bhupali: { ang: "G R G; P G; D P; S' D P G; P G R G; G R S;", vishranti: "S; R; G; P; - P; G; R; S;", source: "tanarang", url: T("raag-bhoopali") },
   shuddhakalyan: { ang: "G R G ; R S ; ,N ,D ,P ; G R S ; G R G ; P R S ;", vishranti: "S; G; P; - P; G; S;", source: "tanarang", url: T("raag-shuddha-kalyan-2") },
@@ -61,6 +63,15 @@ export const MUKHYA_ANG: Record<string, AngEntry> = {
   anandbhairav: { ang: "G m P D ; P m G r S", vishranti: "S; m; P;", source: "app" },
   asavari: { ang: "R m P d ; m P g R S", vishranti: "S; P; d;", source: "app" },
   dhanashree: { ang: ",n S g m P ; n D P ; m g R S", vishranti: "S; P;", source: "app" },
+};
+
+export const MUKHYA_ANG: Record<string, AngEntry> = {
+  ...CORE_ANG,
+  ...Object.fromEntries(Object.entries(TANARANG_ANG).map(([id, a]) => [id, {
+    ang: a.ang, vishranti: a.vishranti,
+    source: a.src === "tanarang" ? "tanarang" as const : "other" as const,
+    url: a.src === "tanarang" ? T(a.slug) : a.srcUrl ?? undefined,
+  }])),
 };
 
 /** Convert one site-notation token to app notation (",N" -> "N,"; typographic ' -> '; drop kan "(x)"). */

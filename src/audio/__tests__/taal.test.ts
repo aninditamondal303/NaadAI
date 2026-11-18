@@ -3,10 +3,12 @@ import { clapAt, TAALS } from "../../data/taals";
 import { bolTimes, strokesFor, synthStroke } from "../tabla";
 
 describe("taal library", () => {
-  it("has the 10 taals from the plan", () => {
-    expect(TAALS.map(t => t.name)).toEqual([
+  it("has the 10 core taals first, then the extended list, with unique ids", () => {
+    expect(TAALS.slice(0, 10).map(t => t.name)).toEqual([
       "Teentaal", "Ektaal", "Jhaptaal", "Rupak", "Dadra", "Keherwa", "Jhoomra", "Tilwada", "Chautaal", "Deepchandi",
     ]);
+    expect(TAALS.length).toBe(23);
+    expect(new Set(TAALS.map(t => t.id)).size).toBe(TAALS.length);
   });
 
   for (const t of TAALS) {

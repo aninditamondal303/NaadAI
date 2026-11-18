@@ -59,6 +59,7 @@ export default function App() {
   const [sheetOpen, setSheetOpen] = useState(false);
   const [findOpen, setFindOpen] = useState(false);
   const [openRaagId, setOpenRaagId] = useState<string | null>(null);
+  const [openTaalId, setOpenTaalId] = useState<string | null>(null);
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
       if ((e.key === "k" || e.key === "K") && (e.metaKey || e.ctrlKey)) { e.preventDefault(); setFindOpen(o => !o); }
@@ -170,7 +171,7 @@ export default function App() {
   const navProps = {
     active: activeTab, name: vocalistName, streakDays,
     saLabel: u("saShort", note.name, baseTonicHz.toFixed(1)),
-    onGo: (id: AppTab) => { setOpenRaagId(null); setActiveTab(id); window.scrollTo({ top: 0 }); },
+    onGo: (id: AppTab) => { setOpenRaagId(null); setOpenTaalId(null); setActiveTab(id); window.scrollTo({ top: 0 }); },
     onSwitchSinger: switchSinger,
     onMethod: () => { window.location.hash = "how-it-works"; },
     onFind: () => setFindOpen(true),
@@ -201,6 +202,7 @@ export default function App() {
             onTonicChange={handleTonicChange} 
             selectedTuning={selectedTuning}
             onTuningChange={setSelectedTuning}
+            initialTaalId={openTaalId}
           />
         )}
         {activeTab === "analyzer" && (
@@ -214,7 +216,7 @@ export default function App() {
         {activeTab === "journal" && <JournalTab />}
         {activeTab === "progress" && <ProgressTab />}
         {activeTab === "practice" && <PracticeTab baseTonicHz={baseTonicHz} initialMode={practiceMode} />}
-        {activeTab === "library" && <LibraryTab saHz={baseTonicHz} openRaagId={openRaagId} />}
+        {activeTab === "library" && <LibraryTab saHz={baseTonicHz} openRaagId={openRaagId} onOpenTaal={id => { setOpenTaalId(id); setActiveTab("tanpura"); window.scrollTo({ top: 0 }); }} />}
         {activeTab === "profile" && <ProfileTab baseTonicHz={baseTonicHz} vocalistName={vocalistName} profileId={profileId}
           onDeleted={() => { setProfileId(null); setIsAuthenticated(false); setActivePage("profiles"); }} />}
         </Suspense>

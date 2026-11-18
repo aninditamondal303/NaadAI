@@ -80,6 +80,73 @@ export const TAALS: Taal[] = [
     theka: m("Dha Dhin -  Dha Dha Dhin -  Ta Tin -  Dha Dha Dhin -"),
     usage: "Thumri, hori, dadra-style light classical",
   },
+  // ---- From the extended list at digitabla.com (reference/tals-and-thekas/extended-list).
+  // Pakhawaj taals (Sultaal, Dhamar, Gajajhampa) are played here on tabla sounds.
+  {
+    id: "dhamar", name: "Dhamar", matras: 14, vibhags: [5, 2, 3, 4], claps: ["X", 2, "0", 3],
+    theka: m("Ka Dhe Te Dhe Te  Dha -  Ga Te Te  Te Te Ta -"),
+    usage: "Dhamar compositions (hori themes) in the dhrupad tradition; traditionally on pakhawaj",
+  },
+  {
+    id: "sultaal", name: "Sultaal", matras: 10, vibhags: [2, 2, 2, 2, 2], claps: ["X", "0", 2, 3, "0"],
+    theka: m("Dha Dha  Din Ta  Ki.Ta Dha  Te.Te Ka.Ta  Ga.Di Ga.Na"),
+    usage: "Dhrupad; traditionally on pakhawaj",
+  },
+  {
+    id: "adachautaal", name: "Ada Chautaal", matras: 14, vibhags: [2, 2, 2, 2, 2, 2, 2], claps: ["X", 2, "0", 3, "0", 4, "0"],
+    theka: m("Dhin Ti.Ra.Ki.Ta  Dhi Na  Tu Na  Kat Ta  Ti.Ra.Ki.Ta Dhi  Na Dhi  Dhi Na"),
+    usage: "Vilambit and madhya laya khayal",
+  },
+  {
+    id: "gajajhampa", name: "Gajajhampa", matras: 15, vibhags: [4, 4, 3, 4], claps: ["X", 2, "0", 3],
+    theka: m("Dha Dhi.Na Na.Ka Ta.Ka  Dha Dhi.Na Na.Ka Ta.Ka  Tin Na.Ka Ta.Ka  Te.Te Ka.Ta Ga.Di Ga.Na"),
+    usage: "Rare; dhrupad and pakhawaj repertoire",
+  },
+  {
+    id: "lilawati", name: "Lilawati", matras: 13, vibhags: [4, 4, 3, 2], claps: ["X", 2, 3, 4],
+    theka: m("Dhin Dhin Dha Tra.Ka  Dhin - Tin Tin  Ta Tra.Ka Dhin  Dhin -"),
+    usage: "Rare; vilambit khayal and solo tabla",
+  },
+  {
+    id: "pashto", name: "Pashto", matras: 7, vibhags: [3, 2, 2], claps: ["X", 2, 3],
+    theka: m("Tin - Tra.Ka  Dhin -  Dha Ge"),
+    usage: "Ghazal and light classical",
+  },
+  {
+    id: "dhumali", name: "Dhumali", matras: 8, vibhags: [4, 4], claps: ["X", "0"],
+    theka: m("Dhin Dhin Dha Tin  Tra.Ka Dhin Dha.Ge Tra.Ka"),
+    usage: "Bhajan, kirtan and light music",
+  },
+  {
+    id: "khemta", name: "Khemta", matras: 12, vibhags: [3, 3, 3, 3], claps: ["X", 2, "0", 3],
+    theka: m("Dha Te Dhi  Na Ti Na  Ta Te Dhi  Na Dhi Na"),
+    usage: "Light classical and folk music",
+  },
+  {
+    id: "jat", name: "Jat", matras: 16, vibhags: [4, 4, 4, 4], claps: ["X", 2, "0", 3],
+    theka: m("Dha - Dhin -  Dha Dha Tin -  Ta - Tin -  Dha Dha Dhin -"),
+    usage: "Thumri and other light classical forms",
+  },
+  {
+    id: "punjabi", name: "Punjabi", matras: 16, vibhags: [4, 4, 4, 4], claps: ["X", 2, "0", 3],
+    theka: m("Dha -.Dhin Na.Ka Dha  Dha -.Dhin Na.Ka Dha  Dha -.Tin Na.Ka Ta  Ta -.Dhin Na.Ka Dha"),
+    usage: "Tappa and thumri",
+  },
+  {
+    id: "sitarkhani", name: "Sitarkhani", matras: 16, vibhags: [4, 4, 4, 4], claps: ["X", 2, "0", 3],
+    theka: m("Dha -.Dhi -.Ka Dha  Dha -.Dhi -.Ka Dha  Dha -.Ti -.Ka Ta  Ta -.Dhi -.Ka Dha"),
+    usage: "Qawwali, thumri and light music",
+  },
+  {
+    id: "tappataal", name: "Tappa taal", matras: 16, vibhags: [4, 4, 4, 4], claps: ["X", 2, "0", 3],
+    theka: m("Dhin - Dha -.Ga  Dha Dhin Ta -.Kra  Tin - Ta -.Ga  Dha Dhin Ta -.Kra"),
+    usage: "Tappa singing",
+  },
+  {
+    id: "ikwai", name: "Ikwai", matras: 16, vibhags: [4, 4, 4, 4], claps: ["X", 2, "0", 3],
+    theka: m("Dha - Ghe Ghe  Dha Ghe - Ghe  Ta - Ke Ke  Dha Ghe - Ghe"),
+    usage: "Rare; light classical",
+  },
 ];
 
 /** The clap mark on a matra (1-based), or null if the matra doesn't start a vibhag. */

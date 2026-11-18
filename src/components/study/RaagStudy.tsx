@@ -201,7 +201,7 @@ export const RaagStudy: React.FC<{ raag: ComprehensiveRaag; saHz: number }> = ({
 
             {(c as UserComposition).user && <p className="st-muted">Entered by you{(c as UserComposition).source ? `, ${(c as UserComposition).source}` : ""}.</p>}
             <dl className="st-basis">
-              <div><dt>Raag</dt><dd>{raag.name.replace(/^Raag\s+/i, "")}, {raag.thaat} thaat; vadi {SYM_NAMES[raag.vadi]}, samvadi {SYM_NAMES[raag.samvadi]}</dd></div>
+              <div><dt>Raag</dt><dd>{raag.name.replace(/^Raag\s+/i, "")}, {raag.thaat === "Not defined" ? "no thaat assigned" : `${raag.thaat} thaat`}{raag.vadiGiven === false ? "" : <>; vadi {SYM_NAMES[raag.vadi]}, samvadi {SYM_NAMES[raag.samvadi]}</>}</dd></div>
               <div><dt>Taal</dt><dd>{taal.name}, {taal.matras} matras in {taal.vibhags.length} vibhags of {taal.vibhags.join(" + ")}; taali on {taal.claps.map((x, i) => (x === "0" ? null : `${x === "X" ? "sam" : x}`)).filter(Boolean).join(", ")}, khali on vibhag {taal.claps.map((x, i) => (x === "0" ? i + 1 : null)).filter(Boolean).join(", ")}</dd></div>
               <div><dt>Theka</dt><dd className="st-theka">{(() => { let i = 0; return taal.vibhags.map(v => taal.theka.slice(i, (i += v)).map(m => m.join(" ")).join(" ")).join("  |  "); })()}</dd></div>
               <div><dt>Laya</dt><dd>{c.laya[0].toUpperCase() + c.laya.slice(1)} laya, approximately {c.bpm} matras per minute. The composition begins on sam; in playback the tabla plays one avartan of theka first.</dd></div>

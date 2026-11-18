@@ -61,7 +61,7 @@ export function guessRaag(notes: HeldNote[], raags: ComprehensiveRaag[], top = 5
     const okSteps = steps.filter(s => (s.up ? up : down).has(s.to)).length;
     const movement = steps.length >= 4 ? okSteps / steps.length : null;
     const share = 2 / raag.allowedSwaras.length;
-    const emph = Math.min(1.5, (hist[raag.vadi] + hist[raag.samvadi]) / total / share) / 1.5;
+    const emph = raag.vadiGiven === false ? 0 : Math.min(1.5, (hist[raag.vadi] + hist[raag.samvadi]) / total / share) / 1.5;
     const outside = hist.map((h, s) => (sung[s] && !A.has(s) ? s : -1)).filter(s => s >= 0);
     const score = 6 * inRaag + 2 * coverage + 1.5 * (movement ?? 0.5) + 0.5 * emph;
     return { raag, score, inRaag, coverage, movement, outside };

@@ -19,11 +19,11 @@ export type Stroke = "na" | "tin" | "tu" | "ti" | "ra" | "ge" | "ke";
 export const STROKES: Stroke[] = ["na", "tin", "tu", "ti", "ra", "ge", "ke"];
 
 const BOL_STROKES: Record<string, Stroke[]> = {
-  dha: ["na", "ge"], dhin: ["tin", "ge"], dhi: ["tin", "ge"], din: ["tin", "ge"],
+  dha: ["na", "ge"], dhe: ["na", "ge"], dhin: ["tin", "ge"], dhi: ["tin", "ge"], din: ["tin", "ge"],
   na: ["na"], ta: ["na"], tin: ["tin"], tu: ["tu"],
-  ti: ["ti"], te: ["ti"], di: ["ti"], ra: ["ra"],
+  ti: ["ti"], te: ["ti"], di: ["ti"], ra: ["ra"], tra: ["ti"],
   ge: ["ge"], ga: ["ge"], ghe: ["ge"],
-  ke: ["ke"], ka: ["ke"], ki: ["ke"], kat: ["ke"],
+  ke: ["ke"], ka: ["ke"], ki: ["ke"], kat: ["ke"], kra: ["ke"],
   "-": [],
 };
 
@@ -96,11 +96,11 @@ export function synthStroke(stroke: Stroke, sampleRate: number, saHz: number): F
 export type SampleBol = "Dha" | "Dhin" | "Na" | "Ta" | "Tin" | "Tun" | "Ti" | "Ge" | "Ga" | "Ke";
 
 const BOL_SAMPLE: Record<string, SampleBol | null> = {
-  dha: "Dha", dhin: "Dhin", dhi: "Dhin", din: "Dhin",
+  dha: "Dha", dhe: "Dha", dhin: "Dhin", dhi: "Dhin", din: "Dhin",
   na: "Na", ta: "Ta", tin: "Tin", tu: "Tun",
-  ti: "Ti", te: "Ti", di: "Ti", ra: "Ti",
+  ti: "Ti", te: "Ti", di: "Ti", ra: "Ti", tra: "Ti",
   ge: "Ge", ghe: "Ge", ga: "Ga",
-  ke: "Ke", ka: "Ke", ki: "Ke", kat: "Ke",
+  ke: "Ke", ka: "Ke", ki: "Ke", kat: "Ke", kra: "Ke",
   "-": null,
 };
 

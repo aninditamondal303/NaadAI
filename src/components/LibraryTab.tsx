@@ -3,6 +3,8 @@
  * content). Raags with full grammar are marked; all entries are awaiting a
  * guru's review, and the page says so.
  */
+import { FormsReference, GharanasReference, TaalsReference } from './library/Reference';
+import { RAAG_SOURCE_INFO } from '../data/raagsTanarang';
 import { ArrowLeftRight } from 'lucide-react';
 import { RaagCompare } from './library/RaagCompare';
 import { CLOSE_PAIRS } from '../data/raagCompare';
@@ -20,7 +22,7 @@ import { SamayChakra } from './library/SamayChakra';
 const SYM = ["S", "r", "R", "g", "G", "m", "M", "P", "d", "D", "n", "N"];
 const NAMES = ["Sa", "komal Re", "Re", "komal Ga", "Ga", "Ma", "tivra Ma", "Pa", "komal Dha", "Dha", "komal Ni", "Ni"];
 const FAMILIES: [string, number[]][] = [["Re", [1, 2]], ["Ga", [3, 4]], ["Ma", [5, 6]], ["Pa", [7]], ["Dha", [8, 9]], ["Ni", [10, 11]]];
-const THAATS = ["All", "Bilawal", "Kalyan", "Khamaj", "Kafi", "Asavari", "Bhairavi", "Bhairav", "Todi", "Marwa", "Poorvi"];
+const THAATS = ["All", "Bilawal", "Kalyan", "Khamaj", "Kafi", "Asavari", "Bhairavi", "Bhairav", "Todi", "Marwa", "Poorvi", "Not defined"];
 
 const shortName = (r: ComprehensiveRaag) => r.name.replace(/^Raag\s+/i, "");
 const varjitOf = (r: ComprehensiveRaag) => FAMILIES.filter(([, idx]) => idx.every(i => !r.allowedSwaras.includes(i))).map(([n]) => n);
@@ -32,7 +34,8 @@ const Row: React.FC<{ label: string; children: React.ReactNode }> = ({ label, ch
   </div>
 );
 
-export const LibraryTab: React.FC<{ saHz?: number; openRaagId?: string | null }> = ({ saHz = 130.81, openRaagId = null }) => {
+export const LibraryTab: React.FC<{ saHz?: number; openRaagId?: string | null; onOpenTaal?: (id: string) => void }> = ({ saHz = 130.81, openRaagId = null, onOpenTaal }) => {
+  const [section, setSection] = useState<"raags" | "taals" | "forms" | "gharanas">("raags");
   const u = useUi();
   const [query, setQuery] = useState("");
   const [thaat, setThaat] = useState("All");
@@ -54,6 +57,7 @@ export const LibraryTab: React.FC<{ saHz?: number; openRaagId?: string | null }>
 
   if (viewing) {
     const r = viewing;
+    const info = RAAG_SOURCE_INFO[r.id];
     const d = RAAG_DETAILS[r.id];
     const varjit = varjitOf(r);
     return (
@@ -77,8 +81,12 @@ export const LibraryTab: React.FC<{ saHz?: number; openRaagId?: string | null }>
           <Row label={u("rdRowVarjit")}>{varjit.length ? varjit.join(", ") : u("rdNoVarjit")}</Row>
           <Row label={u("rdRowAroh")}><span className="font-mono">{r.aroha.join(" ")}</span></Row>
           <Row label={u("rdRowAvaroh")}><span className="font-mono">{r.avaroha.join(" ")}</span></Row>
-          <Row label={u("rdRowVadi")}>{NAMES[r.vadi]} ({SYM[r.vadi]}) / {NAMES[r.samvadi]} ({SYM[r.samvadi]})</Row>
+          <Row label={u("rdRowVadi")}>{r.vadiGiven === false ? u("rdVadiNone") : <>{NAMES[r.vadi]} ({SYM[r.vadi]}) / {NAMES[r.samvadi]} ({SYM[r.samvadi]})</>}</Row>
           <Row label={u("rdRowTime")}>{r.time}</Row>
+          {info?.swar && <Row label={u("rdRowSwar")}>{info.swar}</Row>}
+          {!d && info?.notes && info.notes.length > 0 && (
+            <Row label={u("rdRowNotes")}><ul className="lib-notes">{info.notes.map((n, i) => <li key={i}>{n}</li>)}</ul></Row>
+          )}
           {d ? (
             <>
               <Row label={u("rdRowPakad")}><Phrase text={d.pakad} script="deva" /></Row>
@@ -107,6 +115,31 @@ export const LibraryTab: React.FC<{ saHz?: number; openRaagId?: string | null }>
             <Row label={u("rdRowAng")}>{angPhrases(r.id).map((ph, i) => <span key={i} className="lib-ang"><Phrase text={ph} script="deva" /></span>)}</Row>
           )}
           {vishrantiSwaras(r.id).length > 0 && <Row label={u("rdRowVishranti")}><Phrase text={vishrantiSwaras(r.id).join(" ")} script="deva" /></Row>}
+          {info && (info.bn > 0 || info.v.length > 0) && (
+            <Row label={u("rdRowBandish")}>
+              <div className="lib-bandishen">
+                {info.b.length > 0 && (
+                  <ul>
+                    {info.b.map(([title, type, taal, theme], i) => (
+                      <li key={i}>
+                        <span className="lib-b-title">{title || type}</span>
+                        <span className="lib-b-meta">{[title ? type : "", taal, theme].filter(Boolean).join(", ")}</span>
+                      </li>
+                    ))}
+                  </ul>
+                )}
+                {info.v.length > 0 && (
+                  <p className="lib-b-video">{u("rdRecorded")} {info.v.map(([who, what, taal]) => `${who}: ${what}${taal ? ` (${taal})` : ""}`).join("; ")}.</p>
+                )}
+                {MUKHYA_ANG[r.id]?.url && MUKHYA_ANG[r.id].source === "tanarang" && (
+                  <a className="btn btn-ghost lib-b-link" href={MUKHYA_ANG[r.id].url} target="_blank" rel="noreferrer">
+                    {u("rdListenAll", info.bn)}
+                  </a>
+                )}
+                <p className="lib-b-note">{u("rdBandishNote")}</p>
+              </div>
+            </Row>
+          )}
           <Row label={u("rdRowSource")}>{(() => { const src = pakadSource(r.id); const e = MUKHYA_ANG[r.id];
             return <>{src.label}{e?.source === "tanarang" && e.url && <> (<a href={e.url} target="_blank" rel="noreferrer" className="lib-src">Raag {shortName(r)} on tanarang.com</a>)</>}. Vadi and samvadi have been checked against the same reference where it lists the raag.</>; })()}</Row>
         </div>
@@ -123,25 +156,36 @@ export const LibraryTab: React.FC<{ saHz?: number; openRaagId?: string | null }>
       <header className="lib-head">
         <div>
           <h1 className="lib-title">{u("libraryTitle")}</h1>
-          <p className="lib-intro">
+          <div className="az-modes lib-sections" role="tablist" aria-label={u("libraryTitle")}>
+            {(["raags", "taals", "forms", "gharanas"] as const).map(id => (
+              <button key={id} type="button" role="tab" aria-selected={section === id} aria-current={section === id ? "true" : undefined} onClick={() => setSection(id)}>
+                {u(`libSec_${id}` as "libSec_raags")}
+              </button>
+            ))}
+          </div>
+          {section === "raags" && <p className="lib-intro">
             {u("libIntro", RAAG_LIST.length, fullCount)}
-          </p>
+          </p>}
         </div>
-        <div className="lib-filters">
+        {section === "raags" && <div className="lib-filters">
           <label className="lib-search">
             <span className="lib-vh">{u("searchRaags")}</span>
             <input value={query} onChange={e => setQuery(e.target.value)} placeholder={u("searchRaags")} />
           </label>
           <select value={thaat} onChange={e => setThaat(e.target.value)} aria-label="Thaat">
-            {THAATS.map(t => <option key={t} value={t}>{t === "All" ? u("allThaats") : `${t} thaat`}</option>)}
+            {THAATS.map(t => <option key={t} value={t}>{t === "All" ? u("allThaats") : t === "Not defined" ? u("noThaat") : `${t} thaat`}</option>)}
           </select>
           <button type="button" className="btn btn-ghost" onClick={() => setComparing(CLOSE_PAIRS[0])}><ArrowLeftRight size={16} aria-hidden /> {u("rcTitle")}</button>
           <label className="lib-check">
             <input type="checkbox" checked={fullOnly} onChange={e => setFullOnly(e.target.checked)} />
             {u("withStudy")}
           </label>
-        </div>
+        </div>}
       </header>
+      {section === "taals" && <TaalsReference onOpenTaal={onOpenTaal} />}
+      {section === "forms" && <FormsReference onOpenTaal={onOpenTaal} onOpenRaag={id => { const r = RAAG_LIST.find(x => x.id === id); if (r) { setViewing(r); window.scrollTo({ top: 0 }); } }} />}
+      {section === "gharanas" && <GharanasReference />}
+      {section === "raags" && <>
 
       <SamayChakra raags={list} onOpen={setViewing} />
 
@@ -151,7 +195,7 @@ export const LibraryTab: React.FC<{ saHz?: number; openRaagId?: string | null }>
         <section className="lib-index" aria-label="All raags by thaat">
           {byThaat.map(([t, rs]) => (
             <div key={t} className="lib-thaat">
-              <h2>{t}</h2>
+              <h2>{t === "Not defined" ? u("noThaat") : `${t} thaat`}</h2>
               <ul>
                 {rs.map(r => (
                   <li key={r.id}>
@@ -166,6 +210,7 @@ export const LibraryTab: React.FC<{ saHz?: number; openRaagId?: string | null }>
           ))}
         </section>
       )}
+      </>}
     </div>
   );
 };
