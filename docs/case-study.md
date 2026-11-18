@@ -96,6 +96,7 @@ accuracy"), and the synthetic benchmarks run in CI on every push.
   accessibility, best practices and SEO. Tabs load on demand, so the welcome
   page becomes usable quickly.
 - **Languages:** English, Hindi and Bengali.
+- **Library:** 125 raags (the full tanarang.com index: thaat, jati, vadi and samvadi, aroh and avroh, mukhya ang, vishranti sthan and the compositions published for each), 23 taals with thekas, the vocal forms from dhrupad to bhajan, and the principal khayal gharanas. Raag data was collected from the source pages and converted by a script; tests check that every aroh, avroh, phrase, vadi and samvadi uses only the raag's own swaras.
 
 ## What remains
 
