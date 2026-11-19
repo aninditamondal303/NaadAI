@@ -16,6 +16,7 @@
     "raag:review": "tsx eval/raag-review.ts",
     "eval:real": "tsx eval/real-eval.ts",
     "eval:f0": "tsx eval/f0-eval.ts",
+    "eval:raag": "tsx eval/raag-eval.ts",
     "build:site": "vite build",
     "e2e": "node e2e/flows.mjs"
   },

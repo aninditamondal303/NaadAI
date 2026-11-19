@@ -95,6 +95,7 @@ export const MethodPage: React.FC<{ onBack: () => void; onOpenApp: () => void }>
               <tr><th scope="row">Real singing, within 20 cents</th><td>92.0%</td><td>A public research dataset of 40 solo singers, 13.6 minutes, with pitch marked by musicians. The YIN method scores 84.3% on the same recordings.</td></tr>
               <tr><th scope="row">Real singing, within 50 cents</th><td>96.6%</td><td>Median error 2.8 cents. Pitch reported in passages marked silent: 13.0%, mostly breaths and fading note endings.</td></tr>
               <tr><th scope="row">Computer-generated voices, within 20 cents</th><td>100%</td><td>20 clips with gamak, meend and background noise; no pitch reported in silence.</td></tr>
+              <tr><th scope="row">Raag recognised, Sa set by the singer</th><td>22 / 27</td><td>27 short public recordings of aroh, avaroh and pakad in 27 raags, chosen among all 125 in the library. The right raag was in the first three for 26; every first guess had the right swaras. With Sa found automatically: 20 / 27.</td></tr>
               <tr><th scope="row">Sa found, raag and voice type known</th><td>56 / 56</td><td>Computer-generated phrases in four raags, Sa from 110 to 233 Hz. Testing on Hindustani riyaz recordings is in progress.</td></tr>
             </tbody>
           </table>

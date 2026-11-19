@@ -150,7 +150,7 @@ export const TakeReport: React.FC<TakeReportProps> = ({ audio, m, track, raagNam
             </>
           )}
 
-          {tab === "raag" && <RaagGuessPanel heldNotes={m.heldNotes} chosenRaag={raagName} />}
+          {tab === "raag" && <RaagGuessPanel heldNotes={m.heldNotes} chosenRaag={raagName} track={m.saSource === "profile" ? undefined : track} saHz={m.saHz} />}
 
           {tab === "ornaments" && (
             <>

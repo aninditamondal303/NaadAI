@@ -93,6 +93,7 @@ All results are reproducible with one command each.
 | Sa detection within ±20 cents | 56 of 56 phrases (raag and voice type known) | 56 synthetic 20 s phrases, 4 raags × 14 Sa values | `npm run eval:sa` |
 | **Pitch on real singing within ±20 cents** | **92.0%** of sung frames (96.6% within ±50; median error 2.8 cents; YIN: 84.3%) | Public research dataset: 40 solo singers, 13.6 min, f0 marked by musicians (CC BY 4.0) | `npm run eval:f0 -- <folder>` or the *Real-voice accuracy* workflow |
 | Pitch reported in pauses, real singing | 13.0% of frames marked silent | same | same |
+| **Raag recognition on real recordings** | **22 of 27** first, 26 of 27 in the first three (Sa set by the singer); 20 of 27 first with Sa found automatically | 27 short aroh/avaroh/pakad recordings, 27 raags, among all 125 in the library; see [eval/raag-labels](eval/raag-labels/README.md) | `npm run eval:raag -- <folder> <labels.csv>` |
 | Sa detection on Hindustani riyaz | *Collecting recordings* | see [eval/recordings](eval/recordings/README.md) | `npm run eval:real` |
 
 Synthetic clips are much easier than real singing, so those numbers are an
