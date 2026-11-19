@@ -4,7 +4,7 @@
  */
 
 import { Raag } from '../types';
-import { TANARANG_RAAGS } from './raagsTanarang';
+import { EXTENDED_RAAGS } from './raagsExtended';
 
 export interface ComprehensiveRaag extends Raag {
   jati: string;
@@ -671,5 +671,5 @@ const CORE_RAAGS: ComprehensiveRaag[] = [
   }
 ];
 
-/** Every raag in the library: the original set followed by those added from tanarang.com. */
-export const RAAG_LIST: ComprehensiveRaag[] = [...CORE_RAAGS, ...TANARANG_RAAGS];
+/** Every raag in the library: the core set followed by the extended set. */
+export const RAAG_LIST: ComprehensiveRaag[] = [...CORE_RAAGS, ...EXTENDED_RAAGS];

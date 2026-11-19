@@ -23,7 +23,7 @@ Available in **English, हिन्दी and বাংলা**.
 - **Riyaz with the tanpura**, with lock-screen controls so it keeps playing when the phone sleeps; 23 taals with editable thekas, from Teentaal to Dhamar and Sultaal.
 - **Analyse a take**: a summary of held-in-tune time, the raag rule check, range and breath, then the pitch line, each swara's position and wobble, the shruti view, andolan and gamak, and which raag it sounds like. While recording, the raag is recognised live.
 - **Paltas and pakad** graded note by note across four layas; **Guru-shishya**, where the phrase can come from the app or from your own guru (the guru records once and sends a link; the guide follows the guru's own pitch line, meends included).
-- **Learn a raag**: 125 raags (the full tanarang.com index) with thaat, aroh, avaroh, vadi, samvadi, mukhya ang and vishranti sthan (sourced), alaap, sargam geet and bandish in swaralipi with **sing-along** at any laya, and **side-by-side comparison** of close raags.
+- **Learn a raag**: 125 raags with thaat, aroh, avaroh, vadi, samvadi, mukhya ang and vishranti sthan, alaap, sargam geet and bandish in swaralipi with **sing-along** at any laya, and **side-by-side comparison** of close raags.
 - **Progress**: a weekly report (this week against last), swara tuning ring, streaks, journal, and a daily riyaz reminder (a notification in the Android app).
 - **Quick find** (Ctrl/⌘ K) to reach any screen or raag.
 
@@ -79,7 +79,7 @@ npm run eval:f0 -- eval/datasets/vocadito --name vocadito
 | **Daily riyaz planner** | Aakar → Sa sadhana → kharaj → paltas → raag → taans → ear training; time adapts to your measurements and each step cites them |
 | **Raags for now** | From the time of day (prahar) |
 | **Tanpura and 23 taals** | Real tanpura and tabla recordings retuned to your Sa; Pa/Ma/Ni first string, fine tuning; Teentaal, Ektaal, Jhaptaal, Rupak, Dadra, Keherwa, Jhoomra, Tilwada, Chautaal, Deepchandi |
-| **Raag library** | 125 raags with mukhya ang, vishranti sthan, notes and the bandishen published for each on tanarang.com; 9 with written pakad, chalan and bandish; taal reference (23 taals), vocal forms from dhrupad to bhajan, and the principal gharanas |
+| **Raag library** | 125 raags with mukhya ang, vishranti sthan, notes and a catalogue of traditional bandishen for each; 9 with written pakad, chalan and bandish; taal reference (23 taals), vocal forms from dhrupad to bhajan, and the principal gharanas |
 | **Profiles** | Several singers per device, no passwords, data stays in the browser; export/import |
 | **Written feedback (optional)** | An AI model comments only on the measured numbers, through gharana-style lenses; never invents numbers or quotes real musicians |
 
@@ -91,12 +91,12 @@ All results are reproducible with one command each.
 |---|---|---|---|
 | Pitch within ±20 cents | 100% of sung frames; 0% false pitch in silence | 20 synthetic clips (Sa sadhana, aroh, kharaj, taar, andolan, gamak, meend, noise) | `npm run eval:pitch` |
 | Sa detection within ±20 cents | 56 of 56 phrases (raag and voice type known) | 56 synthetic 20 s phrases, 4 raags × 14 Sa values | `npm run eval:sa` |
-| **Pitch on real singing within ±20 cents** | **92.0%** of sung frames (96.6% within ±50; median error 2.8 cents; YIN: 84.3%) | [vocadito](https://zenodo.org/record/5578807): 40 solo singers, 13.6 min, f0 marked by musicians (CC BY 4.0) | `npm run eval:f0 -- <folder>` or the *Real-voice accuracy* workflow |
+| **Pitch on real singing within ±20 cents** | **92.0%** of sung frames (96.6% within ±50; median error 2.8 cents; YIN: 84.3%) | Public research dataset: 40 solo singers, 13.6 min, f0 marked by musicians (CC BY 4.0) | `npm run eval:f0 -- <folder>` or the *Real-voice accuracy* workflow |
 | Pitch reported in pauses, real singing | 13.0% of frames marked silent | same | same |
 | Sa detection on Hindustani riyaz | *Collecting recordings* | see [eval/recordings](eval/recordings/README.md) | `npm run eval:real` |
 
 Synthetic clips are much easier than real singing, so those numbers are an
-upper bound. The vocadito singers are not Hindustani vocalists; most "pitch in
+upper bound. The dataset's singers are not Hindustani vocalists; most "pitch in
 pauses" frames are breaths and fading note endings that the annotators marked
 silent, and held-note measurements need a quarter second of steady pitch.
 Full table: [eval/results/real-voice-pitch.md](eval/results/real-voice-pitch.md).
@@ -152,7 +152,7 @@ npm run dev            # http://localhost:3000
 | `npm run raag:review` | Writes `docs/raag-review.md`, a checklist for a guru to verify the raag data |
 | `npm run build` then `npm start` | Production build and server (uses `PORT` if set) |
 
-## Credits
+## Credits and licences
 
 Tabla and tanpura recordings: [Naad](https://github.com/oormicreations/naad)
 by Oormi Creations, MIT licence (see `public/samples/*/LICENSE`).
@@ -171,8 +171,7 @@ To run with the server (and written feedback), any Node host works (for example 
 ## Status and what's still needed
 
 - **More tanpura recordings.** The app ships real tanpura and tabla
-  recordings from the MIT-licensed [Naad](https://github.com/oormicreations/naad)
-  project, but only one tanpura key (Sa–Pa, Sa = C). Ma/Ni tuning still uses a
+  recordings (see Credits), but only one tanpura key (Sa–Pa, Sa = C). Ma/Ni tuning still uses a
   synthesised tanpura. See [docs/recording-guide.md](docs/recording-guide.md).
 - **Raag data review.** Every raag entry is marked as awaiting a guru's
   review; see `docs/raag-review.md`.

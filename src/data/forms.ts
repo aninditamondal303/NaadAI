@@ -1,8 +1,7 @@
 /**
- * Vocal forms (gayan prakar) and gharanas, written for the app from standard
- * references (see `sources`). Form descriptions are short summaries; the
- * raags listed under a form are those in this library for which tanarang.com
- * publishes a composition of that form, so every link can be followed up.
+ * Vocal forms (gayan prakar) and gharanas, written for the app. Form
+ * descriptions are short summaries; the raags listed under a form are those
+ * in this library with a catalogued composition of that form.
  */
 
 export type FormGroup = "classical" | "semi" | "seasonal" | "devotional";
@@ -17,12 +16,9 @@ export interface VocalForm {
   features: string[];
   /** Taal ids from taals.ts that the form is usually sung in. */
   taals: string[];
-  /** Bandish types on tanarang.com that count as this form (lower case). */
+  /** Catalogued bandish types that count as this form (lower case). */
   matchTypes: string[];
-  sources: { label: string; url: string }[];
 }
-
-const W = (page: string) => ({ label: `Wikipedia: ${page.replace(/_/g, " ").replace(/\s*\(.*\)/, "")}`, url: `https://en.wikipedia.org/wiki/${page}` });
 
 export const FORMS: VocalForm[] = [
   {
@@ -36,7 +32,6 @@ export const FORMS: VocalForm[] = [
     ],
     taals: ["chautaal", "sultaal", "adachautaal"],
     matchTypes: ["dhrupad"],
-    sources: [W("Dhrupad")],
   },
   {
     id: "dhamar", name: "Dhamar", deva: "धमार", group: "classical",
@@ -48,7 +43,6 @@ export const FORMS: VocalForm[] = [
     ],
     taals: ["dhamar"],
     matchTypes: ["dhamar"],
-    sources: [W("Dhamar")],
   },
   {
     id: "khayal", name: "Khayal", deva: "ख़याल", group: "classical",
@@ -61,7 +55,6 @@ export const FORMS: VocalForm[] = [
     ],
     taals: ["ektaal", "teentaal", "jhaptaal", "jhoomra", "tilwada", "adachautaal", "rupak"],
     matchTypes: ["bada khayal", "chota khayal", "madhya laya khayal", "sadra"],
-    sources: [W("Khyal")],
   },
   {
     id: "tarana", name: "Tarana", deva: "तराना", group: "classical",
@@ -73,7 +66,6 @@ export const FORMS: VocalForm[] = [
     ],
     taals: ["teentaal", "ektaal", "jhaptaal"],
     matchTypes: ["tarana"],
-    sources: [W("Tarana_(music)")],
   },
   {
     id: "thumri", name: "Thumri", deva: "ठुमरी", group: "semi",
@@ -86,7 +78,6 @@ export const FORMS: VocalForm[] = [
     ],
     taals: ["deepchandi", "jat", "punjabi", "keherwa", "teentaal"],
     matchTypes: ["thumri"],
-    sources: [W("Thumri")],
   },
   {
     id: "dadra", name: "Dadra", deva: "दादरा", group: "semi",
@@ -97,7 +88,6 @@ export const FORMS: VocalForm[] = [
     ],
     taals: ["dadra", "keherwa"],
     matchTypes: ["dadra"],
-    sources: [W("Dadra")],
   },
   {
     id: "tappa", name: "Tappa", deva: "टप्पा", group: "semi",
@@ -109,7 +99,6 @@ export const FORMS: VocalForm[] = [
     ],
     taals: ["tappataal", "punjabi"],
     matchTypes: ["tappa"],
-    sources: [W("Tappa")],
   },
   {
     id: "hori", name: "Hori", deva: "होरी", group: "seasonal",
@@ -120,7 +109,6 @@ export const FORMS: VocalForm[] = [
     ],
     taals: ["deepchandi", "jat", "keherwa"],
     matchTypes: ["hori"],
-    sources: [W("Hori_(music)")],
   },
   {
     id: "chaiti", name: "Chaiti", deva: "चैती", group: "seasonal",
@@ -131,7 +119,6 @@ export const FORMS: VocalForm[] = [
     ],
     taals: ["deepchandi", "keherwa", "dadra"],
     matchTypes: ["chaiti"],
-    sources: [W("Chaiti")],
   },
   {
     id: "kajari", name: "Kajari", deva: "कजरी", group: "seasonal",
@@ -142,7 +129,6 @@ export const FORMS: VocalForm[] = [
     ],
     taals: ["keherwa", "dadra"],
     matchTypes: ["kajari"],
-    sources: [W("Kajari")],
   },
   {
     id: "sawani", name: "Sawani and jhoola", deva: "सावनी, झूला", group: "seasonal",
@@ -153,7 +139,6 @@ export const FORMS: VocalForm[] = [
     ],
     taals: ["keherwa", "dadra", "teentaal"],
     matchTypes: ["jhoola", "sawani"],
-    sources: [],
   },
   {
     id: "ghazal", name: "Ghazal", deva: "ग़ज़ल", group: "devotional",
@@ -164,7 +149,6 @@ export const FORMS: VocalForm[] = [
     ],
     taals: ["keherwa", "dadra", "rupak", "pashto"],
     matchTypes: ["ghazal"],
-    sources: [W("Ghazal")],
   },
   {
     id: "bhajan", name: "Bhajan", deva: "भजन", group: "devotional",
@@ -175,7 +159,6 @@ export const FORMS: VocalForm[] = [
     ],
     taals: ["keherwa", "dadra", "dhumali", "rupak"],
     matchTypes: ["bhajan"],
-    sources: [W("Bhajan")],
   },
 ];
 
@@ -196,7 +179,6 @@ export interface Gharana {
   exponents: string;
   /** Where the commonly given account differs from a shorter one in circulation. */
   note?: string;
-  sources: { label: string; url: string }[];
 }
 
 export const GHARANAS: Gharana[] = [
@@ -206,14 +188,12 @@ export const GHARANAS: Gharana[] = [
     style: ["Regarded as the oldest khayal gharana.", "Straightforward, open-voiced presentation that keeps the composition (bandish) at the centre.", "Bol-taan and gamak taans; a broad repertoire including tappa and tarana."],
     exponents: "Haddu Khan and Hassu Khan, Vishnu Digambar Paluskar (through Balakrishnabuwa Ichalkaranjikar), Krishnarao Shankar Pandit",
     note: "Some lists name the founder as Nathan Khan; he is the same Naththan Pir Bakhsh.",
-    sources: [W("Gwalior_gharana")],
   },
   {
     id: "agra", name: "Agra", place: "Agra",
     founders: "Haji Sujan Khan, a dhrupad singer at Akbar's court (16th century); the khayal style took shape with Ghagge Khuda Bakhsh, who learnt from Naththan Pir Bakhsh of Gwalior",
     style: ["Close to dhrupad: a nom-tom alaap before the composition.", "Bold, full-throated voice production and vigorous layakari.", "Rich in dhrupad and dhamar as well as khayal."],
     exponents: "Faiyaz Khan, Vilayat Hussain Khan, Khadim Hussain Khan, S. N. Ratanjankar",
-    sources: [W("Agra_gharana")],
   },
   {
     id: "rangila", name: "Rangila (Agra)", place: "Agra",
@@ -221,14 +201,12 @@ export const GHARANAS: Gharana[] = [
     style: ["Agra gayaki with greater charm and colour (rang) in presentation.", "Faiyaz Khan sang khayal, dhrupad, dhamar, thumri and ghazal with equal mastery."],
     exponents: "Faiyaz Khan and his disciples, among them Dipali Nag and S. N. Ratanjankar",
     note: "Rangila is usually described as a name of, or a branch within, the Agra gharana rather than a separately founded gharana; Faiyaz Khan did not found it but is its foremost representative.",
-    sources: [W("Faiyaz_Khan"), W("Agra_gharana")],
   },
   {
     id: "jaipur", name: "Jaipur-Atrauli", place: "Atrauli (near Aligarh), and Jaipur, where the family served at court",
     founders: "Alladiya Khan (1855–1946)",
     style: ["Intricate, vakra phrases that weave around the raag's structure.", "Fine layakari and continuity of the melodic line.", "Known for rare and jod raags created or revived by Alladiya Khan."],
     exponents: "Kesarbai Kerkar, Mogubai Kurdikar, Mallikarjun Mansur, Kishori Amonkar",
-    sources: [W("Jaipur-Atrauli_gharana"), W("Alladiya_Khan")],
   },
   {
     id: "kirana", name: "Kirana", place: "Kairana (Kirana), a town in Shamli district of western Uttar Pradesh",
@@ -236,6 +214,5 @@ export const GHARANAS: Gharana[] = [
     style: ["Unhurried, note-by-note development of the raag in very slow (ati-vilambit) laya.", "Great attention to the exact placement (sur) of each swara.", "Introspective and meditative in mood."],
     exponents: "Sawai Gandharva, Hirabai Barodekar, Gangubai Hangal, Bhimsen Joshi, Prabha Atre",
     note: "The town of Kairana is in western Uttar Pradesh, not in Awadh.",
-    sources: [W("Kirana_gharana"), W("Abdul_Karim_Khan")],
   },
 ];

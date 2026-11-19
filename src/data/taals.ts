@@ -80,7 +80,7 @@ export const TAALS: Taal[] = [
     theka: m("Dha Dhin -  Dha Dha Dhin -  Ta Tin -  Dha Dha Dhin -"),
     usage: "Thumri, hori, dadra-style light classical",
   },
-  // ---- From the extended list at digitabla.com (reference/tals-and-thekas/extended-list).
+  // ---- Further taals: less common, regional and light-music taals.
   // Pakhawaj taals (Sultaal, Dhamar, Gajajhampa) are played here on tabla sounds.
   {
     id: "dhamar", name: "Dhamar", matras: 14, vibhags: [5, 2, 3, 4], claps: ["X", 2, "0", 3],

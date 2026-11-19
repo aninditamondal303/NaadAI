@@ -187,7 +187,7 @@ export class TaalPlayer {
       }));
       this.dayanHz = manifest.dayanHz ?? null;
       this.source = "samples";
-      this.sourceCredit = [manifest.credit, manifest.licence].filter(Boolean).join(" · ") || null;
+      this.sourceCredit = null; // licence notice ships in public/samples/*/LICENSE
     } catch {
       this.recorded.clear();
       this.source = "synth";

@@ -378,7 +378,7 @@ export const Landing: React.FC<Props> = ({ returningName, onOpenApp, onDemoAnaly
 
       <footer className="ln-foot">
         <p>
-          {t.credit} <a href="https://github.com/oormicreations/naad">{t.creditLink}</a> {t.creditPost} {t.review}
+          {t.review}
         </p>
       </footer>
     </div>

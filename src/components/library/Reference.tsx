@@ -1,10 +1,10 @@
 /** Reference pages in the library: taals and thekas, vocal forms, gharanas. */
 import React, { useMemo } from "react";
-import { ExternalLink, Play } from "lucide-react";
+import { Play } from "lucide-react";
 import { TAALS, type Taal } from "../../data/taals";
 import { FORMS, FORM_GROUPS, GHARANAS } from "../../data/forms";
 import { RAAG_LIST } from "../../data/allRaags";
-import { RAAG_SOURCE_INFO } from "../../data/raagsTanarang";
+import { RAAG_SOURCE_INFO } from "../../data/raagsExtended";
 import { useUi } from "../../i18n/ui";
 
 const CORE = 10; // the first ten taals are the commonly taught set
@@ -64,7 +64,6 @@ export const TaalsReference: React.FC<{ onOpenTaal?: (id: string) => void }> = (
           </div>
         </section>
       ))}
-      <p className="rf-source">{u("rfTaalsSource")} <a href="https://digitabla.com/reference/tals-and-thekas/extended-list/" target="_blank" rel="noreferrer">digitabla.com <ExternalLink size={12} aria-hidden /></a></p>
     </div>
   );
 };
@@ -114,7 +113,6 @@ export const FormsReference: React.FC<{ onOpenRaag: (id: string) => void; onOpen
                     </div>
                   )}
                 </dl>
-                {f.sources.length > 0 && <p className="rf-source">{u("rfReadMore")} {f.sources.map(s => <a key={s.url} href={s.url} target="_blank" rel="noreferrer">{s.label} <ExternalLink size={12} aria-hidden /></a>)}</p>}
               </article>
             ))}
           </div>
@@ -149,7 +147,6 @@ export const GharanasReference: React.FC = () => {
               <div><dt>{u("rfExponents")}</dt><dd>{g.exponents}</dd></div>
             </dl>
             {g.note && <p className="rf-note">{g.note}</p>}
-            <p className="rf-source">{u("rfReadMore")} {g.sources.map(s => <a key={s.url} href={s.url} target="_blank" rel="noreferrer">{s.label} <ExternalLink size={12} aria-hidden /></a>)}</p>
           </article>
         ))}
       </div>

@@ -4,7 +4,7 @@
  * guru's review, and the page says so.
  */
 import { FormsReference, GharanasReference, TaalsReference } from './library/Reference';
-import { RAAG_SOURCE_INFO } from '../data/raagsTanarang';
+import { RAAG_SOURCE_INFO } from '../data/raagsExtended';
 import { ArrowLeftRight } from 'lucide-react';
 import { RaagCompare } from './library/RaagCompare';
 import { CLOSE_PAIRS } from '../data/raagCompare';
@@ -15,7 +15,6 @@ import { RAAG_DETAILS } from '../data/raagDetails';
 import { RaagStudy } from './study/RaagStudy';
 import { useUi } from '../i18n/ui';
 import { Phrase } from './study/Swaralipi';
-import { pakadSource } from '../data/pakad';
 import { angPhrases, MUKHYA_ANG, vishrantiSwaras } from '../data/mukhyaAng';
 import { SamayChakra } from './library/SamayChakra';
 
@@ -90,7 +89,7 @@ export const LibraryTab: React.FC<{ saHz?: number; openRaagId?: string | null; o
           {d ? (
             <>
               <Row label={u("rdRowPakad")}><Phrase text={d.pakad} script="deva" /></Row>
-              {MUKHYA_ANG[r.id]?.source === "tanarang" && <Row label={u("rdRowAng")}>{angPhrases(r.id).map((ph, i) => <span key={i} className="lib-ang"><Phrase text={ph} script="deva" /></span>)}</Row>}
+              {MUKHYA_ANG[r.id]?.source === "reference" && <Row label={u("rdRowAng")}>{angPhrases(r.id).map((ph, i) => <span key={i} className="lib-ang"><Phrase text={ph} script="deva" /></span>)}</Row>}
               <Row label={u("rdRowChalan")}><span className="font-mono space-y-1 block">{d.chalan.map((c, i) => <span key={i} className="block">{c}</span>)}</span></Row>
               <Row label={u("rdRowNyas")}><span className="font-mono">{d.nyas.join(", ")}</span></Row>
               {d.specialNotes && <Row label={u("rdRowNotes")}>{d.specialNotes}</Row>}
@@ -115,7 +114,7 @@ export const LibraryTab: React.FC<{ saHz?: number; openRaagId?: string | null; o
             <Row label={u("rdRowAng")}>{angPhrases(r.id).map((ph, i) => <span key={i} className="lib-ang"><Phrase text={ph} script="deva" /></span>)}</Row>
           )}
           {vishrantiSwaras(r.id).length > 0 && <Row label={u("rdRowVishranti")}><Phrase text={vishrantiSwaras(r.id).join(" ")} script="deva" /></Row>}
-          {info && (info.bn > 0 || info.v.length > 0) && (
+          {info && info.b.length > 0 && (
             <Row label={u("rdRowBandish")}>
               <div className="lib-bandishen">
                 {info.b.length > 0 && (
@@ -128,20 +127,10 @@ export const LibraryTab: React.FC<{ saHz?: number; openRaagId?: string | null; o
                     ))}
                   </ul>
                 )}
-                {info.v.length > 0 && (
-                  <p className="lib-b-video">{u("rdRecorded")} {info.v.map(([who, what, taal]) => `${who}: ${what}${taal ? ` (${taal})` : ""}`).join("; ")}.</p>
-                )}
-                {MUKHYA_ANG[r.id]?.url && MUKHYA_ANG[r.id].source === "tanarang" && (
-                  <a className="btn btn-ghost lib-b-link" href={MUKHYA_ANG[r.id].url} target="_blank" rel="noreferrer">
-                    {u("rdListenAll", info.bn)}
-                  </a>
-                )}
                 <p className="lib-b-note">{u("rdBandishNote")}</p>
               </div>
             </Row>
           )}
-          <Row label={u("rdRowSource")}>{(() => { const src = pakadSource(r.id); const e = MUKHYA_ANG[r.id];
-            return <>{src.label}{e?.source === "tanarang" && e.url && <> (<a href={e.url} target="_blank" rel="noreferrer" className="lib-src">Raag {shortName(r)} on tanarang.com</a>)</>}. Vadi and samvadi have been checked against the same reference where it lists the raag.</>; })()}</Row>
         </div>
 
         <RaagStudy raag={r} saHz={saHz} />

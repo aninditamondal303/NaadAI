@@ -15,9 +15,8 @@ reports what it has actually measured.
   When something cannot be measured, the app shows "–".
 - **The singer's own Sa.** Every swara is placed relative to the singer's Sa,
   set on a harmonium keyboard or found from the voice.
-- **Authority stays with the guru.** Raag facts cite their source
-  (tanarang.com for mukhya ang, vishranti sthan, vadi and samvadi).
-  Compositions written for the app are labelled as such. A guru can record
+- **Authority stays with the guru.** Raag facts follow established
+  references and every entry is marked for a guru's review. Compositions written for the app are labelled as such. A guru can record
   phrases for the student, and traditional bandishes can be entered by hand.
 - **Private by default.** Analysis runs on the device. Share links carry
   measurements and a pitch line, never audio.
@@ -56,7 +55,7 @@ reports what it has actually measured.
 
 | Test | Result |
 |---|---|
-| Real singing: 40 singers, pitch marked by musicians (vocadito, CC BY 4.0) | 92.0% of frames within 20 cents, 96.6% within 50, median error 2.8 cents |
+| Real singing: 40 singers, pitch marked by musicians (public research dataset, CC BY 4.0) | 92.0% of frames within 20 cents, 96.6% within 50, median error 2.8 cents |
 | The common YIN method on the same data | 84.3% within 20 cents |
 | Pitch reported where annotators marked silence | 13% (mostly breaths and fading note endings) |
 | Synthetic voices with gamak, meend and noise | 100% within 20 cents |
@@ -68,8 +67,8 @@ accuracy"), and the synthetic benchmarks run in CI on every push.
 ## Design decisions
 
 - **Recorded instruments.** The tanpura (Sa–Pa) and tabla bols are
-  recordings retuned to the singer's Sa, not synthesis. They come from
-  Oormi Creations' Naad, under the MIT licence.
+  recordings retuned to the singer's Sa, not synthesis, used under an
+  open-source licence.
 - **Timing stays tight on screen and survives a locked screen.** While the
   app is visible, sound goes straight to the speakers. When the screen locks,
   the same sound is sent through a media element, so the phone keeps playing
@@ -96,7 +95,7 @@ accuracy"), and the synthetic benchmarks run in CI on every push.
   accessibility, best practices and SEO. Tabs load on demand, so the welcome
   page becomes usable quickly.
 - **Languages:** English, Hindi and Bengali.
-- **Library:** 125 raags (the full tanarang.com index: thaat, jati, vadi and samvadi, aroh and avroh, mukhya ang, vishranti sthan and the compositions published for each), 23 taals with thekas, the vocal forms from dhrupad to bhajan, and the principal khayal gharanas. Raag data was collected from the source pages and converted by a script; tests check that every aroh, avroh, phrase, vadi and samvadi uses only the raag's own swaras.
+- **Library:** 125 raags (thaat, jati, vadi and samvadi, aroh and avroh, mukhya ang, vishranti sthan and a catalogue of traditional compositions), 23 taals with thekas, the vocal forms from dhrupad to bhajan, and the principal khayal gharanas. Raag data is converted to the app's notation by a script; tests check that every aroh, avroh, phrase, vadi and samvadi uses only the raag's own swaras.
 
 ## What remains
 

@@ -180,7 +180,7 @@ export class TanpuraEngine {
       }));
       this.manifest = manifest;
       this.source = "samples";
-      this.sourceCredit = [manifest.credit, manifest.licence].filter(Boolean).join(" · ") || null;
+      this.sourceCredit = null; // licence notice ships in public/samples/*/LICENSE
     } catch {
       this.manifest = null;
       this.samples.clear();

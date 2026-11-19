@@ -37,7 +37,7 @@ export interface Strings {
   };
   practise: { h: string; items: [string, string][] };
   privacy: { h: string; lede: string };
-  credit: string; creditLink: string; creditPost: string; review: string; sourceCode: string;
+  review: string; sourceCode: string;
   gate: {
     back: string; who: string; newSinger: string; savedHere: string; add: string; name: string; enterName: string;
     yourSa: string; start: string; backToProfiles: string; import: string; importFailed: string;
@@ -123,7 +123,7 @@ const en: Strings = {
   },
   accuracy: {
     h: "How well it measures",
-    lede: "The first three rows come from 40 recordings of real singers whose pitch was marked by musicians (the vocadito dataset, CC BY 4.0). The rest use computer-generated voices whose pitch is known exactly. The real singers are not Hindustani vocalists, so tests on riyaz recordings will follow.",
+    lede: "The first three rows come from 40 recordings of real singers whose pitch was marked by musicians (a public research dataset). The rest use computer-generated voices whose pitch is known exactly. The real singers are not Hindustani vocalists, so tests on riyaz recordings will follow.",
     rows: [
       ["Real singing: pitch within 20 cents", "92%", "40 solo singers, 13.6 minutes, compared every 10 ms with pitch marked by musicians"],
       ["Real singing: within 50 cents", "96.6%", "Median error 2.8 cents. The common YIN method scores 84% within 20 cents on the same test"],
@@ -150,7 +150,6 @@ const en: Strings = {
     h: "Where your voice goes",
     lede: "Nowhere. Recordings are analysed inside your browser, and profiles and practice history stay on this device. There are no accounts or passwords. You can export a profile to move it to another device.",
   },
-  credit: "Tanpura and tabla recordings from", creditLink: "Naad by Oormi Creations", creditPost: "(MIT licence).",
   review: "Raag notes are awaiting review by a guru.",
   sourceCode: "Source code on GitHub",
   gate: {
@@ -253,7 +252,7 @@ const hi: Strings = {
   },
   accuracy: {
     h: "यह कितना सही मापता है",
-    lede: "पहली तीन पंक्तियाँ असली गायकों की 40 रिकॉर्डिंग से हैं, जिनका सुर संगीतकारों ने चिह्नित किया है (vocadito डेटासेट, CC BY 4.0)। बाकी कंप्यूटर से बनी आवाज़ों पर हैं जिनका सुर ठीक-ठीक पता है। ये गायक हिंदुस्तानी शास्त्रीय गायक नहीं हैं, इसलिए रियाज़ रिकॉर्डिंग पर परीक्षण आगे होंगे।",
+    lede: "पहली तीन पंक्तियाँ असली गायकों की 40 रिकॉर्डिंग से हैं, जिनका सुर संगीतकारों ने चिह्नित किया है (एक सार्वजनिक शोध डेटासेट)। बाकी कंप्यूटर से बनी आवाज़ों पर हैं जिनका सुर ठीक-ठीक पता है। ये गायक हिंदुस्तानी शास्त्रीय गायक नहीं हैं, इसलिए रियाज़ रिकॉर्डिंग पर परीक्षण आगे होंगे।",
     rows: [
       ["असली गायन: 20 सेंट के भीतर", "92%", "40 गायक, 13.6 मिनट, हर 10 ms पर संगीतकारों के चिह्नित सुर से तुलना"],
       ["असली गायन: 50 सेंट के भीतर", "96.6%", "माध्य त्रुटि 2.8 सेंट। आम YIN विधि इसी परीक्षण में 20 सेंट के भीतर 84% पर है"],
@@ -280,7 +279,6 @@ const hi: Strings = {
     h: "आपकी आवाज़ कहाँ जाती है",
     lede: "कहीं नहीं। रिकॉर्डिंग का विश्लेषण आपके ब्राउज़र में ही होता है, और प्रोफ़ाइल व अभ्यास का इतिहास इसी डिवाइस पर रहता है। कोई अकाउंट या पासवर्ड नहीं है। दूसरे डिवाइस पर ले जाने के लिए प्रोफ़ाइल एक्सपोर्ट कर सकते हैं।",
   },
-  credit: "तानपुरा और तबला की रिकॉर्डिंग", creditLink: "Naad by Oormi Creations", creditPost: "से (MIT लाइसेंस)।",
   review: "राग-विवरण की गुरु द्वारा जाँच बाकी है।",
   sourceCode: "GitHub पर सोर्स कोड",
   gate: {
@@ -383,7 +381,7 @@ const bn: Strings = {
   },
   accuracy: {
     h: "এটি কতটা ঠিক মাপে",
-    lede: "প্রথম তিনটি সারি আসল শিল্পীদের ৪০টি রেকর্ডিং থেকে, যাদের সুর সংগীতজ্ঞরা চিহ্নিত করেছেন (vocadito ডেটাসেট, CC BY 4.0)। বাকিগুলো কম্পিউটারে তৈরি কণ্ঠে, যার সুর একদম জানা। এই শিল্পীরা হিন্দুস্তানি শাস্ত্রীয় শিল্পী নন, তাই রেওয়াজের রেকর্ডিংয়ে পরীক্ষা পরে হবে।",
+    lede: "প্রথম তিনটি সারি আসল শিল্পীদের ৪০টি রেকর্ডিং থেকে, যাদের সুর সংগীতজ্ঞরা চিহ্নিত করেছেন (একটি উন্মুক্ত গবেষণা ডেটাসেট)। বাকিগুলো কম্পিউটারে তৈরি কণ্ঠে, যার সুর একদম জানা। এই শিল্পীরা হিন্দুস্তানি শাস্ত্রীয় শিল্পী নন, তাই রেওয়াজের রেকর্ডিংয়ে পরীক্ষা পরে হবে।",
     rows: [
       ["আসল গান: ২০ সেন্টের মধ্যে", "92%", "৪০ জন শিল্পী, ১৩.৬ মিনিট, প্রতি ১০ ms-এ সংগীতজ্ঞদের চিহ্নিত সুরের সঙ্গে তুলনা"],
       ["আসল গান: ৫০ সেন্টের মধ্যে", "96.6%", "মধ্যমা ত্রুটি ২.৮ সেন্ট। প্রচলিত YIN পদ্ধতি একই পরীক্ষায় ২০ সেন্টের মধ্যে ৮৪%"],
@@ -410,7 +408,6 @@ const bn: Strings = {
     h: "আপনার গলা কোথায় যায়",
     lede: "কোথাও না। রেকর্ডিংয়ের বিশ্লেষণ আপনার ব্রাউজারেই হয়, আর প্রোফাইল ও অনুশীলনের ইতিহাস এই ডিভাইসেই থাকে। কোনো অ্যাকাউন্ট বা পাসওয়ার্ড নেই। অন্য ডিভাইসে নিতে প্রোফাইল এক্সপোর্ট করতে পারেন।",
   },
-  credit: "তানপুরা আর তবলার রেকর্ডিং", creditLink: "Naad by Oormi Creations", creditPost: "থেকে (MIT লাইসেন্স)।",
   review: "রাগের বিবরণ এখনও গুরুর যাচাইয়ের অপেক্ষায়।",
   sourceCode: "GitHub-এ সোর্স কোড",
   gate: {

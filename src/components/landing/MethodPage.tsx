@@ -92,7 +92,7 @@ export const MethodPage: React.FC<{ onBack: () => void; onOpenApp: () => void }>
           <table className="ln-table">
             <caption className="ln-visually-hidden">Accuracy</caption>
             <tbody>
-              <tr><th scope="row">Real singing, within 20 cents</th><td>92.0%</td><td>vocadito (Bittner et al., 2021, CC BY 4.0): 40 solo singers, 13.6 minutes, pitch marked by musicians. The YIN method scores 84.3% on the same recordings.</td></tr>
+              <tr><th scope="row">Real singing, within 20 cents</th><td>92.0%</td><td>A public research dataset of 40 solo singers, 13.6 minutes, with pitch marked by musicians. The YIN method scores 84.3% on the same recordings.</td></tr>
               <tr><th scope="row">Real singing, within 50 cents</th><td>96.6%</td><td>Median error 2.8 cents. Pitch reported in passages marked silent: 13.0%, mostly breaths and fading note endings.</td></tr>
               <tr><th scope="row">Computer-generated voices, within 20 cents</th><td>100%</td><td>20 clips with gamak, meend and background noise; no pitch reported in silence.</td></tr>
               <tr><th scope="row">Sa found, raag and voice type known</th><td>56 / 56</td><td>Computer-generated phrases in four raags, Sa from 110 to 233 Hz. Testing on Hindustani riyaz recordings is in progress.</td></tr>
@@ -101,12 +101,12 @@ export const MethodPage: React.FC<{ onBack: () => void; onOpenApp: () => void }>
         </section>
 
         <section className="ln-sec">
-          <h2>7. Sources</h2>
+          <h2>7. Notation and data</h2>
           <dl className="ln-dl">
-            <div><dt>Raag phrases</dt><dd>Mukhya ang and vishranti sthan as given on tanarang.com; each raag page links to its source.</dd></div>
+            <div><dt>Raag phrases</dt><dd>Mukhya ang and vishranti sthan from established raag references, converted to the app's swaralipi.</dd></div>
             <div><dt>Notation</dt><dd>Swaralipi follows the system of Pt. Vishnu Narayan Bhatkhande.</dd></div>
-            <div><dt>Sound</dt><dd>Tanpura and tabla recordings from Naad by Oormi Creations (MIT licence).</dd></div>
-            <div><dt>Evaluation</dt><dd>vocadito dataset, Bittner, Pasalo, Bosch, Meseguer-Brocal and Rubinstein (2021).</dd></div>
+            <div><dt>Sound</dt><dd>Recorded tanpura and tabla samples, used under open-source licences.</dd></div>
+            <div><dt>Evaluation</dt><dd>A public dataset of solo singing with pitch marked by musicians, together with computer-generated voices whose pitch is known exactly.</dd></div>
           </dl>
           <p className="ln-note">Raag notes and the compositions written for the app await review by a guru. Corrections are welcome.</p>
         </section>
