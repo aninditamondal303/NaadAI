@@ -3,6 +3,7 @@
  * two-level voicing rule as the full analysis (track.ts), applied to the
  * newest window of microphone audio once per animation frame.
  */
+import { HUM_MIN_SEC, looksLikeHum } from "./hum";
 import { makeMpmDetector } from "./pitch/mpm";
 import { MAX_JUMP_CENTS, rmsOf, VOICING, windowSizeFor } from "./track";
 import { DEFAULT_PITCH_SETTINGS } from "./types";
@@ -21,6 +22,7 @@ export function createLiveTracker(src: LiveSource, saHz: number, keepSec = 9) {
   const silence = Math.pow(10, silenceDb / 20);
   const points: LivePoint[] = [];
   let prevHz: number | null = null;
+  const recent: { t: number; hz: number }[] = []; // unbroken run of readings, for the hum check
 
   /** Measure the newest window; returns cents from Sa, or null if no clear pitch. */
   const step = (now: number): number | null => {
@@ -32,6 +34,13 @@ export function createLiveTracker(src: LiveSource, saHz: number, keepSec = 9) {
       if (r.hz !== null && (r.clarity >= VOICING.mpm.start || (smooth && r.clarity >= VOICING.mpm.keep))) hz = r.hz;
     }
     prevHz = hz;
+    if (hz === null) recent.length = 0;
+    else {
+      recent.push({ t: now, hz });
+      while (recent.length && recent[0].t < now - HUM_MIN_SEC) recent.shift();
+      // a steady tone on a mains frequency for the whole window is hum, not a voice
+      if (recent.length > 1 && now - recent[0].t >= HUM_MIN_SEC * 0.9 && looksLikeHum(recent.map(r => r.hz))) hz = null;
+    }
     const c = hz === null ? null : 1200 * Math.log2(hz / saHz);
     points.push({ t: now, c });
     while (points.length && points[0].t < now - keepSec) points.shift();

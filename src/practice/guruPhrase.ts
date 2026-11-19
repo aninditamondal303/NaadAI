@@ -54,10 +54,37 @@ export function phraseFromPoints(points: { t: number; c: number | null }[], raag
 }
 
 export const encodeGuruPhrase = (g: GuruPhrase) => encodeJson(g);
+/** Longest phrase a link may carry: two minutes of contour. */
+export const MAX_CONTOUR = CONTOUR_RATE * 120;
+const NOTES_RE = /^[SrRgGmMPdDnN][,']{0,3}( [SrRgGmMPdDnN][,']{0,3}){0,199}$/;
+const ID_RE = /^[a-z0-9_]{1,40}$/i;
+
+/**
+ * Check every field of a guru phrase that arrived in a link. Links can be
+ * edited by hand, so nothing is trusted: types, lengths and pitch ranges are
+ * all checked, and anything outside them is refused.
+ */
+export function validateGuruPhrase(g: unknown): GuruPhrase {
+  const bad = () => new Error("This link is not a Naad AI guru phrase.");
+  if (!g || typeof g !== "object") throw bad();
+  const o = g as Record<string, unknown>;
+  if (o.v !== 1) throw bad();
+  if (typeof o.id !== "string" || !ID_RE.test(o.id)) throw bad();
+  if (typeof o.raagId !== "string" || !ID_RE.test(o.raagId)) throw bad();
+  if (typeof o.notes !== "string" || !NOTES_RE.test(o.notes)) throw bad();
+  if (o.by !== undefined && (typeof o.by !== "string" || o.by.length > 40)) throw bad();
+  if (!Array.isArray(o.contour) || o.contour.length < 2 || o.contour.length > MAX_CONTOUR) throw bad();
+  // three octaves either side of Sa covers every voice
+  if (!o.contour.every(c => c === null || (typeof c === "number" && Number.isFinite(c) && Math.abs(c) <= 3600))) throw bad();
+  const created = typeof o.created === "string" && !Number.isNaN(Date.parse(o.created)) ? o.created : new Date(0).toISOString();
+  return { v: 1, id: o.id, by: (o.by as string | undefined) ?? "", raagId: o.raagId, notes: o.notes, contour: o.contour as (number | null)[], created };
+}
+
 export async function decodeGuruPhrase(code: string): Promise<GuruPhrase> {
-  const g = await decodeJson<GuruPhrase>(code);
-  if (g?.v !== 1 || !Array.isArray(g.contour) || typeof g.notes !== "string") throw new Error("This link is not a Naad AI guru phrase.");
-  return g;
+  if (code.length > 40_000) throw new Error("This link is too long to be a Naad AI guru phrase.");
+  let g: unknown;
+  try { g = await decodeJson<unknown>(code); } catch { throw new Error("This link is not a Naad AI guru phrase."); }
+  return validateGuruPhrase(g);
 }
 export const guruPhraseUrl = (code: string) => `${window.location.origin}${import.meta.env.BASE_URL}#guru=${code}`;
 

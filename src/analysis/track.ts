@@ -4,6 +4,7 @@
  *
  * No randomness anywhere: the same samples always give the same track.
  */
+import { humMask } from "./hum";
 import { makeAutocorrDetector } from "./pitch/autocorr";
 import { makeMpmDetector } from "./pitch/mpm";
 import { makeYinDetector } from "./pitch/yin";
@@ -91,7 +92,9 @@ export function trackPitch(
 
   // 2. Decide which readings to trust.
   const voiced = decideVoicing(raw, VOICING[method]);
-  const frames = raw.map((f, i) => (voiced[i] ? f : { ...f, hz: null }));
+  // 3. Drop steady electrical hum (see hum.ts).
+  const hum = humMask(raw.map((f, i) => (voiced[i] ? f.hz : null)), hop / sampleRate);
+  const frames = raw.map((f, i) => (voiced[i] && !hum[i] ? f : { ...f, hz: null }));
 
   return { method, sampleRate, hopSec: hop / sampleRate, windowSize, frames };
 }
