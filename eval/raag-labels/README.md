@@ -44,3 +44,32 @@ The two weights added (phrase match 2, Sa evidence 2) were chosen before
 the run and not tuned afterwards, but the method was developed while
 looking at this set. A separate dataset (Thaat and Raga Forest) is the
 independent check.
+
+## trf-sample.csv: the independent check
+
+Thaat and Raga Forest (Kaggle / IEEE DataPort, AGPL-3.0, 17 GB): concert,
+film and instrumental recordings, with tabla, harmonium and other
+accompaniment. A fixed sample was taken before any results were seen: the
+first two files (by number, under 40 MB) of each of the 48 folders whose
+name maps to one raag in this app, 96 recordings in all. Folders that could
+mean several raags (Malhar, Sarang, Deepak, Gauri and others) were left out.
+Each was cut to at most 5 minutes, starting 30 s in to skip announcements:
+
+```sh
+ffmpeg -ss 30 -t 300 -i in.mp3 -ac 1 -ar 44100 out.wav
+```
+
+There are no Sa labels, so only automatic Sa is measured. Nothing was
+changed after seeing these results.
+
+| Version | Top 1 | Top 3 | First guess in the right thaat | Median rank (of 125) |
+|---|---|---|---|---|
+| Before (swaras, steps and vadi; Sa found first) | 7 / 96 | 11 / 96 | 22 / 96 | 48 |
+| Now (phrase matching; Sa and raag together) | **16 / 96** | **22 / 96** | **26 / 96** | **31** |
+
+Chance would be under 1 in 100 for top 1. The improvement carries over to
+recordings the method was not developed on, but concert recordings with
+accompaniment and an unknown Sa remain hard: the pitch tracker follows one
+voice and is confused by harmonium and sarangi, and many of these are
+instrumental or film songs. Solo riyaz recordings, which the app is made
+for, are much closer to the first test set.
