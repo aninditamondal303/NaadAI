@@ -1,0 +1,13 @@
+{
+  "credit": "Naad by Oormi Creations, github.com/oormicreations/naad",
+  "licence": "MIT licence",
+  "strings": {},
+  "drones": {
+    "Pa": [
+      {
+        "file": "drone_sa-pa_C3.wav",
+        "saHz": 131.2
+      }
+    ]
+  }
+}
