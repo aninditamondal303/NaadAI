@@ -282,3 +282,8 @@
 }
 .ln-btn-main { transition: transform 0.12s, filter 0.15s; }
 .ln-btn-main:active:not(:disabled) { transform: scale(0.97); }
+
+.ln-qr { display: flex; gap: 1.25rem; align-items: center; margin: 1.25rem auto 0; max-width: 34rem; text-align: left; }
+.ln-qr img { border-radius: 6px; flex: none; }
+.ln-qr p { margin: 0 0 0.5rem; }
+@media (max-width: 520px) { .ln-qr { flex-direction: column; align-items: flex-start; } }

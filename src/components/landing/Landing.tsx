@@ -18,7 +18,7 @@ import "./landing.css";
 import { useLang } from "../../i18n/lang";
 import { LangPicker } from "../../i18n/LangPicker";
 import { useUi } from "../../i18n/ui";
-import { ANDROID_APK_URL, canInstall, isNativeApp, onInstallChange, promptInstall } from "../../lib/install";
+import { ANDROID_APK_URL, canInstall, isAndroidDevice, isInstalledApp, isIOSDevice, isNativeApp, onInstallChange, promptInstall } from "../../lib/install";
 import type { AppTab } from "../../types";
 
 const FEATURES: { shot: string; tab: AppTab; h: "lnF1h" | "lnF2h" | "lnF3h" | "lnF4h"; p: "lnF1p" | "lnF2p" | "lnF3p" | "lnF4p" }[] = [
@@ -69,6 +69,10 @@ export const Landing: React.FC<Props> = ({ returningName, onOpenApp, onDemoAnaly
   const readoutRef = useRef<HTMLDivElement | null>(null);
   const [mode, setMode] = useState<Mode>("idle");
   const [installable, setInstallable] = useState(canInstall);
+  const [showQr, setShowQr] = useState(false);
+  const isAndroid = isAndroidDevice();
+  const [showHowInstall, setShowHowInstall] = useState(false);
+  const offerManualInstall = !isNativeApp() && !isInstalledApp() && !isAndroid && !isIOSDevice();
   useEffect(() => onInstallChange(() => setInstallable(canInstall())), []);
   const [demoDone, setDemoDone] = useState(false);
   const [saId, setSaId] = useState<"low" | "high">("low");
@@ -370,9 +374,25 @@ export const Landing: React.FC<Props> = ({ returningName, onOpenApp, onDemoAnaly
           <p>{u("lnGetP")} {u("lnPrivacyP")}</p>
           <div className="ln-get-row">
             <button type="button" className="ln-btn ln-btn-main" onClick={onOpenApp}>{openLabel}</button>
-            {installable && <button type="button" className="ln-btn ln-btn-quiet" onClick={() => void promptInstall()}>{u("lnInstall")}</button>}
-            {ANDROID_APK_URL && !isNativeApp() && <a className="ln-btn ln-btn-quiet" href={ANDROID_APK_URL}>{u("lnAndroid")}</a>}
+            {installable
+              ? <button type="button" className="ln-btn ln-btn-quiet" onClick={() => void promptInstall()}>{u("lnInstall")}</button>
+              : offerManualInstall && <button type="button" className="ln-btn ln-btn-quiet" aria-expanded={showHowInstall} onClick={() => setShowHowInstall(v => !v)}>{u("lnInstallPc")}</button>}
+            {ANDROID_APK_URL && !isNativeApp() && (isAndroid
+              ? <a className="ln-btn ln-btn-quiet" href={ANDROID_APK_URL}>{u("lnAndroid")}</a>
+              : <button type="button" className="ln-btn ln-btn-quiet" aria-expanded={showQr} onClick={() => setShowQr(v => !v)}>{u("lnAndroidPhone")}</button>)}
           </div>
+          {showHowInstall && !installable && (
+            <div className="ln-qr"><p>{u("lnInstallHow")}</p></div>
+          )}
+          {showQr && ANDROID_APK_URL && (
+            <div className="ln-qr">
+              <img src={`${import.meta.env.BASE_URL}android-qr.svg`} width={168} height={168} alt={u("lnQrAlt")} />
+              <div>
+                <p>{u("lnQrP")}</p>
+                <a href={ANDROID_APK_URL}>{u("lnQrDirect")}</a>
+              </div>
+            </div>
+          )}
         </section>
       </main>
 

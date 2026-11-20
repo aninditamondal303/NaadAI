@@ -29,3 +29,9 @@ export async function promptInstall(): Promise<boolean> {
 }
 export const ANDROID_APK_URL: string | null = (import.meta.env.VITE_ANDROID_APK_URL as string | undefined) || null;
 export const isNativeApp = () => typeof window !== "undefined" && !!(window as any).Capacitor?.isNativePlatform?.();
+
+/** True when already running as an installed app (its own window). */
+export const isInstalledApp = () =>
+  typeof window !== "undefined" && (window.matchMedia?.("(display-mode: standalone)").matches || (navigator as any).standalone === true);
+export const isAndroidDevice = () => typeof navigator !== "undefined" && /Android/i.test(navigator.userAgent);
+export const isIOSDevice = () => typeof navigator !== "undefined" && /iPhone|iPad|iPod/i.test(navigator.userAgent);

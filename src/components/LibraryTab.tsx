@@ -17,6 +17,7 @@ import { useUi } from '../i18n/ui';
 import { Phrase } from './study/Swaralipi';
 import { angPhrases, MUKHYA_ANG, vishrantiSwaras } from '../data/mukhyaAng';
 import { SamayChakra } from './library/SamayChakra';
+import { RaagHours } from './library/RaagHours';
 
 const SYM = ["S", "r", "R", "g", "G", "m", "M", "P", "d", "D", "n", "N"];
 const NAMES = ["Sa", "komal Re", "Re", "komal Ga", "Ga", "Ma", "tivra Ma", "Pa", "komal Dha", "Dha", "komal Ni", "Ni"];
@@ -65,6 +66,7 @@ export const LibraryTab: React.FC<{ saHz?: number; openRaagId?: string | null; o
         <header className="lib-raag-head">
           <h1 className="lib-title">{shortName(r)}</h1>
           <p className="lib-intro">{u("rdIntro", r.thaat, r.jati, r.time)}</p>
+          <RaagHours time={r.time} />
           <button type="button" className="btn btn-ghost lib-compare" onClick={() => {
             const pair = CLOSE_PAIRS.find(p => p.includes(r.id));
             const other = pair ? pair.find(x => x !== r.id)! : (d?.similar.find(x => x.raagId)?.raagId ?? (r.id === "yaman" ? "bhupali" : "yaman"));

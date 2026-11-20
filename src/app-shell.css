@@ -299,6 +299,14 @@
 
 .lib-back { font: inherit; color: #D9B45F; background: none; border: 0; padding: 0; cursor: pointer; text-decoration: underline; text-underline-offset: 0.2em; margin-top: 0.5rem; }
 .lib-raag-head { padding: 1rem 0 1.5rem; }
+.rh { margin: 0.9rem 0 0; max-width: 30rem; }
+.rh svg { width: 100%; height: auto; display: block; }
+.rh-day { fill: rgba(243,236,223,0.06); }
+.rh-tick { stroke: rgba(243,236,223,0.16); stroke-width: 1; }
+.rh-span { fill: rgba(217,180,95,0.55); }
+.rh-now { stroke: #F3ECDF; stroke-width: 2; }
+.rh-label { fill: var(--muted); font-size: 11px; font-family: var(--font-sans); }
+.rh figcaption { color: var(--muted); font-size: 0.9rem; margin-top: 0.15rem; }
 .lib-review { margin: 0.75rem 0 0; color: rgba(217,180,95,0.85); font-size: 0.9rem; }
 .lib-rows { border-top: 1px solid var(--rule); padding-bottom: 1.5rem; }
 .lib-row { display: grid; grid-template-columns: 11rem 1fr; gap: 1.5rem; padding: 0.7rem 0; border-bottom: 1px solid var(--rule); }
