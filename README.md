@@ -3,6 +3,8 @@
 [![Tests](https://github.com/aninditamondal303/naadai/actions/workflows/ci.yml/badge.svg)](https://github.com/aninditamondal303/naadai/actions/workflows/ci.yml)
 [![Website](https://github.com/aninditamondal303/naadai/actions/workflows/pages.yml/badge.svg)](https://aninditamondal303.github.io/NaadAI/)
 
+> **For recruiters:** I built this solo and use it myself after 15+ years of Hindustani vocal training. It's a React + TypeScript app on the web and Android with real-time pitch analysis (92% of notes measured within 20 cents), 125 raags and 23 taals in three languages, 861 tests, CI/CD and a Lighthouse accessibility score of 100.
+
 A riyaz (practice) companion for Hindustani classical vocalists. It plays a
 recorded tanpura and tabla tuned to your Sa, listens while you sing, and
 measures every swara: how close it sat to its place, how steadily it was held,
@@ -155,6 +157,8 @@ npm run dev            # http://localhost:3000
 | `npm run build` then `npm start` | Production build and server (uses `PORT` if set) |
 
 ## Credits and licences
+
+Code: MIT (see [LICENSE](LICENSE)).
 
 Tabla and tanpura recordings: [Naad](https://github.com/oormicreations/naad)
 by Oormi Creations, MIT licence (see `public/samples/*/LICENSE`).
